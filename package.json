@@ -1,0 +1,13 @@
+{
+  "name": "koara-js",
+  "version": "0.6.0",
+  "description": "Koara to HTML parser written in Javascript",
+  "main": "parser.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koara/koara-js.git"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+  }
+}
