@@ -9,9 +9,11 @@
 				if(text.substr(this.index).length > 0) {
 					var charactersRead = 0;
 					for(var i=0; i < length; i++) {
-						var c = text.substr(this.index + i, 1);
-						buffer[offset + i] = c;
-						charactersRead++;
+						var c = text.substr((this.index + i), 1);
+						if(c !== '') {
+							buffer[offset + i] = c;
+							charactersRead++;
+						}
 					}
 					this.index += length;
 					return charactersRead;
