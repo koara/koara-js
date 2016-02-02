@@ -6,7 +6,7 @@ var buffer;
 describe("CharStream tests", function() {
 	
 	beforeEach(function() {
-	   buffer = [];
+      buffer = [];
     });
 	
 	it("Test Read", function() {
@@ -34,7 +34,7 @@ describe("CharStream tests", function() {
 		expect(0 in buffer).toBe(false);
 		expect(1 in buffer).toBe(false);
 		expect(buffer[2]).toEqual('a');
-	    expect(buffer[3]).toEqual('b');
+        expect(buffer[3]).toEqual('b');
 	});
 	
 	it("Test Read With Offset Too Large Part Of String", function() {
@@ -50,11 +50,11 @@ describe("CharStream tests", function() {
 		var reader = koara.StringReader('abcd');
 		expect(reader.read(buffer, 0, 2)).toEqual(2);
 		expect(buffer[0]).toEqual('a');
-	    expect(buffer[1]).toEqual('b');
-	    
-	    expect(reader.read(buffer, 0, 3)).toEqual(2);
-	    expect(buffer[0]).toEqual('c');
-	    expect(buffer[1]).toEqual('d');
+        expect(buffer[1]).toEqual('b');
+
+        expect(reader.read(buffer, 0, 3)).toEqual(2);
+        expect(buffer[0]).toEqual('c');
+        expect(buffer[1]).toEqual('d');
 	    
 	    expect(reader.read(buffer, 0, 2)).toEqual(-1);
 	});

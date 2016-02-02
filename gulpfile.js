@@ -1,8 +1,16 @@
-var gulp = require('gulp'),
-	jasmine = require('gulp-jasmine'),
-    webserver = require('gulp-webserver');
+var gulp = require('gulp');
+var jasmine = require('gulp-jasmine');
+var eslint = require('gulp-eslint');
+var webserver = require('gulp-webserver');
 
-gulp.task('default', ['test'], function() {});
+gulp.task('default', ['lint', 'test'], function() {});
+
+gulp.task('lint', function() {
+	return gulp.src(['**/*.js', '!gulpfile.js', '!node_modules/**'])
+      .pipe(eslint())
+      .pipe(eslint.format())
+      .pipe(eslint.failAfterError());
+});
 
 gulp.task('test', function () {
 	return gulp.src('test/stringreader.js').pipe(jasmine());

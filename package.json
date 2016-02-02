@@ -9,7 +9,9 @@
   },
   "devDependencies": {
     "gulp": "^3.9.0",
+    "gulp-eslint": "^1.1.1",
     "gulp-jasmine": "^2.2.1",
-    "gulp-webserver": "0.9.1"
+    "gulp-webserver": "0.9.1",
+    "jshint": "^2.9.1"
   }
 }

@@ -1,7 +1,7 @@
-var fs = require('fs');
-var path = require('path');
-var modules = fs.readdirSync('test/testsuite');
-var koara = require('../koara.js');
+//var fs = require('fs');
+//var path = require('path');
+//var modules = fs.readdirSync('test/testsuite');
+//var koara = require('../koara.js');
 
 //for(i in modules) {
 //    describe(modules[i], function() {
@@ -19,6 +19,5 @@ var koara = require('../koara.js');
 
 describe("suite", function() {
 	it("test", function() {
-      console.log('//' + koara.Parser.parse())
     });
 });

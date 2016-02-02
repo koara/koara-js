@@ -24,5 +24,4 @@
 	}
 	
 	exports.StringReader = StringReader;
-	
 })(typeof exports === 'undefined' ? this.koara = {} : exports);
