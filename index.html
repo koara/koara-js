@@ -10,9 +10,21 @@
             <textarea id="output" cols="80" rows="6"></textarea>
         </div>
         
-        <script type="text/javascript" src="koara.js"></script>
+       
         <script type="text/javascript">
-          console.log('//' + koara.Parser.parse());
+          var Person = function(name) {
+        	  this.name = name
+          }
+          
+          Person.prototype.sayHello = function() {
+        	  console.log("Hello, I'm " + this.name);
+          }
+          
+          var person1 = new Person("Alice");
+          var person2 = new Person("Bob");
+          
+          person1.sayHello();
+          person2.sayHello();
         </script>
     </body>
 </html>

@@ -13,7 +13,7 @@ gulp.task('lint', function() {
 });
 
 gulp.task('test', function () {
-	return gulp.src('test/*.js').pipe(jasmine());
+	return gulp.src('test/string*.js').pipe(jasmine());
 })
 
 gulp.task('serve', ['default'], function() {
