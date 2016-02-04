@@ -26,7 +26,7 @@
 	var CharStream = function(reader) {
 		this.available = 4096;
 		this.bufsize = 4096;
-		this.tokenBegin;
+		this.tokenBegin = 0;
 		this.bufcolumn = [];
 		this.bufpos = -1;
 		this.bufline = [];
@@ -41,7 +41,10 @@
 	}
 	
 	CharStream.prototype.beginToken = function() {
-		return 'a'
+		this.tokenBegin = -1;
+        var c = this.readChar();
+        this.tokenBegin = this.bufpos;
+        return c;
 	}
 	
 	CharStream.prototype.readChar = function() {
@@ -76,7 +79,6 @@
         
         try {
             if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) == -1) {
-            	this.reader.close();
                 throw "IOException";
             } else {
                 this.maxNextCharInd += i;
@@ -119,20 +121,29 @@
         this.bufcolumn[this.bufpos] = this.column;
     }
 	
+	CharStream.prototype.getImage = function() {
+        if (this.bufpos >= this.tokenBegin) {
+        	return this.buffer.slice(this.tokenBegin, (this.bufpos - this.tokenBegin + 1)).join('');
+        } else { 
+        	return this.buffer.slice(this.tokenBegin, (this.bufsize - this.tokenBegin)).join('')
+        		+ this.buffer.slice(0, (this.bufpos +1)).join('') ;
+        }
+    }
+	
 	CharStream.prototype.getBeginColumn = function() {
-		return 1;
+		return (this.bufpos in this.bufcolumn) ? this.bufcolumn[this.bufpos] : 0;
 	}
 	
 	CharStream.prototype.getBeginLine = function() {
-		return 1;
+		return (this.bufpos in this.bufline) ? this.bufline[this.bufpos] : 0;
 	}
 	
 	CharStream.prototype.getEndColumn = function() {
-		return 1;
+		return (this.tokenBegin in this.bufcolumn) ? this.bufcolumn[this.tokenBegin] : 0;
 	}
 	
 	CharStream.prototype.getEndLine = function() {
-		return 1;
+		return (this.tokenBegin	 in this.bufline) ? this.bufline[this.tokenBegin] : 0;
 	}
 	
 	exports.CharStream = CharStream;
