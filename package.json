@@ -1,17 +1,11 @@
 {
   "name": "koara-js",
   "version": "0.6.0",
-  "description": "Koara to HTML parser written in Javascript",
-  "main": "parser.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/koara/koara-js.git"
-  },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1",
-    "gulp-jasmine": "^2.2.1",
-    "gulp-webserver": "0.9.1",
-    "jshint": "^2.9.1"
+    "gulp-concat": "^2.6.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.1"
   }
 }

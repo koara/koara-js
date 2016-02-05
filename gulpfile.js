@@ -1,22 +1,22 @@
+'use strict';
+
 var gulp = require('gulp');
-var jasmine = require('gulp-jasmine');
-var eslint = require('gulp-eslint');
-var webserver = require('gulp-webserver');
+var concat = require('gulp-concat');
+var rename = require('gulp-rename');
+var sourcemaps = require('gulp-sourcemaps');
+var uglify = require('gulp-uglify');
 
-gulp.task('default', ['lint', 'test'], function() {});
+gulp.task('default', ['build']);
 
-gulp.task('lint', function() {
-	return gulp.src(['**/*.js', '!gulpfile.js', '!node_modules/**'])
-      .pipe(eslint())
-      .pipe(eslint.format())
-      .pipe(eslint.failAfterError());
+gulp.task('build', ['minify']);
+
+gulp.task('minify', function() {
+  return gulp.src(['src/parser.js', 'src/charstream.js'])
+    .pipe(sourcemaps.init())
+	.pipe(concat('koara.js'))
+	.pipe(gulp.dest('dist'))
+	.pipe(rename('koara.min.js'))
+	.pipe(uglify())
+	.pipe(sourcemaps.write('./'))
+	.pipe(gulp.dest('dist'));
 });
-
-gulp.task('test', function () {
-	return gulp.src('test/*.js').pipe(jasmine());
-})
-
-gulp.task('serve', ['default'], function() {
-	gulp.src('.').pipe(webserver());
-});
-
