@@ -21,7 +21,7 @@ gulp.task('lint', function() {
 });
 
 gulp.task('scripts', function() {
-  return gulp.src(['./app.js', 'src/*'])
+  return gulp.src(['./app.js', 'src/**'])
     .pipe(sourcemaps.init())
 	.pipe(concat('koara.js'))
 	.pipe(gulp.dest('dist'))
