@@ -11,43 +11,49 @@ koara.Parser.prototype = {
 	},
 	
 	parseReader: function(reader) {
-		this.cs = new koara.CharStream(reader);
-		this.tm = new koara.TokenManager(this.cs);
-		token = new koara.Token();
-		tree = new koara.TreeState();
-		this.nextTokenKind = -1;
-		
-		document = new koara.Document();
-		tree.openScope();
-//		while(this.getNextTokenKind == EOL)) {
-//			this.consumeToken(EOL);
+//		this.cs = new koara.CharStream(reader);
+//		this.tm = new koara.TokenManager(this.cs);
+//		token = new koara.Token();
+//		tree = new koara.TreeState();
+//		this.nextTokenKind = -1;
+//		
+//		document = new koara.Document();
+//		tree.openScope();
+//		while(this.getNextTokenKind() == this.tm.EOL) {
+//			this.consumeToken(this.tm.EOL);
 //		}
 //		this.whiteSpace();
 //		if (this.hasAnyBlockElementsAhead()) {
 //			this.blockElement();
 //			while (this.blockAhead(0)) {
-//				while (this.getNextTokenKind() == EOL) {
-//                  this.consumeToken(EOL);
-//                  this.whiteSpace();
+//				while (this.getNextTokenKind() == this.tm.EOL) {
+//                    this.consumeToken(this.tm.EOL);
+//                    this.whiteSpace();
 //				}
 //                this.blockElement();
-//          }
-//          while (this.getNextTokenKind() == EOL) {
-//              this.consumeToken(EOL);
-//          }
-//          this.whiteSpace();
-//      }
-//      this.consumeToken(EOF);
-//      this.tree.closeScope(document);
+//            }
+//            while (this.getNextTokenKind() == this.tm.EOL) {
+//                this.consumeToken(this.tm.EOL);
+//            }
+//            this.whiteSpace();
+//        }
+//        this.consumeToken(this.tm.EOF);
+//        this.tree.closeScope(document);
       return document;
+	},
+	
+	blockElement: function() {
+//		this.currentBlockLevel++;
+//		if(modules.contains(Module.HEADINGS)) {
+//			
+//		}
 	}
 }
 
 
 
 
-//    }
-//
+
 //    private void blockElement() {
 //        currentBlockLevel++;
 //        if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
