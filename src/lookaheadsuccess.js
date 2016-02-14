@@ -1,0 +1,6 @@
+koara.LookaheadSuccess = function() {}
+
+koara.LookaheadSuccess.prototype = {
+	constructor: koara.LookaheadSuccess
+		
+}

@@ -15,109 +15,115 @@ koara.CharStream = function(reader) {
 	this.tabSize = 4;
 }
 
-koara.CharStream.prototype.beginToken = function() {
-	this.tokenBegin = -1;
-	var c = this.readChar();
-	this.tokenBegin = this.bufpos;
-	return c;
-}
+koara.CharStream.prototype = {
+	constructor: koara.CharStream,
+	
+	beginToken: function() {
+		this.tokenBegin = -1;
+		var c = this.readChar();
+		this.tokenBegin = this.bufpos;
+		return c;
+	},
 
-koara.CharStream.prototype.readChar = function() {
-	if (this.inBuf > 0) {
-		--this.inBuf;
-		if (++this.bufpos == this.bufsize) {
-			this.bufpos = 0;
-		}
-		return this.buffer[this.bufpos];
-	}
-	if (++this.bufpos >= this.maxNextCharInd) {
-		this.fillBuff();
-	}
-	var c = this.buffer[this.bufpos];
-	this.updateLineColumn(c);
-	return c;
-}
-
-koara.CharStream.prototype.fillBuff = function() {
-	if (this.maxNextCharInd == this.available) {
-		if (this.available == this.bufsize) {
-			this.bufpos = 0;
-			this.maxNextCharInd = 0;
-			if (this.tokenBegin > 2048) {
-				this.available = this.tokenBegin;
+	readChar: function() {
+		if (this.inBuf > 0) {
+			--this.inBuf;
+			if (++this.bufpos == this.bufsize) {
+				this.bufpos = 0;
 			}
-		} else {
-			this.available = this.bufsize;
+			return this.buffer[this.bufpos];
 		}
-	}
-	var i;
-
-	try {
-		if ((i = this.reader.read(this.buffer, this.maxNextCharInd,
+		if (++this.bufpos >= this.maxNextCharInd) {
+			this.fillBuff();
+		}
+		var c = this.buffer[this.bufpos];
+		this.updateLineColumn(c);
+		return c;
+	},
+	
+	fillBuff: function() {
+		if (this.maxNextCharInd == this.available) {
+			if (this.available == this.bufsize) {
+				this.bufpos = 0;
+				this.maxNextCharInd = 0;
+				if (this.tokenBegin > 2048) {
+					this.available = this.tokenBegin;
+				}
+			} else {
+				this.available = this.bufsize;
+			}
+		}
+		var i;
+		try {
+			if ((i = this.reader.read(this.buffer, this.maxNextCharInd,
 				this.available - this.maxNextCharInd)) == -1) {
-			throw "IOException";
+				throw "IOException";
+			} else {
+				this.maxNextCharInd += i;
+			}
+		} catch (e) {
+			--this.bufpos;
+			this.backup(0);
+			if (this.tokenBegin == -1) {
+				this.tokenBegin = this.bufpos;
+			}
+			throw e;
+		}
+	},
+	
+	backup: function(amount) {
+		this.inBuf += this.amount;
+		if ((this.bufpos -= this.amount) < 0) {
+			this.bufpos += this.bufsize;
+		}
+	},
+	
+	updateLineColumn: function(c) {
+		this.column++;
+		if (this.prevCharIsLF) {
+			this.prevCharIsLF = false;
+			this.column = 1;
+			this.line += this.column;
+		}
+
+		switch (c) {
+		case '\n':
+			this.prevCharIsLF = true;
+			break;
+		case '\t':
+			this.column--;
+			this.column += this.tabSize - this.column % this.tabSize;
+			break;
+		}
+		this.bufline[this.bufpos] = this.line;
+		this.bufcolumn[this.bufpos] = this.column;
+	},
+	
+	getImage: function() {
+		if (this.bufpos >= this.tokenBegin) {
+			return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('');
 		} else {
-			this.maxNextCharInd += i;
+			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
+					+ this.buffer.slice(0, this.bufpos + 1).join('');
 		}
-	} catch (e) {
-		--this.bufpos;
-		this.backup(0);
-		if (this.tokenBegin == -1) {
-			this.tokenBegin = this.bufpos;
-		}
-		throw e;
+	}, 
+	
+	getBeginColumn: function() {
+		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
+	},
+	
+	getBeginLine: function() {
+		return this.bufpos in this.bufline ? this.bufline[this.bufpos] : 0;
+	},
+	
+	getEndColumn: function() {
+		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
+	},
+	
+	getEndLine: function() {
+		return this.tokenBegin in this.bufline ? this.bufline[this.tokenBegin] : 0;
 	}
-}
+}		
+		
 
-koara.CharStream.prototype.backup = function(amount) {
-	this.inBuf += this.amount;
-	if ((this.bufpos -= this.amount) < 0) {
-		this.bufpos += this.bufsize;
-	}
-}
 
-koara.CharStream.prototype.updateLineColumn = function(c) {
-	this.column++;
-	if (this.prevCharIsLF) {
-		this.prevCharIsLF = false;
-		this.column = 1;
-		this.line += this.column;
-	}
-
-	switch (c) {
-	case '\n':
-		this.prevCharIsLF = true;
-		break;
-	case '\t':
-		this.column--;
-		this.column += this.tabSize - this.column % this.tabSize;
-		break;
-	}
-	this.bufline[this.bufpos] = this.line;
-	this.bufcolumn[this.bufpos] = this.column;
-}
-
-koara.CharStream.prototype.getImage = function() {
-	if (this.bufpos >= this.tokenBegin) {
-		return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('');
-	} else {
-		return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
-				+ this.buffer.slice(0, this.bufpos + 1).join('');
-	}
-}
-
-koara.CharStream.prototype.getBeginColumn = function() {
-	return this.bufpos in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
-}
-
-koara.CharStream.prototype.getBeginLine = function() {
-	return this.bufpos in this.bufline ? this.bufline[this.bufpos] : 0;
-}
-
-koara.CharStream.prototype.getEndColumn = function() {
-	return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
-}
-
-koara.CharStream.prototype.getEndLine = function() {
-	return this.tokenBegin in this.bufline ? this.bufline[this.tokenBegin] : 0;
-}

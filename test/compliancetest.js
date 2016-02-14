@@ -17,7 +17,7 @@ for(i in modules) {
                     var document = parser.parse(kd);                    
                     var renderer = new koara.Html5Renderer();
                     document.accept(renderer);
-                    expect(renderer.getOutput()).toEqual(html);
+                    expect(renderer.output).toEqual(html);
                 });
 		    }
 	    }

@@ -21,7 +21,27 @@ gulp.task('lint', function() {
 });
 
 gulp.task('scripts', function() {
-  return gulp.src(['./app.js', 'src/**'])
+  return gulp.src([
+      './app.js',
+      'src/ast/node.js',
+      'src/ast/document.js',
+      'src/ast/blockelement.js',
+      'src/ast/blockquote.js',
+      'src/ast/code.js',
+      'src/ast/codeblock.js',
+      'src/ast/em.js',
+      'src/ast/heading.js',
+      'src/ast/image.js',
+      'src/ast/linebreak.js',
+      'src/ast/link.js',
+      'src/ast/listblock.js',
+      'src/ast/listitem.js',
+      'src/ast/paragraph.js',
+      'src/ast/strong.js',
+      'src/io/*.js',
+      'src/renderer/*.js',
+      'src/*.js'
+     ])
     .pipe(sourcemaps.init())
 	.pipe(concat('koara.js'))
 	.pipe(gulp.dest('dist'))
