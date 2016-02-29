@@ -44,19 +44,19 @@ koara.Parser.prototype = {
 	
 	blockElement: function() {
         this.currentBlockLevel++;
-//      if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
+        if (this.modules.indexOf("headings") >= 0 && this.headingAhead(1)) {
           this.heading();
-//      } else if (modules.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
+        } else if (this.modules.indexOf("blockquotes") >= 0 && this.getNextTokenKind() == GT) {
           this.blockQuote();
-//      } else if (modules.contains(Module.LISTS) && getNextTokenKind() == DASH) {
+        } else if (this.modules.indexOf("lists") >= 0 && thsi.getNextTokenKind() == DASH) {
           this.unorderedList();
-//      } else if (modules.contains(Module.LISTS) && hasOrderedListAhead()) {
+        } else if (this.modules.indexOf("lists") >= 0 && this.hasOrderedListAhead()) {
           this.orderedList();
-//      } else if (modules.contains(Module.CODE) && hasFencedCodeBlockAhead()) {
+        } else if (this.modules.indexOf("code") >= 0 && this.hasFencedCodeBlockAhead()) {
           this.fencedCodeBlock();
-//      } else {
+        } else {
           this.paragraph();
-//      }
+        }
         this.currentBlockLevel--;
 	},
 
@@ -73,21 +73,21 @@ koara.Parser.prototype = {
         while (this.headingHasInlineElementsAhead()) {
             if (this.hasTextAhead()) {
                 this.text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-//            } else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.hasStrongAhead()) {
                 this.strong();
-//            } else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.hasEmAhead()) {
                 this.em();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
-//            } else {
+            } else {
                 this.looseChar();
-//            }
+            }
           }
-          heading.setValue(headingLevel);
+          heading.value = headingLevel;
           this.tree.closeScope(heading);
     },
 
@@ -103,7 +103,7 @@ koara.Parser.prototype = {
         if (this.blockQuoteHasAnyBlockElementseAhead()) {
             this.blockElement();
             while (this.blockAhead(0)) {
-                while (this.getNextTokenKind() == EOL) {
+                while (this.getNextTokenKind() == this.tm.EOL) {
                     this.consumeToken(EOL);
                     this.whiteSpace();
                     this.blockQuotePrefix();
@@ -132,7 +132,7 @@ koara.Parser.prototype = {
           do {
         	  this.consumeToken(this.tm.GT);
         	  this.whiteSpace();
-          } while (this.getNextTokenKind() == GT);
+          } while (this.getNextTokenKind() == this.tm.GT);
       },
 
       unorderedList: function() {
@@ -287,7 +287,7 @@ koara.Parser.prototype = {
 		                s += this.consumeToken(this.tm.UNDERSCORE).image;
 		                break;
 		            case this.tm.BACKTICK:
-		                s += this.consumeToken(this.tm.BACKTICK).image);
+		                s += this.consumeToken(this.tm.BACKTICK).image;
 		                break;
 		            default:
 		                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
@@ -320,23 +320,23 @@ koara.Parser.prototype = {
 
     paragraph: function() {
         var paragraph;
-        //if (modules.contains(Module.PARAGRAPHS)) {
-            paragraph = new Paragraph();
-        //} else {
-        //    paragraph = new BlockElement();
-        //}
+        if (this.modules.indexOf("paragraphs") >= 0) {
+            paragraph = new koara.Paragraph();
+        } else {
+            paragraph = new koara.BlockElement();
+        }
 
         this.tree.openScope();
         this.inline();
         while (this.textAhead()) {
             this.lineBreak();
             this.whiteSpace();
-            //if (modules.contains(Module.BLOCKQUOTES)) {
+            if (this.modules.indexOf("blockquotes") >= 0) {
                 while (this.getNextTokenKind() == this.tm.GT) {
                     this.consumeToken(this.tm.GT);
                     this.whiteSpace();
                 }
-            //}
+            }
             this.inline();
         }
         this.tree.closeScope(paragraph);
@@ -361,7 +361,7 @@ koara.Parser.prototype = {
                 s += this.consumeToken(this.tm.DASH).image;
                 break;
             case this.tm.DIGITS:
-                s += this.consumeToken(this.tm.DIGITS).image);
+                s += this.consumeToken(this.tm.DIGITS).image;
                 break;
             case this.tm.DOT:
                 s += this.consumeToken(this.tm.DOT).image;
@@ -439,19 +439,19 @@ koara.Parser.prototype = {
         this.consumeToken(this.tm.LBRACK);
         this.whiteSpace();
         while (this.linkHasAnyElements()) {
-            //if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            //} else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
+            } else if (modules.indexOf("formatting") >= 0 && this.hasStrongAhead()) {
                 this.strong();
-            //} else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
+            } else if (modules.indexOf("formatting") >= 0 && this.hasEmAhead()) {
                 this.em();
-            //} else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
-            //} else if (hasResourceTextAhead()) {
+            } else if (this.hasResourceTextAhead()) {
                 this.resourceText();
-            //} else {
+            } else {
                 this.looseChar();
-            //}
+            }
         }
         this.whiteSpace();
         this.consumeToken(this.tm.RBRACK);
@@ -469,13 +469,13 @@ koara.Parser.prototype = {
         while (this.strongHasElements()) {
             if (this.hasTextAhead()) {
                 this.text();
-           // } else if (modules.contains(Module.IMAGES) && hasImage()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImage()) {
                 this.image();
-           // } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            //} else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
+            } else if (this.modules.indexOf("code") >= 0 && this.multilineAhead(this.tm.BACKTICK)) {
                 this.codeMultiline();
-            //} else if (strongEmWithinStrongAhead()) {
+            } else if (this.strongEmWithinStrongAhead()) {
                 this.emWithinStrong();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -502,13 +502,13 @@ koara.Parser.prototype = {
         while (this.emHasElements()) {
             if (this.hasTextAhead()) {
                 this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImage()) {
+            } else if (modules.indexOf("images") >= 0 && this.hasImage()) {
                 this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-           // } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
-            //} else if (emHasStrongWithinEm()) {
+            } else if (this.emHasStrongWithinEm()) {
                 this.strongWithinEm();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -727,19 +727,19 @@ koara.Parser.prototype = {
     	  do {
     		  if (this.hasInlineTextAhead()) {
     			  text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                   image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                   link();
-//            } else if (modules.contains(Module.FORMATTING) && multilineAhead(ASTERISK)) {
+            } else if (modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.ASTERISK)) {
                   strongMultiline();
-//            } else if (modules.contains(Module.FORMATTING) && multilineAhead(UNDERSCORE)) {
+            } else if (modules.indexOf("formatting") >= 0 && multilineAhead(UNDERSCORE)) {
                   emMultiline();
-//            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
+            } else if (modules.indexOf("code") >= 0 && multilineAhead(this.tm.BACKTICK)) {
                   codeMultiline();
-//            } else {
+            } else {
                  looseChar();
-              }
+            }
           } while (this.hasInlineElementAhead());
       },
 
@@ -816,8 +816,8 @@ koara.Parser.prototype = {
       }, 
 
       resourceUrlText: function() {
-        var s = '';
-        while (this.resourceTextHasElementsAhead()) {
+          var s = '';
+          while (this.resourceTextHasElementsAhead()) {
             switch (this.getNextTokenKind()) {
         	case this.tm.CHAR_SEQUENCE:
         		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
@@ -850,7 +850,7 @@ koara.Parser.prototype = {
                 s += this.consumeToken(this.tm.ESCAPED_CHAR).image.substring(1);
                 break;
             case this.tm.IMAGE_LABEL:
-                s += this.consumeToken(this.tm.IMAGE_LABEL).image);
+                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
                 break;
             case this.tm.GT:
                 s += this.consumeToken(this.tm.GT).image;
@@ -882,9 +882,9 @@ koara.Parser.prototype = {
                         break;
                     }
                 }
+              }
             }
-          }
-          return s;
+            return s;
       },
 
 	  strongMultiline: function() {
@@ -904,13 +904,13 @@ koara.Parser.prototype = {
         do {
             if (this.hasTextAhead()) {
                 this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
                 this.code();
-//            } else if (hasEmWithinStrongMultiline()) {
+            } else if (this.hasEmWithinStrongMultiline()) {
                 this.emWithinStrongMultiline();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -945,11 +945,11 @@ koara.Parser.prototype = {
         do {
             if (this.hasTextAhead()) {
                 this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
                 this.link();
-            //} else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
                 this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -974,14 +974,14 @@ koara.Parser.prototype = {
         do {
             if (this.hasTextAhead()) {
                this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
                this.link();
-            //} else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
                this.code();
             } else {
-                switch (this;getNextTokenKind()) {
+                switch (this.getNextTokenKind()) {
                 case this.tm.BACKTICK:
                     this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
@@ -1015,11 +1015,11 @@ koara.Parser.prototype = {
         do {
             if (this.hasTextAhead()) {
                 this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0  && this.hasImageAhead()) {
                 this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
                 this.link();
-            //} else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
+            } else if (this.modules.indexOf("code") >= 0  && this.multilineAhead(this.tm.BACKTICK)) {
                 this.codeMultiline();
             } else if (this.hasStrongWithinEmMultilineAhead()) {
                 this.strongWithinEmMultiline();
@@ -1054,13 +1054,13 @@ koara.Parser.prototype = {
 
     emWithinStrongMultilineContent: function() {
         do {
-            //if (this.hasTextAhead()) {
+            if (this.hasTextAhead()) {
                 this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
                 this.link();
-            //} else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
                 this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -1085,11 +1085,11 @@ koara.Parser.prototype = {
         do {
             if (this.hasTextAhead()) {
                 this.text();
-            //} else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            //} else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
                 this.link();
-            //} else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
                 this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -1174,7 +1174,7 @@ koara.Parser.prototype = {
 
     multilineAhead: function(token) {
         if (this.getNextTokenKind() == token && this.getToken(2).kind != token && this.getToken(2).kind != this.tm.EOL) {
-            for (int i = 2;; i++) {
+            for (var i = 2;; i++) {
                 var t = this.getToken(i);
                 if (t.kind == token) {
                     return true;
@@ -1497,7 +1497,7 @@ koara.Parser.prototype = {
         lastPosition = scanPosition = token;
         try {
             return !scanResourceElement();
-        } catch (LookaheadSuccess ls) {
+        } catch (ls) {
             return true;
         }
     },
@@ -1617,7 +1617,7 @@ koara.Parser.prototype = {
         lastPosition = scanPosition = token;
         try {
             return !scanEmWithinStrongMultilineContent();
-        } catch (LookaheadSuccess ls) {
+        } catch (ls) {
             return true;
         }
     },
@@ -2597,7 +2597,7 @@ koara.Parser.prototype = {
         if (this.scanPosition == this.lastPosition) {
             this.lookAhead--;
             if (this.scanPosition.next == null) {
-                this.lastPosition = this.?scanPosition = this.scanPosition.next = this.tm.getNextToken();
+                this.lastPosition = this.scanPosition = this.scanPosition.next = this.tm.getNextToken();
             } else {
                 this.lastPosition = this.scanPosition = this.scanPosition.next;
             }
@@ -2610,7 +2610,7 @@ koara.Parser.prototype = {
         if (this.lookAhead == 0 && this.scanPosition == this.lastPosition) {
             throw lookAheadSuccess;
         }
-        return false;
+	      return false;
     },
 
     getNextTokenKind: function() {

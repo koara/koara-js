@@ -500,16 +500,6 @@ koara.LookaheadSuccess.prototype = {
 	constructor: koara.LookaheadSuccess
 		
 }
-var Module = {
-//  PARAGRAPHS: 1,
-//  HEADINGS: 2,
-//  LISTS: 3,
-//  LINKS: 4,
-//  IMAGES: 5,
-//  FORMATTING: 6,
-//  BLOCKQUOTES: 7,
-//  CODE: 8
-};
 koara.Parser = function() {
 	this.lookAheadSuccess = new koara.LookaheadSuccess();
 	this.modules = ['paragraphs', 'headings', 'lists', 'links', 'images', 'formatting', 'blockquotes', 'code'];
@@ -525,8 +515,8 @@ koara.Parser.prototype = {
 	parseReader: function(reader) {
 		this.cs = new koara.CharStream(reader);
 		this.tm = new koara.TokenManager(this.cs);
-		token = new koara.Token();
-		tree = new koara.TreeState();
+		var token = new koara.Token();
+		var tree = new koara.TreeState();
 		this.nextTokenKind = -1;
 		
 		document = new koara.Document();
@@ -556,26 +546,26 @@ koara.Parser.prototype = {
 	
 	blockElement: function() {
         this.currentBlockLevel++;
-//      if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
+        if (this.modules.indexOf("headings") >= 0 && this.headingAhead(1)) {
           this.heading();
-//      } else if (modules.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
+        } else if (this.modules.indexOf("blockquotes") >= 0 && this.getNextTokenKind() == GT) {
           this.blockQuote();
-//      } else if (modules.contains(Module.LISTS) && getNextTokenKind() == DASH) {
+        } else if (this.modules.indexOf("lists") >= 0 && thsi.getNextTokenKind() == DASH) {
           this.unorderedList();
-//      } else if (modules.contains(Module.LISTS) && hasOrderedListAhead()) {
+        } else if (this.modules.indexOf("lists") >= 0 && this.hasOrderedListAhead()) {
           this.orderedList();
-//      } else if (modules.contains(Module.CODE) && hasFencedCodeBlockAhead()) {
+        } else if (this.modules.indexOf("code") >= 0 && this.hasFencedCodeBlockAhead()) {
           this.fencedCodeBlock();
-//      } else {
+        } else {
           this.paragraph();
-//      }
+        }
         this.currentBlockLevel--;
 	},
 
     heading: function() {
-        heading = new koara.Heading();
+        var heading = new koara.Heading();
         this.tree.openScope();
-        headingLevel = 0;
+        var headingLevel = 0;
 
         while (this.getNextTokenKind() == this.tm.EQ) {
             this.consumeToken(this.tm.EQ);
@@ -585,26 +575,26 @@ koara.Parser.prototype = {
         while (this.headingHasInlineElementsAhead()) {
             if (this.hasTextAhead()) {
                 this.text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-//            } else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.hasStrongAhead()) {
                 this.strong();
-//            } else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.hasEmAhead()) {
                 this.em();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
-//            } else {
+            } else {
                 this.looseChar();
-//            }
+            }
           }
-          heading.setValue(headingLevel);
+          heading.value = headingLevel;
           this.tree.closeScope(heading);
     },
 
     blockQuote: function() {
-        blockQuote = new koara.BlockQuote();
+        var blockQuote = new koara.BlockQuote();
         this.tree.openScope();
         this.currentQuoteLevel++;
         this.consumeToken(this.tm.GT);
@@ -615,7 +605,7 @@ koara.Parser.prototype = {
         if (this.blockQuoteHasAnyBlockElementseAhead()) {
             this.blockElement();
             while (this.blockAhead(0)) {
-                while (this.getNextTokenKind() == EOL) {
+                while (this.getNextTokenKind() == this.tm.EOL) {
                     this.consumeToken(EOL);
                     this.whiteSpace();
                     this.blockQuotePrefix();
@@ -631,2505 +621,2500 @@ koara.Parser.prototype = {
       },
 
       blockQuotePrefix: function() {
-        i = 0;
+        var i = 0;
         do {
             consumeToken(this.tm.GT);
             this.whiteSpace();
         } while (++i < this.currentQuoteLevel);
       },
 
-//    private void blockQuoteEmptyLine() {
-//        consumeToken(EOL);
-//        whiteSpace();
-//        do {
-//            consumeToken(GT);
-//            whiteSpace();
-//        } while (getNextTokenKind() == GT);
-//    }
-//
-//    private void unorderedList() {
-//        ListBlock list = new ListBlock(false);
-//        tree.openScope();
-//        int listBeginColumn = unorderedListItem();
-//        while (listItemAhead(listBeginColumn, false)) {
-//            while (getNextTokenKind() == EOL) {
-//                consumeToken(EOL);
-//            }
-//            whiteSpace();
-//            if (currentQuoteLevel > 0) {
-//                blockQuotePrefix();
-//            }
-//            unorderedListItem();
-//        }
-//        tree.closeScope(list);
-//    }
-//
-//    private int unorderedListItem() {
-//        ListItem listItem = new ListItem();
-//        tree.openScope();
-//
-//        Token t = consumeToken(DASH);
-//        whiteSpace();
-//        if (listItemHasInlineElements()) {
-//            blockElement();
-//            while (blockAhead(t.beginColumn)) {
-//                while (getNextTokenKind() == EOL) {
-//                    consumeToken(EOL);
-//                    whiteSpace();
-//                    if (currentQuoteLevel > 0) {
-//                        blockQuotePrefix();
-//                    }
-//                }
-//                blockElement();
-//            }
-//        }
-//        tree.closeScope(listItem);
-//        return t.beginColumn;
-//    }
-//
-//    private void orderedList() {
-//        ListBlock list = new ListBlock(true);
-//        tree.openScope();
-//        int listBeginColumn = orderedListItem();
-//        while (listItemAhead(listBeginColumn, true)) {
-//            while (getNextTokenKind() == EOL) {
-//                consumeToken(EOL);
-//            }
-//            whiteSpace();
-//            if (currentQuoteLevel > 0) {
-//                blockQuotePrefix();
-//            }
-//            orderedListItem();
-//        }
-//        tree.closeScope(list);
-//    }
-//
-//    private int orderedListItem() {
-//        ListItem listItem = new ListItem();
-//        tree.openScope();
-//        Token t = consumeToken(DIGITS);
-//        consumeToken(DOT);
-//        whiteSpace();
-//        if (listItemHasInlineElements()) {
-//            blockElement();
-//            while (blockAhead(t.beginColumn)) {
-//                while (getNextTokenKind() == EOL) {
-//                    consumeToken(EOL);
-//                    whiteSpace();
-//                    if (currentQuoteLevel > 0) {
-//                        blockQuotePrefix();
-//                    }
-//                }
-//                blockElement();
-//            }
-//        }
-//        listItem.setNumber(Integer.valueOf(t.image));
-//        tree.closeScope(listItem);
-//        return t.beginColumn;
-//    }
-//
-//    private void fencedCodeBlock() {
-//        CodeBlock codeBlock = new CodeBlock();
-//        tree.openScope();
-//        StringBuilder s = new StringBuilder();
-//        int beginColumn = consumeToken(BACKTICK).beginColumn;
-//        do {
-//            consumeToken(BACKTICK);
-//        } while (getNextTokenKind() == BACKTICK);
-//        whiteSpace();
-//        if (getNextTokenKind() == CHAR_SEQUENCE) {
-//            codeBlock.setLanguage(codeLanguage());
-//        }
-//        if (getNextTokenKind() != EOF && !fencesAhead()) {
-//            consumeToken(EOL);
-//            levelWhiteSpace(beginColumn);
-//        }
-//        
-//        while (getNextTokenKind() != EOF && (getNextTokenKind() != EOL || !fencesAhead())) {
-//            switch (getNextTokenKind()) {
-//        	case CHAR_SEQUENCE:
-//        		s.append(consumeToken(CHAR_SEQUENCE).image);
-//        		break;
-//            case ASTERISK:
-//                s.append(consumeToken(ASTERISK).image);
-//                break;
-//            case BACKSLASH:
-//                s.append(consumeToken(BACKSLASH).image);
-//                break;
-//            case COLON:
-//                s.append(consumeToken(COLON).image);
-//                break;
-//            case DASH:
-//                s.append(consumeToken(DASH).image);
-//                break;
-//            case DIGITS:
-//                s.append(consumeToken(DIGITS).image);
-//                break;
-//            case DOT:
-//                s.append(consumeToken(DOT).image);
-//                break;
-//            case EQ:
-//                s.append(consumeToken(EQ).image);
-//                break;
-//            case ESCAPED_CHAR:
-//                s.append(consumeToken(ESCAPED_CHAR).image);
-//                break;
-//            case IMAGE_LABEL:
-//                s.append(consumeToken(IMAGE_LABEL).image);
-//                break;
-//            case LT:
-//                s.append(consumeToken(LT).image);
-//                break;
-//            case GT:
-//                s.append(consumeToken(GT).image);
-//                break;
-//            case LBRACK:
-//                s.append(consumeToken(LBRACK).image);
-//                break;
-//            case RBRACK:
-//                s.append(consumeToken(RBRACK).image);
-//                break;
-//            case LPAREN:
-//                s.append(consumeToken(LPAREN).image);
-//                break;
-//            case RPAREN:
-//                s.append(consumeToken(RPAREN).image);
-//                break;
-//            case UNDERSCORE:
-//                s.append(consumeToken(UNDERSCORE).image);
-//                break;
-//            case BACKTICK:
-//                s.append(consumeToken(BACKTICK).image);
-//                break;
-//            default:
-//                if (!nextAfterSpace(EOL, EOF)) {
-//                    switch (getNextTokenKind()) {
-//                    case SPACE:
-//                        s.append(consumeToken(SPACE).image);
-//                        break;
-//                    case TAB:
-//                        consumeToken(TAB);
-//                        s.append("    ");
-//                        break;
-//                    }
-//                } else if (!fencesAhead()) {
-//                    consumeToken(EOL);
-//                    s.append("\n");
-//                    levelWhiteSpace(beginColumn);
-//                }
-//            }
-//        }
-//        if (fencesAhead()) {
-//            consumeToken(EOL);
-//            whiteSpace();
-//            while (getNextTokenKind() == BACKTICK) {
-//                consumeToken(BACKTICK);
-//            }
-//        }
-//        codeBlock.setValue(s.toString());
-//        tree.closeScope(codeBlock);
-//    }
-//
-//    private void paragraph() {
-//        BlockElement paragraph;
-//        if (modules.contains(Module.PARAGRAPHS)) {
-//            paragraph = new Paragraph();
-//        } else {
-//            paragraph = new BlockElement();
-//        }
-//
-//        tree.openScope();
-//        inline();
-//        while (textAhead()) {
-//            lineBreak();
-//            whiteSpace();
-//            if (modules.contains(Module.BLOCKQUOTES)) {
-//                while (getNextTokenKind() == GT) {
-//                    consumeToken(GT);
-//                    whiteSpace();
-//                }
-//            }
-//            inline();
-//        }
-//        tree.closeScope(paragraph);
-//    }
-//
-//    private void text() {
-//        Text text = new Text();
-//        tree.openScope();
-//        StringBuffer s = new StringBuffer();
-//        while (textHasTokensAhead()) {
-//            switch (getNextTokenKind()) {
-//        	case CHAR_SEQUENCE:
-//        		s.append(consumeToken(CHAR_SEQUENCE).image);
-//        		break;
-//            case BACKSLASH:
-//                s.append(consumeToken(BACKSLASH).image);
-//                break;
-//            case COLON:
-//                s.append(consumeToken(COLON).image);
-//                break;
-//            case DASH:
-//                s.append(consumeToken(DASH).image);
-//                break;
-//            case DIGITS:
-//                s.append(consumeToken(DIGITS).image);
-//                break;
-//            case DOT:
-//                s.append(consumeToken(DOT).image);
-//                break;
-//            case EQ:
-//                s.append(consumeToken(EQ).image);
-//                break;
-//            case ESCAPED_CHAR:
-//                s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-//                break;
-//            case GT:
-//                s.append(consumeToken(GT).image);
-//                break;
-//            case IMAGE_LABEL:
-//                s.append(consumeToken(IMAGE_LABEL).image);
-//                break;
-//            case LPAREN:
-//                s.append(consumeToken(LPAREN).image);
-//                break;
-//            case LT:
-//                s.append(consumeToken(LT).image);
-//                break;
-//            case RBRACK:
-//                s.append(consumeToken(RBRACK).image);
-//                break;
-//            case RPAREN:
-//                s.append(consumeToken(RPAREN).image);
-//                break;
-//            default:
-//                if (!nextAfterSpace(EOL, EOF)) {
-//                    switch (getNextTokenKind()) {
-//                    case SPACE:
-//                        s.append(consumeToken(SPACE).image);
-//                        break;
-//                    case TAB:
-//                        consumeToken(TAB);
-//                        s.append("    ");
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        text.setValue(s.toString());
-//        tree.closeScope(text);
-//    }
-//
-//    private void image() {
-//        Image image = new Image();
-//        tree.openScope();
-//        String ref = "";
-//        consumeToken(LBRACK);
-//        whiteSpace();
-//        consumeToken(IMAGE_LABEL);
-//        whiteSpace();
-//        while (imageHasAnyElements()) {
-//            if (hasTextAhead()) {
-//                resourceText();
-//            } else {
-//                looseChar();
-//            }
-//        }
-//        whiteSpace();
-//        consumeToken(RBRACK);
-//        if (hasResourceUrlAhead()) {
-//            ref = resourceUrl();
-//        }
-//        image.setValue(ref);
-//        tree.closeScope(image);
-//    }
-//
-//    private void link() {
-//        Link link = new Link();
-//        tree.openScope();
-//        String ref = "";
-//        consumeToken(LBRACK);
-//        whiteSpace();
-//        while (linkHasAnyElements()) {
-//            if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
-//                strong();
-//            } else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
-//                em();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else if (hasResourceTextAhead()) {
-//                resourceText();
-//            } else {
-//                looseChar();
-//            }
-//        }
-//        whiteSpace();
-//        consumeToken(RBRACK);
-//        if (hasResourceUrlAhead()) {
-//            ref = resourceUrl();
-//        }
-//        link.setValue(ref);
-//        tree.closeScope(link);
-//    }
-//
-//    private void strong() {
-//        Strong strong = new Strong();
-//        tree.openScope();
-//        consumeToken(ASTERISK);
-//        while (strongHasElements()) {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImage()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
-//                codeMultiline();
-//            } else if (strongEmWithinStrongAhead()) {
-//                emWithinStrong();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                case UNDERSCORE:
-//                    tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-//                    break;
-//                }
-//            }
-//        }
-//        consumeToken(ASTERISK);
-//        tree.closeScope(strong);
-//    }
-//
-//    private void em() {
-//        Em em = new Em();
-//        tree.openScope();
-//        consumeToken(UNDERSCORE);
-//        while (emHasElements()) {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImage()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else if (emHasStrongWithinEm()) {
-//                strongWithinEm();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case ASTERISK:
-//                    tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-//                    break;
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                }
-//            }
-//        }
-//        consumeToken(UNDERSCORE);
-//        tree.closeScope(em);
-//    }
-//
-//    private void code() {
-//        Code code = new Code();
-//        tree.openScope();
-//        consumeToken(BACKTICK);
-//        codeText();
-//        consumeToken(BACKTICK);
-//        tree.closeScope(code);
-//    }
-//
-//    private void codeText() {
-//        Text text = new Text();
-//        tree.openScope();
-//        StringBuffer s = new StringBuffer();
-//        do {
-//            switch (getNextTokenKind()) {
-//        	case CHAR_SEQUENCE:
-//        		s.append(consumeToken(CHAR_SEQUENCE).image);
-//        		break;
-//            case ASTERISK:
-//                s.append(consumeToken(ASTERISK).image);
-//                break;
-//            case BACKSLASH:
-//                s.append(consumeToken(BACKSLASH).image);
-//                break;
-//            case COLON:
-//                s.append(consumeToken(COLON).image);
-//                break;
-//            case DASH:
-//                s.append(consumeToken(DASH).image);
-//                break;
-//            case DIGITS:
-//                s.append(consumeToken(DIGITS).image);
-//                break;
-//            case DOT:
-//                s.append(consumeToken(DOT).image);
-//                break;
-//            case EQ:
-//                s.append(consumeToken(EQ).image);
-//                break;
-//            case ESCAPED_CHAR:
-//                s.append(consumeToken(ESCAPED_CHAR).image);
-//                break;
-//            case IMAGE_LABEL:
-//                s.append(consumeToken(IMAGE_LABEL).image);
-//                break;
-//            case LT:
-//                s.append(consumeToken(LT).image);
-//                break;
-//            case LBRACK:
-//                s.append(consumeToken(LBRACK).image);
-//                break;
-//            case RBRACK:
-//                s.append(consumeToken(RBRACK).image);
-//                break;
-//            case LPAREN:
-//                s.append(consumeToken(LPAREN).image);
-//                break;
-//            case GT:
-//                s.append(consumeToken(GT).image);
-//                break;
-//            case RPAREN:
-//                s.append(consumeToken(RPAREN).image);
-//                break;
-//            case UNDERSCORE:
-//                s.append(consumeToken(UNDERSCORE).image);
-//                break;
-//            default:
-//                if (!nextAfterSpace(EOL, EOF)) {
-//                    switch (getNextTokenKind()) {
-//                    case SPACE:
-//                        s.append(consumeToken(SPACE).image);
-//                        break;
-//                    case TAB:
-//                        consumeToken(TAB);
-//                        s.append("    ");
-//                        break;
-//                    }
-//                }
-//            }
-//        } while (codeTextHasAnyTokenAhead());
-//        text.setValue(s.toString());
-//        tree.closeScope(text);
-//    }
-//
-//    private void looseChar() {
-//        Text text = new Text();
-//        tree.openScope();
-//        switch (getNextTokenKind()) {
-//        case ASTERISK:
-//            text.setValue(consumeToken(ASTERISK).image);
-//            break;
-//        case BACKTICK:
-//            text.setValue(consumeToken(BACKTICK).image);
-//            break;
-//        case LBRACK:
-//            text.setValue(consumeToken(LBRACK).image);
-//            break;
-//        case UNDERSCORE:
-//            text.setValue(consumeToken(UNDERSCORE).image);
-//            break;
-//        }
-//        tree.closeScope(text);
-//    }
-//
-//    private void lineBreak() {
-//        LineBreak linebreak = new LineBreak();
-//        tree.openScope();
-//        while (getNextTokenKind() == SPACE || getNextTokenKind() == TAB) {
-//            consumeToken(getNextTokenKind());
-//        }
-//        consumeToken(EOL);
-//        tree.closeScope(linebreak);
-//    }
-//
-//    private void levelWhiteSpace(int threshold) {
-//        int currentPos = 1;
-//        while (getNextTokenKind() == GT) {
-//            consumeToken(getNextTokenKind());
-//        }
-//        while ((getNextTokenKind() == SPACE || getNextTokenKind() == TAB) && currentPos < (threshold - 1)) {
-//            currentPos = consumeToken(getNextTokenKind()).beginColumn;
-//        }
-//    }
-//
-//    private String codeLanguage() {
-//        StringBuilder s = new StringBuilder();
-//        do {
-//            switch (getNextTokenKind()) {
-//        	case CHAR_SEQUENCE:
-//        		s.append(consumeToken(CHAR_SEQUENCE).image);
-//        		break;
-//            case ASTERISK:
-//                s.append(consumeToken(ASTERISK).image);
-//                break;
-//            case BACKSLASH:
-//                s.append(consumeToken(BACKSLASH).image);
-//                break;
-//            case BACKTICK:
-//                s.append(consumeToken(BACKTICK).image);
-//                break;
-//            case COLON:
-//                s.append(consumeToken(COLON).image);
-//                break;
-//            case DASH:
-//                s.append(consumeToken(DASH).image);
-//                break;
-//            case DIGITS:
-//                s.append(consumeToken(DIGITS).image);
-//                break;
-//            case DOT:
-//                s.append(consumeToken(DOT).image);
-//                break;
-//            case EQ:
-//                s.append(consumeToken(EQ).image);
-//                break;
-//            case ESCAPED_CHAR:
-//                s.append(consumeToken(ESCAPED_CHAR).image);
-//                break;
-//            case IMAGE_LABEL:
-//                s.append(consumeToken(IMAGE_LABEL).image);
-//                break;
-//            case LT:
-//                s.append(consumeToken(LT).image);
-//                break;
-//            case GT:
-//                s.append(consumeToken(GT).image);
-//                break;
-//            case LBRACK:
-//                s.append(consumeToken(LBRACK).image);
-//                break;
-//            case RBRACK:
-//                s.append(consumeToken(RBRACK).image);
-//                break;
-//            case LPAREN:
-//                s.append(consumeToken(LPAREN).image);
-//                break;
-//            case RPAREN:
-//                s.append(consumeToken(RPAREN).image);
-//                break;
-//            case UNDERSCORE:
-//                s.append(consumeToken(UNDERSCORE).image);
-//                break;
-//            case SPACE:
-//                s.append(consumeToken(SPACE).image);
-//                break;
-//            case TAB:
-//                s.append("    ");
-//                break;
-//            default:
-//                break;
-//            }
-//        } while (getNextTokenKind() != EOL && getNextTokenKind() != EOF);
-//        return s.toString();
-//    }
-//
-//    private void inline() {
-//        do {
-//            if (hasInlineTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.FORMATTING) && multilineAhead(ASTERISK)) {
-//                strongMultiline();
-//            } else if (modules.contains(Module.FORMATTING) && multilineAhead(UNDERSCORE)) {
-//                emMultiline();
-//            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
-//                codeMultiline();
-//            } else {
-//                looseChar();
-//            }
-//        } while (hasInlineElementAhead());
-//    }
-//
-//    private void resourceText() {
-//        Text text = new Text();
-//        tree.openScope();
-//        StringBuilder s = new StringBuilder();
-//        do {
-//            switch (getNextTokenKind()) {
-//        	case CHAR_SEQUENCE:
-//        		s.append(consumeToken(CHAR_SEQUENCE).image);
-//        		break;
-//            case BACKSLASH:
-//                s.append(consumeToken(BACKSLASH).image);
-//                break;
-//            case COLON:
-//                s.append(consumeToken(COLON).image);
-//                break;
-//            case DASH:
-//                s.append(consumeToken(DASH).image);
-//                break;
-//            case DIGITS:
-//                s.append(consumeToken(DIGITS).image);
-//                break;
-//            case DOT:
-//                s.append(consumeToken(DOT).image);
-//                break;
-//            case EQ:
-//                s.append(consumeToken(EQ).image);
-//                break;
-//            case ESCAPED_CHAR:
-//                s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-//                break;
-//            case IMAGE_LABEL:
-//                s.append(consumeToken(IMAGE_LABEL).image);
-//                break;
-//            case GT:
-//                s.append(consumeToken(GT).image);
-//                break;
-//            case LPAREN:
-//                s.append(consumeToken(LPAREN).image);
-//                break;
-//            case LT:
-//                s.append(consumeToken(LT).image);
-//                break;
-//            case RPAREN:
-//                s.append(consumeToken(RPAREN).image);
-//                break;
-//            default:
-//                if (!nextAfterSpace(RBRACK)) {
-//                    switch (getNextTokenKind()) {
-//                    case SPACE:
-//                        s.append(consumeToken(SPACE).image);
-//                        break;
-//                    case TAB:
-//                        consumeToken(TAB);
-//                        s.append("    ");
-//                        break;
-//                    }
-//                }
-//            }
-//        } while (resourceHasElementAhead());
-//        text.setValue(s.toString());
-//        tree.closeScope(text);
-//    }
-//
-//    private String resourceUrl() {
-//        consumeToken(LPAREN);
-//        whiteSpace();
-//        String ref = resourceUrlText();
-//        whiteSpace();
-//        consumeToken(RPAREN);
-//        return ref;
-//    }
-//
-//    private String resourceUrlText() {
-//        StringBuilder s = new StringBuilder();
-//        while (resourceTextHasElementsAhead()) {
-//            switch (getNextTokenKind()) {
-//        	case CHAR_SEQUENCE:
-//        		s.append(consumeToken(CHAR_SEQUENCE).image);
-//        		break;
-//            case ASTERISK:
-//                s.append(consumeToken(ASTERISK).image);
-//                break;
-//            case BACKSLASH:
-//                s.append(consumeToken(BACKSLASH).image);
-//                break;
-//            case BACKTICK:
-//                s.append(consumeToken(BACKTICK).image);
-//                break;
-//            case COLON:
-//                s.append(consumeToken(COLON).image);
-//                break;
-//            case DASH:
-//                s.append(consumeToken(DASH).image);
-//                break;
-//            case DIGITS:
-//                s.append(consumeToken(DIGITS).image);
-//                break;
-//            case DOT:
-//                s.append(consumeToken(DOT).image);
-//                break;
-//            case EQ:
-//                s.append(consumeToken(EQ).image);
-//                break;
-//            case ESCAPED_CHAR:
-//                s.append(consumeToken(ESCAPED_CHAR).image.substring(1));
-//                break;
-//            case IMAGE_LABEL:
-//                s.append(consumeToken(IMAGE_LABEL).image);
-//                break;
-//            case GT:
-//                s.append(consumeToken(GT).image);
-//                break;
-//            case LBRACK:
-//                s.append(consumeToken(LBRACK).image);
-//                break;
-//            case LPAREN:
-//                s.append(consumeToken(LPAREN).image);
-//                break;
-//            case LT:
-//                s.append(consumeToken(LT).image);
-//                break;
-//            case RBRACK:
-//                s.append(consumeToken(RBRACK).image);
-//                break;
-//            case UNDERSCORE:
-//                s.append(consumeToken(UNDERSCORE).image);
-//                break;
-//            default:
-//                if (!nextAfterSpace(RPAREN)) {
-//                    switch (getNextTokenKind()) {
-//                    case SPACE:
-//                        s.append(consumeToken(SPACE).image);
-//                        break;
-//                    case TAB:
-//                        consumeToken(TAB);
-//                        s.append("    ");
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return s.toString();
-//    }
-//
-//    private void strongMultiline() {
-//        Strong strong = new Strong();
-//        tree.openScope();
-//        consumeToken(ASTERISK);
-//        strongMultilineContent();
-//        while (textAhead()) {
-//            lineBreak();
-//            strongMultilineContent();
-//        }
-//        consumeToken(ASTERISK);
-//        tree.closeScope(strong);
-//    }
-//
-//    private void strongMultilineContent() {
-//        do {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else if (hasEmWithinStrongMultiline()) {
-//                emWithinStrongMultiline();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                case UNDERSCORE:
-//                    tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-//                    break;
-//                }
-//            }
-//        } while (strongMultilineHasElementsAhead());
-//    }
-//
-//    private void strongWithinEmMultiline() {
-//        Strong strong = new Strong();
-//        tree.openScope();
-//        consumeToken(ASTERISK);
-//        strongWithinEmMultilineContent();
-//        while (textAhead()) {
-//            lineBreak();
-//            strongWithinEmMultilineContent();
-//        }
-//        consumeToken(ASTERISK);
-//        tree.closeScope(strong);
-//    }
-//
-//    private void strongWithinEmMultilineContent() {
-//        do {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                case UNDERSCORE:
-//                    tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-//                    break;
-//                }
-//            }
-//        } while (strongWithinEmMultilineHasElementsAhead());
-//    }
-//
-//    private void strongWithinEm() {
-//        Strong strong = new Strong();
-//        tree.openScope();
-//        consumeToken(ASTERISK);
-//        do {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                case UNDERSCORE:
-//                    tree.addSingleValue(new Text(), consumeToken(UNDERSCORE));
-//                    break;
-//                }
-//            }
-//        } while (strongWithinEmHasElementsAhead());
-//        consumeToken(ASTERISK);
-//        tree.closeScope(strong);
-//    }
-//
-//    private void emMultiline() {
-//        Em em = new Em();
-//        tree.openScope();
-//        consumeToken(UNDERSCORE);
-//        emMultilineContent();
-//        while (textAhead()) {
-//            lineBreak();
-//            emMultilineContent();
-//        }
-//        consumeToken(UNDERSCORE);
-//        tree.closeScope(em);
-//    }
-//
-//    private void emMultilineContent() {
-//        do {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && multilineAhead(BACKTICK)) {
-//                codeMultiline();
-//            } else if (hasStrongWithinEmMultilineAhead()) {
-//                strongWithinEmMultiline();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case ASTERISK:
-//                    tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-//                    break;
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                }
-//            }
-//        } while (emMultilineContentHasElementsAhead());
-//    }
-//
-//    private void emWithinStrongMultiline() {
-//        Em em = new Em();
-//        tree.openScope();
-//        consumeToken(UNDERSCORE);
-//        emWithinStrongMultilineContent();
-//        while (textAhead()) {
-//            lineBreak();
-//            emWithinStrongMultilineContent();
-//        }
-//        consumeToken(UNDERSCORE);
-//        tree.closeScope(em);
-//    }
-//
-//    private void emWithinStrongMultilineContent() {
-//        do {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case ASTERISK:
-//                    tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-//                    break;
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                }
-//            }
-//        } while (emWithinStrongMultilineContentHasElementsAhaed());
-//    }
-//
-//    private void emWithinStrong() {
-//        Em em = new Em();
-//        tree.openScope();
-//        consumeToken(UNDERSCORE);
-//        do {
-//            if (hasTextAhead()) {
-//                text();
-//            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
-//            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
-//            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
-//            } else {
-//                switch (getNextTokenKind()) {
-//                case ASTERISK:
-//                    tree.addSingleValue(new Text(), consumeToken(ASTERISK));
-//                    break;
-//                case BACKTICK:
-//                    tree.addSingleValue(new Text(), consumeToken(BACKTICK));
-//                    break;
-//                case LBRACK:
-//                    tree.addSingleValue(new Text(), consumeToken(LBRACK));
-//                    break;
-//                }
-//            }
-//        } while (emWithinStrongHasElementsAhead());
-//        consumeToken(UNDERSCORE);
-//        tree.closeScope(em);
-//    }
-//
-//    private void codeMultiline() {
-//        Code code = new Code();
-//        tree.openScope();
-//        consumeToken(BACKTICK);
-//        codeText();
-//        while (textAhead()) {
-//            lineBreak();
-//            whiteSpace();
-//            while (getNextTokenKind() == GT) {
-//                consumeToken(GT);
-//                whiteSpace();
-//            }
-//            codeText();
-//        }
-//        consumeToken(BACKTICK);
-//        tree.closeScope(code);
-//    }
-//
-//    private void whiteSpace() {
-//        while (getNextTokenKind() == SPACE || getNextTokenKind() == TAB) {
-//            consumeToken(getNextTokenKind());
-//        }
-//    }
-//
-//    private boolean hasAnyBlockElementsAhead() {
-//        try {
-//            lookAhead = 1;
-//            lastPosition = scanPosition = token;
-//            return !scanMoreBlockElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean blockAhead(int blockBeginColumn) {
-//        int quoteLevel;
-//
-//        if (getNextTokenKind() == EOL) {
-//            Token t;
-//            int i = 2;
-//            quoteLevel = 0;
-//            do {
-//                quoteLevel = 0;
-//                do {
-//                    t = getToken(i++);
-//                    if (t.kind == GT) {
-//                        if (t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0) {
-//                            return false;
-//                        }
-//                        quoteLevel++;
-//                    }
-//                } while (t.kind == GT || t.kind == SPACE || t.kind == TAB);
-//                if (quoteLevel > currentQuoteLevel) {
-//                    return true;
-//                }
-//                if (quoteLevel < currentQuoteLevel) {
-//                    return false;
-//                }
-//            } while (t.kind == EOL);
-//            return t.kind != EOF && (currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2);
-//        }
-//        return false;
-//    }
-//
-//    private boolean multilineAhead(Integer token) {
-//        if (getNextTokenKind() == token && getToken(2).kind != token && getToken(2).kind != EOL) {
-//
-//            for (int i = 2;; i++) {
-//                Token t = getToken(i);
-//                if (t.kind == token) {
-//                    return true;
-//                } else if (t.kind == EOL) {
-//                    i = skip(i + 1, SPACE, TAB);
-//                    int quoteLevel = newQuoteLevel(i);
-//                    if (quoteLevel == currentQuoteLevel) {
-//                        i = skip(i, SPACE, TAB, GT);
-//                        if (getToken(i).kind == token || getToken(i).kind == EOL || getToken(i).kind == DASH
-//                                || (getToken(i).kind == DIGITS && getToken(i + 1).kind == DOT)
-//                                || (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
-//                                        && getToken(i + 2).kind == BACKTICK)
-//                                || headingAhead(i)) {
-//                            return false;
-//                        }
-//                    } else {
-//                        return false;
-//                    }
-//                } else if (t.kind == EOF) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean fencesAhead() {
-//        if (getNextTokenKind() == EOL) {
-//            int i = skip(2, SPACE, TAB, GT);
-//            if (getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK && getToken(i + 2).kind == BACKTICK) {
-//                i = skip(i + 3, SPACE, TAB);
-//                return getToken(i).kind == EOL || getToken(i).kind == EOF;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean headingAhead(int offset) {
-//        if (getToken(offset).kind == EQ) {
-//            int heading = 1;
-//            for (int i = (offset + 1);; i++) {
-//                if (getToken(i).kind != EQ) {
-//                    return true;
-//                }
-//                if (++heading > 6) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean listItemAhead(int listBeginColumn, boolean ordered) {
-//        if (getNextTokenKind() == EOL) {
-//            for (int i = 2, eol = 1;; i++) {
-//                Token t = getToken(i);
-//
-//                if (t.kind == EOL && ++eol > 2) {
-//                    return false;
-//                } else if (t.kind != SPACE && t.kind != TAB && t.kind != GT && t.kind != EOL) {
-//                    if (ordered) {
-//                        return (t.kind == DIGITS && getToken(i + 1).kind == DOT && t.beginColumn >= listBeginColumn);
-//                    }
-//                    return t.kind == DASH && t.beginColumn >= listBeginColumn;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean textAhead() {
-//        if (getNextTokenKind() == EOL && getToken(2).kind != EOL) {
-//            int i = skip(2, SPACE, TAB);
-//            int quoteLevel = newQuoteLevel(i);
-//            if (quoteLevel == currentQuoteLevel || !modules.contains(Module.BLOCKQUOTES)) {
-//                i = skip(i, SPACE, TAB, GT);
-//
-//                Token t = getToken(i);
-//                return getToken(i).kind != EOL && !(modules.contains(Module.LISTS) && t.kind == DASH)
-//                        && !(modules.contains(Module.LISTS) && t.kind == DIGITS && getToken(i + 1).kind == DOT)
-//                        && !(getToken(i).kind == BACKTICK && getToken(i + 1).kind == BACKTICK
-//                                && getToken(i + 2).kind == BACKTICK)
-//                        && !(modules.contains(Module.HEADINGS) && headingAhead(i));
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean nextAfterSpace(Integer... tokens) {
-//        int i = skip(1, SPACE, TAB);
-//        return Arrays.asList(tokens).contains(getToken(i).kind);
-//    }
-//
-//    private int newQuoteLevel(int offset) {
-//        int quoteLevel = 0;
-//        for (int i = offset;; i++) {
-//            Token t = getToken(i);
-//            if (t.kind == GT) {
-//                quoteLevel++;
-//            } else if (t.kind != SPACE && t.kind != TAB) {
-//                return quoteLevel;
-//            }
-//
-//        }
-//    }
-//
-//    private int skip(int offset, Integer... tokens) {
-//        for (int i = offset;; i++) {
-//            Token t = getToken(i);
-//            if (!Arrays.asList(tokens).contains(t.kind) || t.kind == EOF) {
-//                return i;
-//            }
-//        }
-//    }
-//
-//    private boolean hasOrderedListAhead() {
-//        lookAhead = 2;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanToken(DIGITS) && !scanToken(DOT);
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasFencedCodeBlockAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanFencedCodeBlock();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean headingHasInlineElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            Token xsp = scanPosition;
-//            if (scanTextTokens()) {
-//                scanPosition = xsp;
-//                if (scanImage()) {
-//                    scanPosition = xsp;
-//                    if (scanLink()) {
-//                        scanPosition = xsp;
-//                        if (scanStrong()) {
-//                            scanPosition = xsp;
-//                            if (scanEm()) {
-//                                scanPosition = xsp;
-//                                if (scanCode()) {
-//                                    scanPosition = xsp;
-//                                    if (scanLooseChar()) {
-//                                        return false;
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            return true;
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasTextAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanTextTokens();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasImageAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanImage();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean blockQuoteHasEmptyLineAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanBlockQuoteEmptyLine();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasStrongAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrong();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasEmAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEm();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasCodeAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanCode();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean blockQuoteHasAnyBlockElementseAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanMoreBlockElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasBlockQuoteEmptyLinesAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanBlockQuoteEmptyLines();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean listItemHasInlineElements() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanMoreBlockElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasInlineTextAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanTextTokens();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasInlineElementAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanInlineElement();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean imageHasAnyElements() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanImageElement();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasResourceTextAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanResourceElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean linkHasAnyElements() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanLinkElement();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasResourceUrlAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanResourceUrl();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean resourceHasElementAhead() {
-//        lookAhead = 2;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanResourceElement();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean resourceTextHasElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanResourceTextElement();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasEmWithinStrongMultiline() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEmWithinStrongMultiline();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean strongMultilineHasElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrongMultilineElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean strongWithinEmMultilineHasElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrongWithinEmMultilineElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasImage() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanImage();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasLinkAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanLink();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean strongEmWithinStrongAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEmWithinStrong();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean strongHasElements() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrongElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean strongWithinEmHasElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrongWithinEmElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean hasStrongWithinEmMultilineAhead() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrongWithinEmMultiline();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean emMultilineContentHasElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEmMultilineContentElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean emWithinStrongMultilineContentHasElementsAhaed() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEmWithinStrongMultilineContent();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean emHasStrongWithinEm() {
-//        lookAhead = 2147483647;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanStrongWithinEm();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean emHasElements() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEmElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean emWithinStrongHasElementsAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanEmWithinStrongElements();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean codeTextHasAnyTokenAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanCodeTextTokens();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean textHasTokensAhead() {
-//        lookAhead = 1;
-//        lastPosition = scanPosition = token;
-//        try {
-//            return !scanText();
-//        } catch (LookaheadSuccess ls) {
-//            return true;
-//        }
-//    }
-//
-//    private boolean scanLooseChar() {
-//        Token xsp = scanPosition;
-//        if (scanToken(ASTERISK)) {
-//            scanPosition = xsp;
-//            if (scanToken(BACKTICK)) {
-//                scanPosition = xsp;
-//                if (scanToken(LBRACK)) {
-//                    scanPosition = xsp;
-//                    return scanToken(UNDERSCORE);
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanText() {
-//        Token xsp = scanPosition;
-//        if (scanToken(BACKSLASH)) {
-//            scanPosition = xsp;
-//            if (scanToken(CHAR_SEQUENCE)) {
-//                scanPosition = xsp;
-//                if (scanToken(COLON)) {
-//                    scanPosition = xsp;
-//                    if (scanToken(DASH)) {
-//                        scanPosition = xsp;
-//                        if (scanToken(DIGITS)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(DOT)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(EQ)) {
-//                                    scanPosition = xsp;
-//                                    if (scanToken(ESCAPED_CHAR)) {
-//                                        scanPosition = xsp;
-//                                        if (scanToken(GT)) {
-//                                            scanPosition = xsp;
-//                                            if (scanToken(IMAGE_LABEL)) {
-//                                                scanPosition = xsp;
-//                                                if (scanToken(LPAREN)) {
-//                                                    scanPosition = xsp;
-//                                                    if (scanToken(LT)) {
-//                                                        scanPosition = xsp;
-//                                                        if (scanToken(RBRACK)) {
-//                                                            scanPosition = xsp;
-//                                                            if (scanToken(RPAREN)) {
-//                                                                scanPosition = xsp;
-//                                                                lookingAhead = true;
-//                                                                semanticLookAhead = !nextAfterSpace(EOL, EOF);
-//                                                                lookingAhead = false;
-//                                                                return (!semanticLookAhead || scanWhitspaceToken());
-//                                                            }
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanTextTokens() {
-//        if (scanText()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanText()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanCodeTextTokens() {
-//        Token xsp = scanPosition;
-//        if (scanToken(ASTERISK)) {
-//            scanPosition = xsp;
-//            if (scanToken(BACKSLASH)) {
-//                scanPosition = xsp;
-//                if (scanToken(CHAR_SEQUENCE)) {
-//                    scanPosition = xsp;
-//                    if (scanToken(COLON)) {
-//                        scanPosition = xsp;
-//                        if (scanToken(DASH)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(DIGITS)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(DOT)) {
-//                                    scanPosition = xsp;
-//                                    if (scanToken(EQ)) {
-//                                        scanPosition = xsp;
-//                                        if (scanToken(ESCAPED_CHAR)) {
-//                                            scanPosition = xsp;
-//                                            if (scanToken(IMAGE_LABEL)) {
-//                                                scanPosition = xsp;
-//                                                if (scanToken(LT)) {
-//                                                    scanPosition = xsp;
-//                                                    if (scanToken(LBRACK)) {
-//                                                        scanPosition = xsp;
-//                                                        if (scanToken(RBRACK)) {
-//                                                            scanPosition = xsp;
-//                                                            if (scanToken(LPAREN)) {
-//                                                                scanPosition = xsp;
-//                                                                if (scanToken(GT)) {
-//                                                                    scanPosition = xsp;
-//                                                                    if (scanToken(RPAREN)) {
-//                                                                        scanPosition = xsp;
-//                                                                        if (scanToken(UNDERSCORE)) {
-//                                                                            scanPosition = xsp;
-//                                                                            lookingAhead = true;
-//                                                                            semanticLookAhead = !nextAfterSpace(EOL,
-//                                                                                    EOF);
-//                                                                            lookingAhead = false;
-//                                                                            return (!semanticLookAhead
-//                                                                                    || scanWhitspaceToken());
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                            }
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanCode() {
-//        return scanToken(BACKTICK) || scanCodeTextTokensAhead() || scanToken(BACKTICK);
-//    }
-//
-//    private boolean scanCodeMultiline() {
-//        if (scanToken(BACKTICK) || scanCodeTextTokensAhead()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (hasCodeTextOnNextLineAhead()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(BACKTICK);
-//    }
-//
-//    private boolean scanCodeTextTokensAhead() {
-//        if (scanCodeTextTokens()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanCodeTextTokens()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean hasCodeTextOnNextLineAhead() {
-//        if (scanWhitespaceTokenBeforeEol()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanToken(GT)) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanCodeTextTokensAhead();
-//    }
-//
-//    private boolean scanWhitspaceTokens() {
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanWhitspaceToken()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanWhitespaceTokenBeforeEol() {
-//        return scanWhitspaceTokens() || scanToken(EOL);
-//    }
-//
-//    private boolean scanEmWithinStrongElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanToken(ASTERISK)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(BACKTICK)) {
-//                                scanPosition = xsp;
-//                                return scanToken(LBRACK);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanEmWithinStrong() {
-//        if (scanToken(UNDERSCORE) || scanEmWithinStrongElements()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanEmWithinStrongElements()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(UNDERSCORE);
-//    }
-//
-//    private boolean scanEmElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanStrongWithinEm()) {
-//                            scanPosition = xsp;
-//                            if (scanToken(ASTERISK)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(BACKTICK)) {
-//                                    scanPosition = xsp;
-//                                    return scanToken(LBRACK);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanEm() {
-//        if (scanToken(UNDERSCORE) || scanEmElements()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanEmElements()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(UNDERSCORE);
-//    }
-//
-//    private boolean scanEmWithinStrongMultilineContent() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanToken(ASTERISK)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(BACKTICK)) {
-//                                scanPosition = xsp;
-//                                return scanToken(LBRACK);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean hasNoEmWithinStrongMultilineContentAhead() {
-//        if (scanEmWithinStrongMultilineContent()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanEmWithinStrongMultilineContent()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanEmWithinStrongMultiline() {
-//        if (scanToken(UNDERSCORE) || hasNoEmWithinStrongMultilineContentAhead()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanWhitespaceTokenBeforeEol() || hasNoEmWithinStrongMultilineContentAhead()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(UNDERSCORE);
-//    }
-//
-//    private boolean scanEmMultilineContentElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    lookingAhead = true;
-//                    semanticLookAhead = multilineAhead(BACKTICK);
-//                    lookingAhead = false;
-//                    if (!semanticLookAhead || scanCodeMultiline()) {
-//                        scanPosition = xsp;
-//                        if (scanStrongWithinEmMultiline()) {
-//                            scanPosition = xsp;
-//                            if (scanToken(ASTERISK)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(BACKTICK)) {
-//                                    scanPosition = xsp;
-//                                    return scanToken(LBRACK);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanStrongWithinEmElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanToken(BACKTICK)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(LBRACK)) {
-//                                scanPosition = xsp;
-//                                return scanToken(UNDERSCORE);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanStrongWithinEm() {
-//        if (scanToken(ASTERISK) || scanStrongWithinEmElements()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanStrongWithinEmElements()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(ASTERISK);
-//    }
-//
-//    private boolean scanStrongElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    lookingAhead = true;
-//                    semanticLookAhead = multilineAhead(BACKTICK);
-//                    lookingAhead = false;
-//                    if (!semanticLookAhead || scanCodeMultiline()) {
-//                        scanPosition = xsp;
-//                        if (scanEmWithinStrong()) {
-//                            scanPosition = xsp;
-//                            if (scanToken(BACKTICK)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(LBRACK)) {
-//                                    scanPosition = xsp;
-//                                    return scanToken(UNDERSCORE);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanStrong() {
-//        if (scanToken(ASTERISK) || scanStrongElements()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanStrongElements()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(ASTERISK);
-//    }
-//
-//    private boolean scanStrongWithinEmMultilineElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanToken(BACKTICK)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(LBRACK)) {
-//                                scanPosition = xsp;
-//                                return scanToken(UNDERSCORE);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanForMoreStrongWithinEmMultilineElements() {
-//        if (scanStrongWithinEmMultilineElements()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanStrongWithinEmMultilineElements()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanStrongWithinEmMultiline() {
-//        if (scanToken(ASTERISK) || scanForMoreStrongWithinEmMultilineElements()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanWhitespaceTokenBeforeEol() || scanForMoreStrongWithinEmMultilineElements()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return scanToken(ASTERISK);
-//    }
-//
-//    private boolean scanStrongMultilineElements() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanEmWithinStrongMultiline()) {
-//                            scanPosition = xsp;
-//                            if (scanToken(BACKTICK)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(LBRACK)) {
-//                                    scanPosition = xsp;
-//                                    return scanToken(UNDERSCORE);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanResourceTextElement() {
-//        Token xsp = scanPosition;
-//        if (scanToken(ASTERISK)) {
-//            scanPosition = xsp;
-//            if (scanToken(BACKSLASH)) {
-//                scanPosition = xsp;
-//                if (scanToken(BACKTICK)) {
-//                    scanPosition = xsp;
-//                    if (scanToken(CHAR_SEQUENCE)) {
-//                        scanPosition = xsp;
-//                        if (scanToken(COLON)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(DASH)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(DIGITS)) {
-//                                    scanPosition = xsp;
-//                                    if (scanToken(DOT)) {
-//                                        scanPosition = xsp;
-//                                        if (scanToken(EQ)) {
-//                                            scanPosition = xsp;
-//                                            if (scanToken(ESCAPED_CHAR)) {
-//                                                scanPosition = xsp;
-//                                                if (scanToken(IMAGE_LABEL)) {
-//                                                    scanPosition = xsp;
-//                                                    if (scanToken(GT)) {
-//                                                        scanPosition = xsp;
-//                                                        if (scanToken(LBRACK)) {
-//                                                            scanPosition = xsp;
-//                                                            if (scanToken(LPAREN)) {
-//                                                                scanPosition = xsp;
-//                                                                if (scanToken(LT)) {
-//                                                                    scanPosition = xsp;
-//                                                                    if (scanToken(RBRACK)) {
-//                                                                        scanPosition = xsp;
-//                                                                        if (scanToken(UNDERSCORE)) {
-//                                                                            scanPosition = xsp;
-//                                                                            lookingAhead = true;
-//                                                                            semanticLookAhead = !nextAfterSpace(RPAREN);
-//                                                                            lookingAhead = false;
-//                                                                            return (!semanticLookAhead
-//                                                                                    || scanWhitspaceToken());
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                            }
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanImageElement() {
-//        Token xsp = scanPosition;
-//        if (scanResourceElements()) {
-//            scanPosition = xsp;
-//            if (scanLooseChar()) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanResourceTextElements() {
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanResourceTextElement()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanResourceUrl() {
-//        return scanToken(LPAREN) || scanWhitspaceTokens() || scanResourceTextElements() || scanWhitspaceTokens()
-//                || scanToken(RPAREN);
-//    }
-//
-//    private boolean scanLinkElement() {
-//        Token xsp = scanPosition;
-//        if (scanImage()) {
-//            scanPosition = xsp;
-//            if (scanStrong()) {
-//                scanPosition = xsp;
-//                if (scanEm()) {
-//                    scanPosition = xsp;
-//                    if (scanCode()) {
-//                        scanPosition = xsp;
-//                        if (scanResourceElements()) {
-//                            scanPosition = xsp;
-//                            return scanLooseChar();
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanResourceElement() {
-//        Token xsp = scanPosition;
-//        if (scanToken(BACKSLASH)) {
-//            scanPosition = xsp;
-//            if (scanToken(COLON)) {
-//                scanPosition = xsp;
-//                if (scanToken(CHAR_SEQUENCE)) {
-//                    scanPosition = xsp;
-//                    if (scanToken(DASH)) {
-//                        scanPosition = xsp;
-//                        if (scanToken(DIGITS)) {
-//                            scanPosition = xsp;
-//                            if (scanToken(DOT)) {
-//                                scanPosition = xsp;
-//                                if (scanToken(EQ)) {
-//                                    scanPosition = xsp;
-//                                    if (scanToken(ESCAPED_CHAR)) {
-//                                        scanPosition = xsp;
-//                                        if (scanToken(IMAGE_LABEL)) {
-//                                            scanPosition = xsp;
-//                                            if (scanToken(GT)) {
-//                                                scanPosition = xsp;
-//                                                if (scanToken(LPAREN)) {
-//                                                    scanPosition = xsp;
-//                                                    if (scanToken(LT)) {
-//                                                        scanPosition = xsp;
-//                                                        if (scanToken(RPAREN)) {
-//                                                            scanPosition = xsp;
-//                                                            lookingAhead = true;
-//                                                            semanticLookAhead = !nextAfterSpace(RBRACK);
-//                                                            lookingAhead = false;
-//                                                            return (!semanticLookAhead || scanWhitspaceToken());
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanResourceElements() {
-//        if (scanResourceElement()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanResourceElement()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanLink() {
-//        if (scanToken(LBRACK) || scanWhitspaceTokens() || scanLinkElement()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanLinkElement()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        if (scanWhitspaceTokens() || scanToken(RBRACK)) {
-//            return true;
-//        }
-//        xsp = scanPosition;
-//        if (scanResourceUrl()) {
-//            scanPosition = xsp;
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanImage() {
-//        if (scanToken(LBRACK) || scanWhitspaceTokens() || scanToken(IMAGE_LABEL) || scanImageElement()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanImageElement()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        if (scanWhitspaceTokens() || scanToken(RBRACK)) {
-//            return true;
-//        }
-//        xsp = scanPosition;
-//        if (scanResourceUrl()) {
-//            scanPosition = xsp;
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanInlineElement() {
-//        Token xsp = scanPosition;
-//        if (scanTextTokens()) {
-//            scanPosition = xsp;
-//            if (scanImage()) {
-//                scanPosition = xsp;
-//                if (scanLink()) {
-//                    scanPosition = xsp;
-//                    lookingAhead = true;
-//                    semanticLookAhead = multilineAhead(ASTERISK);
-//                    lookingAhead = false;
-//                    if (!semanticLookAhead || scanToken(ASTERISK)) {
-//                        scanPosition = xsp;
-//                        lookingAhead = true;
-//                        semanticLookAhead = multilineAhead(UNDERSCORE);
-//                        lookingAhead = false;
-//                        if (!semanticLookAhead || scanToken(UNDERSCORE)) {
-//                            scanPosition = xsp;
-//                            lookingAhead = true;
-//                            semanticLookAhead = multilineAhead(BACKTICK);
-//                            lookingAhead = false;
-//                            if (!semanticLookAhead || scanCodeMultiline()) {
-//                                scanPosition = xsp;
-//                                return scanLooseChar();
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanParagraph() {
-//        Token xsp;
-//        if (scanInlineElement()) {
-//            return true;
-//        }
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanInlineElement()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanForCodeLanguageElement() {
-//        Token xsp = scanPosition;
-//        if (scanToken(CHAR_SEQUENCE)) {
-//            scanPosition = xsp;
-//            if (scanToken(BACKTICK)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanForCodeLanguageElements() {
-//        if (scanForCodeLanguageElement()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanForCodeLanguageElement()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanWhitspaceToken() {
-//        Token xsp = scanPosition;
-//        if (scanToken(SPACE)) {
-//            scanPosition = xsp;
-//            if (scanToken(TAB)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanFencedCodeBlock() {
-//        if (scanToken(BACKTICK) || scanToken(BACKTICK) || scanToken(BACKTICK)) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanToken(BACKTICK)) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        if (scanWhitspaceTokens()) {
-//            return true;
-//        }
-//        xsp = scanPosition;
-//        if (scanForCodeLanguageElements()) {
-//            scanPosition = xsp;
-//        }
-//        xsp = scanPosition;
-//        if (scanToken(EOL) || scanWhitspaceTokens()) {
-//            scanPosition = xsp;
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanBlockQuoteEmptyLines() {
-//        return scanBlockQuoteEmptyLine() || scanToken(EOL);
-//    }
-//
-//    private boolean scanBlockQuoteEmptyLine() {
-//        if (scanToken(EOL) || scanWhitspaceTokens() || scanToken(GT) || scanWhitspaceTokens()) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanToken(GT) || scanWhitspaceTokens()) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanForHeadersigns() {
-//        if (scanToken(EQ)) {
-//            return true;
-//        }
-//        Token xsp;
-//        while (true) {
-//            xsp = scanPosition;
-//            if (scanToken(EQ)) {
-//                scanPosition = xsp;
-//                break;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanMoreBlockElements() {
-//        Token xsp = scanPosition;
-//        lookingAhead = true;
-//        semanticLookAhead = headingAhead(1);
-//        lookingAhead = false;
-//        if (!semanticLookAhead || scanForHeadersigns()) {
-//            scanPosition = xsp;
-//            if (scanToken(GT)) {
-//                scanPosition = xsp;
-//                if (scanToken(DASH)) {
-//                    scanPosition = xsp;
-//                    if (scanToken(DIGITS) || scanToken(DOT)) {
-//                        scanPosition = xsp;
-//                        if (scanFencedCodeBlock()) {
-//                            scanPosition = xsp;
-//                            return scanParagraph();
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean scanToken(int kind) {
-//        if (scanPosition == lastPosition) {
-//            lookAhead--;
-//            if (scanPosition.next == null) {
-//                lastPosition = scanPosition = scanPosition.next = tm.getNextToken();
-//            } else {
-//                lastPosition = scanPosition = scanPosition.next;
-//            }
-//        } else {
-//            scanPosition = scanPosition.next;
-//        }
-//        if (scanPosition.kind != kind) {
-//            return true;
-//        }
-//        if (lookAhead == 0 && scanPosition == lastPosition) {
-//            throw lookAheadSuccess;
-//        }
-//        return false;
-//    }
-//
+      blockQuoteEmptyLine: function() {
+          this.consumeToken(this.tm.EOL);
+          this.whiteSpace();
+          do {
+        	  this.consumeToken(this.tm.GT);
+        	  this.whiteSpace();
+          } while (this.getNextTokenKind() == this.tm.GT);
+      },
+
+      unorderedList: function() {
+    	  var list = new koara.ListBlock(false);
+    	  this.tree.openScope();
+    	  listBeginColumn = this.unorderedListItem();
+    	  while (this.listItemAhead(this.listBeginColumn, false)) {
+    		  while (this.getNextTokenKind() == this.tm.EOL) {
+    			  this.consumeToken(this.tm.EOL);
+    		  }
+    		  this.whiteSpace();
+    		  if (this.currentQuoteLevel > 0) {
+    			  this.blockQuotePrefix();
+    		  }
+    		  this.unorderedListItem();
+    	  }
+    	  this.tree.closeScope(list);
+      },
+
+      unorderedListItem: function() {
+          var listItem = new ListItem();
+          this.tree.openScope();
+
+          var t = consumeToken(this.tm.DASH);
+          this.whiteSpace();
+          if (this.listItemHasInlineElements()) {
+        	  this.blockElement();
+              while (this.blockAhead(t.beginColumn)) {
+                 while (this.getNextTokenKind() == this.tm.EOL) {
+                	  this.consumeToken(this.tm.EOL);
+                	  this.whiteSpace();
+                	  if (this.currentQuoteLevel > 0) {
+                		  this.blockQuotePrefix();
+                	  }
+                 }
+                 blockElement();
+              }
+          }
+          this.tree.closeScope(listItem);
+          return t.beginColumn;
+      },
+
+      orderedList: function() {
+        var list = new koara.ListBlock(true);
+        this.tree.openScope();
+        var listBeginColumn = this.orderedListItem();
+        while (this.listItemAhead(listBeginColumn, true)) {
+            while (this.getNextTokenKind() == this.tm.EOL) {
+                this.consumeToken(this.tm.EOL);
+            }
+            this.whiteSpace();
+            if (this.currentQuoteLevel > 0) {
+                this.blockQuotePrefix();
+            }
+            this.orderedListItem();
+        }
+        this.tree.closeScope(list);
+    },
+
+    orderedListItem: function() {
+        var listItem = new koara.ListItem();
+        this.tree.openScope();
+        var t = this.consumeToken(this.tm.DIGITS);
+        this.consumeToken(this.tm.DOT);
+        this.whiteSpace();
+        if (this.listItemHasInlineElements()) {
+            this.blockElement();
+            while (this.blockAhead(t.beginColumn)) {
+                while (this.getNextTokenKind() == this.tm.EOL) {
+                    this.consumeToken(this.tm.EOL);
+                    this.whiteSpace();
+                    if (this.currentQuoteLevel > 0) {
+                        this.blockQuotePrefix();
+                    }
+                }
+                this.blockElement();
+            }
+        }
+        listItem.number = t.image;
+        tree.closeScope(listItem);
+        return t.beginColumn;
+    },
+
+    fencedCodeBlock: function() {
+        var codeBlock = new CodeBlock();
+        tree.openScope();
+        var s = '';
+        var beginColumn = this.consumeToken(this.tm.BACKTICK).beginColumn;
+        do {
+            this.consumeToken(BACKTICK);
+        } while (this.getNextTokenKind() == this.tm.BACKTICK);
+        	this.whiteSpace();
+        	if (this.getNextTokenKind() == this.tm.CHAR_SEQUENCE) {
+        		this.codeBlock.language = this.codeLanguage();
+        	}
+        	if (this.getNextTokenKind() != this.tm.EOF && !this.fencesAhead()) {
+        	  this.consumeToken(this.tm.EOL);
+        	  this.levelWhiteSpace(this.beginColumn);
+        	}
+        
+        	while (this.getNextTokenKind() != this.tm.EOF && (this.getNextTokenKind() != this.tm.EOL || !this.fencesAhead())) {
+        		switch (this.getNextTokenKind()) {
+        			case this.tm.CHAR_SEQUENCE:
+	        			s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
+	        			break;
+        			case this.tm.ASTERISK:
+		                s += this.consumeToken(this.tm.ASTERISK).image;
+		                break;
+        			case this.tm.BACKSLASH:
+        				s += this.consumeToken(this.tm.BACKSLASH).image;
+        				break;
+		            case this.tm.COLON:
+		                s += this.consumeToken(this.tm.COLON).image;
+		                break;
+		            case this.tm.DASH:
+		                s += this.consumeToken(this.tm.DASH).image;
+		                break;
+		            case this.tm.DIGITS:
+		                s += this.consumeToken(this.tm.DIGITS).image;
+		                break;
+		            case this.tm.DOT:
+		                s += this.consumeToken(this.tm.DOT).image;
+		                break;
+		            case this.tm.EQ:
+		                s += this.consumeToken(this.tm.EQ).image;
+		                break;
+		            case this.tm.ESCAPED_CHAR:
+		                s += this.consumeToken(this.tm.ESCAPED_CHAR).image;
+		                break;
+		            case this.tm.IMAGE_LABEL:
+		                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+		                break;
+		            case this.tm.LT:
+		                s += this.consumeToken(this.tm.LT).image;
+		                break;
+		            case this.tm.GT:
+		                s += this.consumeToken(this.tm.GT).image;
+		                break;
+		            case this.tm.LBRACK:
+		                s += this.consumeToken(this.tm.LBRACK).image;
+		                break;
+		            case this.tm.RBRACK:
+		                s += this.consumeToken(this.tm.RBRACK).image;
+		                break;
+		            case this.tm.LPAREN:
+		                s += this.consumeToken(this.tm.LPAREN).image;
+		                break;
+		            case this.tm.RPAREN:
+		                s += this.consumeToken(this.tm.RPAREN).image;
+		                break;
+		            case this.tm.UNDERSCORE:
+		                s += this.consumeToken(this.tm.UNDERSCORE).image;
+		                break;
+		            case this.tm.BACKTICK:
+		                s += this.consumeToken(this.tm.BACKTICK).image;
+		                break;
+		            default:
+		                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+		                    switch (this.getNextTokenKind()) {
+		                    case this.tm.SPACE:
+		                        s += this.consumeToken(this.tm.SPACE).image;
+		                        break;
+		                    case this.tm.TAB:
+		                        consumeToken(this.tm.TAB);
+		                        s += "    ";
+		                        break;
+		                    }
+		                } else if (!this.fencesAhead()) {
+		                    this.consumeToken(this.tm.EOL);
+		                    s += "\n";
+		                    this.levelWhiteSpace(this.beginColumn);
+		                }
+		            }
+        	}
+        	if (this.fencesAhead()) {
+        		this.consumeToken(this.tm.EOL);
+        		this.whiteSpace();
+        		while (this.getNextTokenKind() == this.tm.BACKTICK) {
+        			this.consumeToken(BACKTICK);
+        		}
+        }
+        codeBlock.setValue(s.toString());
+        tree.closeScope(codeBlock);
+    },
+
+    paragraph: function() {
+        var paragraph;
+        if (this.modules.indexOf("paragraphs") >= 0) {
+            paragraph = new koara.Paragraph();
+        } else {
+            paragraph = new koara.BlockElement();
+        }
+
+        this.tree.openScope();
+        this.inline();
+        while (this.textAhead()) {
+            this.lineBreak();
+            this.whiteSpace();
+            if (this.modules.indexOf("blockquotes") >= 0) {
+                while (this.getNextTokenKind() == this.tm.GT) {
+                    this.consumeToken(this.tm.GT);
+                    this.whiteSpace();
+                }
+            }
+            this.inline();
+        }
+        this.tree.closeScope(paragraph);
+    },
+
+    text: function() {
+        var text = new koara.Text();
+        this.tree.openScope();
+        var s = '';
+        while (this.textHasTokensAhead()) {
+            switch (this.getNextTokenKind()) {
+        	case this.tm.CHAR_SEQUENCE:
+        		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
+        		break;
+            case this.tm.BACKSLASH:
+                s += this.consumeToken(this.tm.BACKSLASH).image;
+                break;
+            case this.tm.COLON:
+                s += this.consumeToken(this.tm.COLON).image;
+                break;
+            case this.tm.DASH:
+                s += this.consumeToken(this.tm.DASH).image;
+                break;
+            case this.tm.DIGITS:
+                s += this.consumeToken(this.tm.DIGITS).image;
+                break;
+            case this.tm.DOT:
+                s += this.consumeToken(this.tm.DOT).image;
+                break;
+            case this.tm.EQ:
+                s += this.consumeToken(this.tm.EQ).image;
+                break;
+            case ESCAPED_CHAR:
+                s += this.consumeToken(this.tm.ESCAPED_CHAR).image.substring(1);
+                break;
+            case this.tm.GT:
+                s += this.consumeToken(this.tm.GT).image;
+                break;
+            case this.tm.IMAGE_LABEL:
+                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+                break;
+            case this.tm.LPAREN:
+                s += this.consumeToken(this.tm.LPAREN).image;
+                break;
+            case this.tm.LT:
+                s += this.consumeToken(this.tm.LT).image;
+                break;
+            case this.tm.RBRACK:
+                s += consumeToken(this.tm.RBRACK).image;
+                break;
+            case this.tm.RPAREN:
+                s += consumeToken(RPAREN).image;
+                break;
+            default:
+                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+                    switch (this.getNextTokenKind()) {
+                    case this.tm.SPACE:
+                        s += this.consumeToken(this.tm.SPACE).image;
+                        break;
+                    case this.tm.TAB:
+                        this.consumeToken(this.tm.TAB);
+                        s += "    ";
+                        break;
+                    }
+                }
+            }
+        }
+        text.value = s;
+        tree.closeScope(text);
+    },
+
+    image: function() {
+        var image = new koara.Image();
+        this.tree.openScope();
+        var ref = '';
+        this.consumeToken(this.tm.LBRACK);
+        this.whiteSpace();
+        this.consumeToken(this.tm.IMAGE_LABEL);
+        this.whiteSpace();
+        while (this.imageHasAnyElements()) {
+            if (this.hasTextAhead()) {
+                this.resourceText();
+            } else {
+                this.looseChar();
+            }
+        }
+        this.whiteSpace();
+        this.consumeToken(this.tm.RBRACK);
+        if (this.hasResourceUrlAhead()) {
+            ref = this.resourceUrl();
+        }
+        image.value = ref;
+        this.tree.closeScope(image);
+    },
+
+    link: function() {
+        var link = new Link();
+        this.tree.openScope();
+        var ref = "";
+        this.consumeToken(this.tm.LBRACK);
+        this.whiteSpace();
+        while (this.linkHasAnyElements()) {
+            if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+                this.image();
+            } else if (modules.indexOf("formatting") >= 0 && this.hasStrongAhead()) {
+                this.strong();
+            } else if (modules.indexOf("formatting") >= 0 && this.hasEmAhead()) {
+                this.em();
+            } else if (modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
+                this.code();
+            } else if (this.hasResourceTextAhead()) {
+                this.resourceText();
+            } else {
+                this.looseChar();
+            }
+        }
+        this.whiteSpace();
+        this.consumeToken(this.tm.RBRACK);
+        if (this.hasResourceUrlAhead()) {
+            ref = this.resourceUrl();
+        }
+        link.value = ref;
+        tree.closeScope(link);
+    },
+
+    strong: function() {
+    	var strong = new koara.Strong();
+        this.tree.openScope();
+        this.consumeToken(this.tm.ASTERISK);
+        while (this.strongHasElements()) {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImage()) {
+                this.image();
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
+                this.link();
+            } else if (this.modules.indexOf("code") >= 0 && this.multilineAhead(this.tm.BACKTICK)) {
+                this.codeMultiline();
+            } else if (this.strongEmWithinStrongAhead()) {
+                this.emWithinStrong();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case this.tm.LBRACK:
+                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                case this.tm.UNDERSCORE:
+                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.UNDERSCORE));
+                    break;
+                }
+            }
+        }
+        this.consumeToken(this.tm.ASTERISK);
+        this.tree.closeScope(strong);
+    },
+
+    em: function() {
+        var em = new Em();
+        this.tree.openScope();
+        this.consumeToken(this.tm.UNDERSCORE);
+        while (this.emHasElements()) {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (modules.indexOf("images") >= 0 && this.hasImage()) {
+                this.image();
+            } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
+                this.link();
+            } else if (modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
+                this.code();
+            } else if (this.emHasStrongWithinEm()) {
+                this.strongWithinEm();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.ASTERISK:
+                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    break;
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case this.tm.LBRACK:
+                    tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                }
+            }
+        }
+        this.consumeToken(this.tm.UNDERSCORE);
+        this.tree.closeScope(em);
+    },
+
+    code: function() {
+        var code = new Code();
+        this.tree.openScope();
+        this.consumeToken(this.tm.BACKTICK);
+        this.codeText();
+        this.consumeToken(this.tm.BACKTICK);
+        this.tree.closeScope(code);
+    },
+
+    codeText: function() {
+        var text = new Text();
+        this.tree.openScope();
+        var s = '';
+        do {
+            switch (this.getNextTokenKind()) {
+        	case this.tm.CHAR_SEQUENCE:
+        		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
+        		break;
+            case this.tm.ASTERISK:
+                s += this.consumeToken(this.tm.ASTERISK).image;
+                break;
+            case this.tm.BACKSLASH:
+                s += this.consumeToken(this.tm.BACKSLASH).image;
+                break;
+            case this.tm.COLON:
+                s += this.consumeToken(this.tm.COLON).image;
+                break;
+            case this.tm.DASH:
+                s += this.consumeToken(this.tm.DASH).image;
+                break;
+            case this.tm.DIGITS:
+                s += this.consumeToken(this.tm.DIGITS).image;
+                break;
+            case this.tm.DOT:
+                s += this.consumeToken(this.tm.DOT).image;
+                break;
+            case this.tm.EQ:
+                s += this.consumeToken(this.tm.EQ).image;
+                break;
+            case this.tm.ESCAPED_CHAR:
+                s += this.consumeToken(this.tm.ESCAPED_CHAR).image;
+                break;
+            case this.tm.IMAGE_LABEL:
+                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+                break;
+            case this.tm.LT:
+                s += this.consumeToken(this.tm.LT).image;
+                break;
+            case this.tm.LBRACK:
+                s += this.consumeToken(this.tm.LBRACK).image;
+                break;
+            case this.tm.RBRACK:
+                s += this.consumeToken(this.tm.RBRACK).image;
+                break;
+            case this.tm.LPAREN:
+                s += this.consumeToken(this.tm.LPAREN).image;
+                break;
+            case this.tm.GT:
+                s += this.consumeToken(this.tm.GT).image;
+                break;
+            case this.tm.RPAREN:
+                s += this.consumeToken(this.tm.RPAREN).image;
+                break;
+            case this.tm.UNDERSCORE:
+                s += this.consumeToken(this.tm.UNDERSCORE).image;
+                break;
+            default:
+                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+                    switch (this.getNextTokenKind()) {
+                    case this.tm.SPACE:
+                        s += this.consumeToken(this.tm.SPACE).image;
+                        break;
+                    case this.tm.TAB:
+                        this.consumeToken(this.tm.TAB);
+                        s += "    ";
+                        break;
+                    }
+                }
+            }
+        } while (this.codeTextHasAnyTokenAhead());
+        text.value = s;
+        this.tree.closeScope(text);
+    },
+
+   looseChar: function() {
+        var text = new Text();
+        this.tree.openScope();
+        switch (this.getNextTokenKind()) {
+        case this.tm.ASTERISK:
+            text.value = this.consumeToken(this.tm.ASTERISK).image;
+            break;
+        case this.tm.BACKTICK:
+            text.value = this.consumeToken(this.tm.BACKTICK).image;
+            break;
+        case this.tm.LBRACK:
+            text.value = this.consumeToken(this.tm.LBRACK).image;
+            break;
+        case this.tm.UNDERSCORE:
+            text.value = this.consumeToken(this.tm.UNDERSCORE).image;
+            break;
+        }
+        tree.closeScope(text);
+    },
+
+    lineBreak: function() {
+        var linebreak = new LineBreak();
+        this.tree.openScope();
+        while (this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) {
+            this.consumeToken(this.getNextTokenKind());
+        }
+        this.consumeToken(this.tm.EOL);
+        this.tree.closeScope(linebreak);
+    },
+
+    levelWhiteSpace: function(threshold) {
+        var currentPos = 1;
+        while (this.getNextTokenKind() == this.tm.GT) {
+            this.consumeToken(this.getNextTokenKind());
+        }
+        while ((this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) && currentPos < (threshold - 1)) {
+            currentPos = this.consumeToken(this.getNextTokenKind()).beginColumn;
+        }
+    },
+
+    codeLanguage: function() {
+        var s = '';
+        do {
+            switch (this.getNextTokenKind()) {
+        	case this.tm.CHAR_SEQUENCE:
+        		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
+        		break;
+            case this.tm.ASTERISK:
+                s += this.consumeToken(this.tm.ASTERISK).image;
+                break;
+            case this.tm.BACKSLASH:
+                s += this.consumeToken(this.tm.BACKSLASH).image;
+                break;
+            case this.tm.ACKTICK:
+                s += this.consumeToken(this.tm.BACKTICK).image;
+                break;
+            case this.tm.COLON:
+                s += this.consumeToken(this.tm.COLON).image;
+                break;
+            case this.tm.DASH:
+                s += this.consumeToken(this.tm.DASH).image;
+                break;
+            case this.tm.DIGITS:
+                s += this.consumeToken(this.tm.DIGITS).image;
+                break;
+            case this.tm.DOT:
+                s += this.consumeToken(this.tm.DOT).imagec;
+                break;
+            case this.tm.EQ:
+                s += this.consumeToken(this.tm.EQ).image;
+                break;
+            case this.tm.ESCAPED_CHAR:
+                s += this.consumeToken(this.tm.ESCAPED_CHAR).image;
+                break;
+            case this.tm.IMAGE_LABEL:
+                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+                break;
+            case this.tm.LT:
+                s += this.consumeToken(this.tm.LT).image;
+                break;
+            case this.tm.GT:
+                s += this.consumeToken(this.tm.GT).image;
+                break;
+            case this.tm.LBRACK:
+                s += this.consumeToken(this.tm.LBRACK).image;
+                break;
+            case this.tm.RBRACK:
+                s += this.consumeToken(this.tm.RBRACK).image;
+                break;
+            case this.tm.LPAREN:
+                s += this.consumeToken(this.tm.LPAREN).image;
+                break;
+            case this.tm.RPAREN:
+                s += this.consumeToken(this.tm.RPAREN).image;
+                break;
+            case this.tm.UNDERSCORE:
+                s += this.consumeToken(this.tm.UNDERSCORE).image;
+                break;
+            case this.tm.SPACE:
+                s += consumeToken(this.tm.SPACE).image;
+                break;
+            case this.tm.TAB:
+                s += "    ";
+                break;
+            default:
+                break;
+            }
+          } while (this.getNextTokenKind() != this.tm.EOL && this.getNextTokenKind() != this.tm.EOF);
+          return s;
+      },
+
+      inline: function() {
+    	  do {
+    		  if (this.hasInlineTextAhead()) {
+    			  text();
+            } else if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+                  image();
+            } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
+                  link();
+            } else if (modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.ASTERISK)) {
+                  strongMultiline();
+            } else if (modules.indexOf("formatting") >= 0 && multilineAhead(UNDERSCORE)) {
+                  emMultiline();
+            } else if (modules.indexOf("code") >= 0 && multilineAhead(this.tm.BACKTICK)) {
+                  codeMultiline();
+            } else {
+                 looseChar();
+            }
+          } while (this.hasInlineElementAhead());
+      },
+
+      resourceText: function() {
+    	  var text = new Text();
+    	  this.tree.openScope();
+    	  var s = '';
+    	  do {
+            switch (this.getNextTokenKind()) {
+            case this.tm.CHAR_SEQUENCE:
+        		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
+        		break;
+            case this.tm.BACKSLASH:
+                s += this.consumeToken(this.tm.BACKSLASH).image;
+                break;
+            case this.tm.COLON:
+                s += this.consumeToken(this.tm.COLON).image;
+                break;
+            case this.tm.DASH:
+                s += this.consumeToken(this.tm.DASH).image;
+                break;
+            case this.tm.DIGITS:
+                s += this.consumeToken(this.tm.DIGITS).image;
+                break;
+            case this.tm.DOT:
+                s += this.consumeToken(this.tm.DOT).image;
+                break;
+            case this.tm.EQ:
+                s += this.consumeToken(this.tm.EQ).image;
+                break;
+            case this.tm.ESCAPED_CHAR:
+                s += this.consumeToken(this.tm.ESCAPED_CHAR).image.substring(1);
+                break;
+            case this.tm.IMAGE_LABEL:
+                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+                break;
+            case this.tm.GT:
+                s += this.consumeToken(this.tm.GT).image;
+                break;
+            case this.tm.LPAREN:
+                s += this.consumeToken(this.tm.LPAREN).image;
+                break;
+            case this.tm.LT:
+                s += this.consumeToken(this.tm.LT).image;
+                break;
+            case this.tm.RPAREN:
+                s += this.consumeToken(this.tm.RPAREN).image;
+                break;
+            default:
+                if (!this.nextAfterSpace(this.tm.RBRACK)) {
+                    switch (this.getNextTokenKind()) {
+                    case this.tm.SPACE:
+                        s += this.consumeToken(this.tm.SPACE).image;
+                        break;
+                    case this.tm.TAB:
+                        consumeToken(this.tm.TAB);
+                        s += "    ";
+                        break;
+                    }
+                }
+            }
+        } while (this.resourceHasElementAhead());
+        text.value = s;
+        this.tree.closeScope(text);
+      },
+
+      resourceUrl: function() {
+        this.consumeToken(this.tm.LPAREN);
+        this.whiteSpace();
+        var ref = this.resourceUrlText();
+        this.whiteSpace();
+        this.consumeToken(this.tm.RPAREN);
+        return ref;
+      }, 
+
+      resourceUrlText: function() {
+          var s = '';
+          while (this.resourceTextHasElementsAhead()) {
+            switch (this.getNextTokenKind()) {
+        	case this.tm.CHAR_SEQUENCE:
+        		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
+        		break;
+            case this.tm.ASTERISK:
+                s += this.consumeToken(this.tm.ASTERISK).image;
+                break;
+            case this.tm.BACKSLASH:
+                s += this.consumeToken(this.tm.BACKSLASH).image;
+                break;
+            case this.tm.BACKTICK:
+                s += this.consumeToken(this.tm.BACKTICK).image;
+                break;
+            case this.tm.COLON:
+                s += this.consumeToken(this.tm.COLON).image;
+                break;
+            case this.tm.DASH:
+                s += this.consumeToken(this.tm.DASH).image;
+                break;
+            case this.tm.DIGITS:
+                s += this.consumeToken(this.tm.DIGITS).image;
+                break;
+            case this.tm.DOT:
+                s += this.consumeToken(this.tm.DOT).image;
+                break;
+            case this.tm.EQ:
+                s += this.consumeToken(this.tm.EQ).image;
+                break;
+            case this.tm.ESCAPED_CHAR:
+                s += this.consumeToken(this.tm.ESCAPED_CHAR).image.substring(1);
+                break;
+            case this.tm.IMAGE_LABEL:
+                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+                break;
+            case this.tm.GT:
+                s += this.consumeToken(this.tm.GT).image;
+                break;
+            case this.tm.LBRACK:
+                s += this.consumeToken(this.tm.LBRACK).image;
+                break;
+            case this.tm.LPAREN:
+                s += this.consumeToken(this.tm.LPAREN).image;
+                break;
+            case this.tm.LT:
+                s += this.consumeToken(this.tm.LT).image;
+                break;
+            case this.tm.RBRACK:
+                s += this.consumeToken(this.tm.RBRACK).image;
+                break;
+            case this.tm.UNDERSCORE:
+                s += this.consumeToken(this.tm.UNDERSCORE).image;
+                break;
+            default:
+                if (!this.nextAfterSpace(this.tm.RPAREN)) {
+                    switch (this.getNextTokenKind()) {
+                    case this.tm.SPACE:
+                        s += this.consumeToken(this.tm.SPACE).image;
+                        break;
+                    case this.tm.TAB:
+                        this.consumeToken(this.tm.TAB);
+                        s += "    ";
+                        break;
+                    }
+                }
+              }
+            }
+            return s;
+      },
+
+	  strongMultiline: function() {
+	    var strong = new Strong();
+	    this.tree.openScope();
+	    this.consumeToken(this.tm.ASTERISK);
+	    this.strongMultilineContent();
+	    while (this.textAhead()) {
+	       this.lineBreak();
+	       this.strongMultilineContent();
+	    }
+	    this.consumeToken(this.tm.ASTERISK);
+	    this.tree.closeScope(this.tm.strong);
+	  },
+
+   	  strongMultilineContent: function() {
+        do {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+                this.image();
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
+                this.link();
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+                this.code();
+            } else if (this.hasEmWithinStrongMultiline()) {
+                this.emWithinStrongMultiline();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case LBRACK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                case this.tm.UNDERSCORE:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.UNDERSCORE));
+                    break;
+                }
+            }
+        } while (this.strongMultilineHasElementsAhead());
+   	  },
+
+   	  strongWithinEmMultiline: function() {
+        var strong = new Strong();
+        this.tree.openScope();
+        this.consumeToken(this.tm.ASTERISK);
+        this. strongWithinEmMultilineContent();
+        while (this.textAhead()) {
+            this.lineBreak();
+            this.strongWithinEmMultilineContent();
+        }
+        this.consumeToken(this.tm.ASTERISK);
+        this.tree.closeScope(this.tm.strong);
+   	  },
+
+   	  strongWithinEmMultilineContent: function() {
+        do {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+                this.image();
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+                this.link();
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+                this.code();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case LBRACK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                case this.tm.UNDERSCORE:
+                    this.tree.addSingleValue(new KoaraText(), this.consumeToken(UNDERSCORE));
+                    break;
+                }
+            }
+        } while (this.strongWithinEmMultilineHasElementsAhead());
+      },
+
+      strongWithinEm: function() {
+        var strong = new Strong();
+        this.tree.openScope();
+        thiss.consumeToken(this.tm.ASTERISK);
+        do {
+            if (this.hasTextAhead()) {
+               this.text();
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+               this.image();
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+               this.link();
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+               this.code();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case this.tm.LBRACK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                case this.tm.UNDERSCORE:
+                    this.tree.addSingleValue(new KoaraText(), this.consumeToken(this.tm.UNDERSCORE));
+                    break;
+                }
+            }
+        } while (this.strongWithinEmHasElementsAhead());
+        this.consumeToken(this.tm.ASTERISK);
+        this.tree.closeScope(strong);
+    },
+
+    emMultiline: function() {
+        var em = new Em();
+        this.tree.openScope();
+        this.consumeToken(this.tm.UNDERSCORE);
+        this.emMultilineContent();
+        while (this.textAhead()) {
+            this.lineBreak();
+            this.emMultilineContent();
+        }
+        this.consumeToken(this.tm.UNDERSCORE);
+        this.tree.closeScope(em);
+    },
+
+    emMultilineContent: function() {
+        do {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (this.modules.indexOf("images") >= 0  && this.hasImageAhead()) {
+                this.image();
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+                this.link();
+            } else if (this.modules.indexOf("code") >= 0  && this.multilineAhead(this.tm.BACKTICK)) {
+                this.codeMultiline();
+            } else if (this.hasStrongWithinEmMultilineAhead()) {
+                this.strongWithinEmMultiline();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.ASTERISK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    break;
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case this.tm.LBRACK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                }
+            }
+        } while (this.emMultilineContentHasElementsAhead());
+    },
+
+    emWithinStrongMultiline: function() {
+        var em = new Em();
+        this.tree.openScope();
+        this.consumeToken(this.tm.UNDERSCORE);
+        this.emWithinStrongMultilineContent();
+        while (this.textAhead()) {
+            this.lineBreak();
+            this.emWithinStrongMultilineContent();
+        }
+        this.consumeToken(this.tm.UNDERSCORE);
+        this.tree.closeScope(em);
+    },
+
+    emWithinStrongMultilineContent: function() {
+        do {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+                this.image();
+            } else if (this.this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+                this.link();
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+                this.code();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.ASTERISK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    break;
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case this.tm.LBRACK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    break;
+                }
+            }
+        } while (this.emWithinStrongMultilineContentHasElementsAhaed());
+    },
+
+    emWithinStrong: function() {
+        var em = new Em();
+        this.tree.openScope();
+        this.consumeToken(this.tm.UNDERSCORE);
+        do {
+            if (this.hasTextAhead()) {
+                this.text();
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+                this.image();
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+                this.link();
+            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+                this.code();
+            } else {
+                switch (this.getNextTokenKind()) {
+                case this.tm.ASTERISK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    break;
+                case this.tm.BACKTICK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    break;
+                case this.tm.LBRACK:
+                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(LBRACK));
+                    break;
+                }
+            }
+        } while (this.emWithinStrongHasElementsAhead());
+        this.consumeToken(this.tm.UNDERSCORE);
+        this.tree.closeScope(em);
+    },
+
+    codeMultiline: function() {
+        var code = new Code();
+        this.tree.openScope();
+        this.consumeToken(this.tm.BACKTICK);
+        this.codeText();
+        while (this.textAhead()) {
+            this.lineBreak();
+            this.whiteSpace();
+            while (this.getNextTokenKind() == this.tm.GT) {
+                this.consumeToken(this.tm.GT);
+                this.whiteSpace();
+            }
+            this.codeText();
+        }
+        this.consumeToken(this.tm.BACKTICK);
+        this.tree.closeScope(code);
+    },
+
+    whiteSpace: function() {
+        while (this.getNextTokenKind() == this.tm.SPACE || this.tm.getNextTokenKind() == this.tm.TAB) {
+            this.consumeToken(this.getNextTokenKind());
+        }
+    },
+
+    hasAnyBlockElementsAhead: function() {
+        try {
+            this.lookAhead = 1;
+            this.lastPosition = this.scanPosition = this.token;
+            return !this.scanMoreBlockElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    blockAhead: function(blockBeginColumn) {
+        var quoteLevel;
+        if (this.getNextTokenKind() == this.tm.EOL) {
+            var t;
+            var i = 2;
+            var quoteLevel = 0;
+            do {
+                quoteLevel = 0;
+                do {
+                    t = this.getToken(i++);
+                    if (t.kind == this.tm.GT) {
+                        if (t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0) {
+                            return false;
+                        }
+                        quoteLevel++;
+                    }
+                } while (t.kind == this.tm.GT || t.kind == this.tm.SPACE || t.kind == this.tm.TAB);
+                if (quoteLevel > currentQuoteLevel) {
+                    return true;
+                }
+                if (quoteLevel < currentQuoteLevel) {
+                    return false;
+                }
+            } while (t.kind == this.tm.EOL);
+            return t.kind != this.tm.EOF && (currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2);
+        }
+        return false;
+    },
+
+    multilineAhead: function(token) {
+        if (this.getNextTokenKind() == token && this.getToken(2).kind != token && this.getToken(2).kind != this.tm.EOL) {
+            for (var i = 2;; i++) {
+                var t = this.getToken(i);
+                if (t.kind == token) {
+                    return true;
+                } else if (t.kind == this.tm.EOL) {
+                    i = this.skip(i + 1, this.tm.SPACE, this.tm.TAB);
+                    var quoteLevel = this.newQuoteLevel(i);
+                    if (quoteLevel == this.currentQuoteLevel) {
+                        i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+                        if (this.getToken(i).kind == token || this.getToken(i).kind == this.tm.EOL || this.getToken(i).kind == this.tm.DASH
+                                || (this.getToken(i).kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
+                                || (getToken(i).kind == this.tm.BACKTICK && getToken(i + 1).kind == this.tm.BACKTICK
+                                        && getToken(i + 2).kind == this.tm.BACKTICK)
+                                || this.headingAhead(i)) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else if (t.kind == this.EOF) {
+                    return false;
+                }
+            }
+        }
+        return false;
+    },
+
+    fencesAhead: function() {
+        if (this.getNextTokenKind() == this.tm.EOL) {
+            var i = skip(2, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+            if (this.getToken(i).kind == this.tm.BACKTICK && getToken(i + 1).kind == this.tm.BACKTICK && getToken(i + 2).kind == this.tm.BACKTICK) {
+                i = skip(i + 3, this.tm.SPACE, this.tm.TAB);
+                return this.getToken(i).kind == this.tm.EOL || this.getToken(i).kind == this.tm.EOF;
+            }
+        }
+        return false;
+    },
+
+    headingAhead: function(offset) {
+        if (this.getToken(offset).kind == this.tm.EQ) {
+            var heading = 1;
+            for (var i = (offset + 1);; i++) {
+                if (this.getToken(i).kind != this.tm.EQ) {
+                    return true;
+                }
+                if (++heading > 6) {
+                    return false;
+                }
+            }
+        }
+        return false;
+    },
+
+    listItemAhead: function(listBeginColumn, ordered) {
+        if (this.getNextTokenKind() == this.tm.EOL) {
+            for (var i = 2, eol = 1;; i++) {
+                var t = this.getToken(i);
+
+                if (t.kind == this.tm.EOL && ++eol > 2) {
+                    return false;
+                } else if (t.kind != this.tm.SPACE && t.kind != this.tm.TAB && t.kind != this.tm.GT && t.kind != this.tm.EOL) {
+                    if (ordered) {
+                        return (t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT && t.beginColumn >= listBeginColumn);
+                    }
+                    return t.kind == this.tm.DASH && t.beginColumn >= listBeginColumn;
+                }
+            }
+        }
+        return false;
+    },
+
+    textAhead: function() {
+        if (this.getNextTokenKind() == this.tm.EOL && this.getToken(2).kind != this.tm.EOL) {
+            var i = skip(2, this.tm.SPACE, this.tm.TAB);
+            var quoteLevel = this.newQuoteLevel(i);
+            if (quoteLevel == this.currentQuoteLevel || !modules.contains(Module.BLOCKQUOTES)) {
+                i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+
+                var t = this.getToken(i);
+                return this.getToken(i).kind != this.tm.EOL && !(modules.contains(Module.LISTS) && t.kind == this.tm.DASH)
+                        && !(modules.contains(Module.LISTS) && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
+                        && !(this.getToken(i).kind == this.tm.BACKTICK && this.getToken(i + 1).kind == this.tm.BACKTICK
+                                && this.getToken(i + 2).kind == this.tm.BACKTICK)
+                        && !(modules.contains(Module.HEADINGS) && this.headingAhead(i));
+            }
+        }
+        return false;
+    },
+
+    nextAfterSpace: function(tokens) {
+        var i = this.skip(1, this.tm.SPACE, this.tm.TAB);
+        return Arrays.asList(tokens).contains(getToken(i).kind);
+    },
+
+    newQuoteLevel: function(offset) {
+        var quoteLevel = 0;
+        for (var i = offset;; i++) {
+            var t = this.getToken(i);
+            if (t.kind == this.tm.GT) {
+                quoteLevel++;
+            } else if (t.kind != this.tm.SPACE && t.kind != this.tm.TAB) {
+                return quoteLevel;
+            }
+
+        }
+    },
+
+    skip: function(offset, tokens) {
+        for (var i = offset;; i++) {
+            var t = this.getToken(i);
+            if (!Arrays.asList(tokens).contains(t.kind) || t.kind == EOF) {
+                return i;
+            }
+        }
+    },
+
+    hasOrderedListAhead: function() {
+        this.lookAhead = 2;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanToken(this.tm.DIGITS) && !this.scanToken(this.tm.DOT);
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasFencedCodeBlockAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanFencedCodeBlock();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    headingHasInlineElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            var xsp = this.scanPosition;
+            if (this.scanTextTokens()) {
+                this.scanPosition = xsp;
+                if (this.scanImage()) {
+                    this.scanPosition = xsp;
+                    if (this.scanLink()) {
+                        this.scanPosition = xsp;
+                        if (this.scanStrong()) {
+                            this.scanPosition = xsp;
+                            if (this.scanEm()) {
+                                this.scanPosition = xsp;
+                                if (this.scanCode()) {
+                                    this.scanPosition = xsp;
+                                    if (this.scanLooseChar()) {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasTextAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanTextTokens();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasImageAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanImage();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    blockQuoteHasEmptyLineAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanBlockQuoteEmptyLine();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasStrongAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrong();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasEmAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanEm();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasCodeAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanCode();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    blockQuoteHasAnyBlockElementseAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanMoreBlockElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasBlockQuoteEmptyLinesAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanBlockQuoteEmptyLines();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    listItemHasInlineElements: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanMoreBlockElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasInlineTextAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanTextTokens();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasInlineElementAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanInlineElement();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    imageHasAnyElements: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanImageElement();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasResourceTextAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanResourceElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    linkHasAnyElements: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanLinkElement();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasResourceUrlAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanResourceUrl();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    resourceHasElementAhead: function() {
+        lookAhead = 2;
+        lastPosition = scanPosition = token;
+        try {
+            return !scanResourceElement();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    resourceTextHasElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanResourceTextElement();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasEmWithinStrongMultiline: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanEmWithinStrongMultiline();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    strongMultilineHasElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrongMultilineElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    strongWithinEmMultilineHasElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrongWithinEmMultilineElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasImage: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanImage();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasLinkAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanLink();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    strongEmWithinStrongAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanEmWithinStrong();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    strongHasElements: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrongElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    strongWithinEmHasElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrongWithinEmElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    hasStrongWithinEmMultilineAhead: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrongWithinEmMultiline();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    emMultilineContentHasElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanEmMultilineContentElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    emWithinStrongMultilineContentHasElementsAhead: function() {
+        lookAhead = 1;
+        lastPosition = scanPosition = token;
+        try {
+            return !scanEmWithinStrongMultilineContent();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+   emHasStrongWithinEm: function() {
+        this.lookAhead = 2147483647;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanStrongWithinEm();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    emHasElements: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanEmElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    emWithinStrongHasElementsAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanEmWithinStrongElements();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    codeTextHasAnyTokenAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanCodeTextTokens();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    textHasTokensAhead: function() {
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
+        try {
+            return !this.scanText();
+        } catch (ls) {
+            return true;
+        }
+    },
+
+    scanLooseChar: function() {
+        var xsp = this.scanPosition;
+        if (this.scanToken(this.tm.ASTERISK)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.BACKTICK)) {
+                this.scanPosition = xsp;
+                if (this.scanToken(this.tm.LBRACK)) {
+                    this.scanPosition = xsp;
+                    return this.scanToken(this.tm.UNDERSCORE);
+                }
+            }
+        }
+        return false;
+    },
+
+    scanText: function() {
+        var xsp = this.scanPosition;
+        if (this.scanToken(this.tm.BACKSLASH)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.CHAR_SEQUENCE)) {
+                this.scanPosition = xsp;
+                if (this.scanToken(this.tm.COLON)) {
+                    this.scanPosition = xsp;
+                    if (this.scanToken(this.tm.DASH)) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.DIGITS)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.DOT)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.EQ)) {
+                                    this.scanPosition = xsp;
+                                    if (this.scanToken(this.tm.ESCAPED_CHAR)) {
+                                        this.tm.scanPosition = xsp;
+                                        if (this.scanToken(this.tm.GT)) {
+                                            this.scanPosition = xsp;
+                                            if (this.scanToken(this.tm.IMAGE_LABEL)) {
+                                                this.scanPosition = xsp;
+                                                if (this.scanToken(this.tm.LPAREN)) {
+                                                    this.scanPosition = xsp;
+                                                    if (this.scanToken(this.tm.LT)) {
+                                                        this.scanPosition = xsp;
+                                                        if (this.scanToken(this.tm.RBRACK)) {
+                                                            this.scanPosition = xsp;
+                                                            if (this.scanToken(this.tm.RPAREN)) {
+                                                                this.scanPosition = xsp;
+                                                                this.lookingAhead = true;
+                                                                this.semanticLookAhead = !this.nextAfterSpace(this.tm.EOL, this.tm.EOF);
+                                                                this.lookingAhead = false;
+                                                                return (!this.semanticLookAhead || this.scanWhitspaceToken());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanTextTokens: function() {
+        if (this.scanText()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanText()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanCodeTextTokens: function() {
+        var xsp = scanPosition;
+        if (this.scanToken(this.tm.ASTERISK)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.BACKSLASH)) {
+                this.scanPosition = xsp;
+                if (this.scanToken(this.tm.CHAR_SEQUENCE)) {
+                    this.scanPosition = xsp;
+                    if (this.scanToken(this.tm.COLON)) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.DASH)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.DIGITS)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.DOT)) {
+                                    this.scanPosition = xsp;
+                                    if (this.scanToken(this.tm.EQ)) {
+                                        this.scanPosition = xsp;
+                                        if (this.scanToken(this.tm.ESCAPED_CHAR)) {
+                                            this.scanPosition = xsp;
+                                            if (this.scanToken(this.tm.IMAGE_LABEL)) {
+                                                this.scanPosition = xsp;
+                                                if (this.scanToken(this.tm.LT)) {
+                                                    this.scanPosition = xsp;
+                                                    if (this.scanToken(this.tm.LBRACK)) {
+                                                        this.scanPosition = xsp;
+                                                        if (this.scanToken(this.tm.RBRACK)) {
+                                                            this.scanPosition = xsp;
+                                                            if (this.scanToken(this.tm.LPAREN)) {
+                                                                this.scanPosition = xsp;
+                                                                if (this.scanToken(this.tm.GT)) {
+                                                                    this.scanPosition = xsp;
+                                                                    if (this.scanToken(this.tm.RPAREN)) {
+                                                                        this.scanPosition = xsp;
+                                                                        if (this.scanToken(this.tm.UNDERSCORE)) {
+                                                                            this.scanPosition = xsp;
+                                                                            this.lookingAhead = true;
+                                                                            this.semanticLookAhead = !this.nextAfterSpace(this.tm.EOL, this.tm.EOF);
+                                                                            this.lookingAhead = false;
+                                                                            return (!this.semanticLookAhead || this.scanWhitspaceToken());
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanCode: function() {
+        return this.scanToken(this.tm.BACKTICK) || this.scanCodeTextTokensAhead() || this.scanToken(this.tm.BACKTICK);
+    },
+
+    scanCodeMultiline: function() {
+        if (scanToken(this.tm.BACKTICK) || this.scanCodeTextTokensAhead()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = scanPosition;
+            if (this.hasCodeTextOnNextLineAhead()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return scanToken(BACKTICK);
+    },
+
+    scanCodeTextTokensAhead: function() {
+        if (this.scanCodeTextTokens()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanCodeTextTokens()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    hasCodeTextOnNextLineAhead: function() {
+        if (this.scanWhitespaceTokenBeforeEol()) {
+           return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanToken(this.tm.GT)) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanCodeTextTokensAhead();
+    },
+
+    scanWhitspaceTokens: function() {
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanWhitspaceToken()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanWhitespaceTokenBeforeEol: function() {
+        return this.scanWhitspaceTokens() || this.scanToken(this.tm.EOL);
+    },
+
+    scanEmWithinStrongElements: function() {
+        var xsp = this.scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.ASTERISK)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.BACKTICK)) {
+                                this.scanPosition = xsp;
+                                return this.scanToken(this.tm.LBRACK);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanEmWithinStrong: function() {
+        if (this.scanToken(this.tm.UNDERSCORE) || this.scanEmWithinStrongElements()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanEmWithinStrongElements()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanToken(this.tm.UNDERSCORE);
+    },
+
+    scanEmElements: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanStrongWithinEm()) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.ASTERISK)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.BACKTICK)) {
+                                    this.scanPosition = xsp;
+                                    return this.scanToken(this.tm.LBRACK);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanEm: function() {
+        if (this.scanToken(this.tm.UNDERSCORE) || this.scanEmElements()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanEmElements()) {
+                thsi.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanToken(this.tm.UNDERSCORE);
+    },
+
+    scanEmWithinStrongMultilineContent: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.ASTERISK)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.BACKTICK)) {
+                                this.scanPosition = xsp;
+                                return this.scanToken(this.tm.LBRACK);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    hasNoEmWithinStrongMultilineContentAhead: function() {
+        if (this.scanEmWithinStrongMultilineContent()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanEmWithinStrongMultilineContent()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanEmWithinStrongMultiline: function() {
+        if (this.scanToken(this.tm.UNDERSCORE) || this.hasNoEmWithinStrongMultilineContentAhead()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanWhitespaceTokenBeforeEol() || this.hasNoEmWithinStrongMultilineContentAhead()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanToken(this.tm.UNDERSCORE);
+    },
+
+    scanEmMultilineContentElements: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    this.lookingAhead = true;
+                    this.semanticLookAhead = this.multilineAhead(this.tm.BACKTICK);
+                    this.lookingAhead = false;
+                    if (!this.semanticLookAhead || this.scanCodeMultiline()) {
+                        this.scanPosition = xsp;
+                        if (this.scanStrongWithinEmMultiline()) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.ASTERISK)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.BACKTICK)) {
+                                    this.scanPosition = xsp;
+                                    return this.scanToken(this.tm.LBRACK);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanStrongWithinEmElements: function() {
+        var xsp = this.scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.BACKTICK)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.LBRACK)) {
+                                this.scanPosition = xsp;
+                                return this.scanToken(this.tm.UNDERSCORE);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanStrongWithinEm: function() {
+        if (this.scanToken(this.tm.ASTERISK) || this.scanStrongWithinEmElements()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanStrongWithinEmElements()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanToken(this.tm.ASTERISK);
+    },
+
+    scanStrongElements: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    this.lookingAhead = true;
+                    this.semanticLookAhead = this.multilineAhead(this.tm.BACKTICK);
+                    this.lookingAhead = false;
+                    if (!this.semanticLookAhead || this.scanCodeMultiline()) {
+                        this.scanPosition = xsp;
+                        if (this.scanEmWithinStrong()) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.BACKTICK)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.LBRACK)) {
+                                    this.scanPosition = xsp;
+                                    return this.scanToken(this.tm.UNDERSCORE);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanStrong: function() {
+        if (this.scanToken(this.tm.ASTERISK) || this.scanStrongElements()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanStrongElements()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanToken(this.tm.ASTERISK);
+    },
+
+    scanStrongWithinEmMultilineElements: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.BACKTICK)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.LBRACK)) {
+                                this.scanPosition = xsp;
+                                return this.scanToken(this.tm.UNDERSCORE);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanForMoreStrongWithinEmMultilineElements: function() {
+        if (this.scanStrongWithinEmMultilineElements()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanStrongWithinEmMultilineElements()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanStrongWithinEmMultiline: function() {
+        if (this.scanToken(ASTERISK) || this.scanForMoreStrongWithinEmMultilineElements()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanWhitespaceTokenBeforeEol() || this.scanForMoreStrongWithinEmMultilineElements()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return this.scanToken(this.tm.ASTERISK);
+    },
+
+    scanStrongMultilineElements: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanEmWithinStrongMultiline()) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.BACKTICK)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.LBRACK)) {
+                                    this.scanPosition = xsp;
+                                    return this.scanToken(this.tm.UNDERSCORE);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanResourceTextElement: function() {
+        var xsp = scanPosition;
+        if (this.scanToken(this.tm.ASTERISK)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.BACKSLASH)) {
+                this.scanPosition = xsp;
+                if (this.scanToken(this.tm.BACKTICK)) {
+                    this.scanPosition = xsp;
+                    if (this.scanToken(this.tm.CHAR_SEQUENCE)) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.COLON)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.DASH)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.DIGITS)) {
+                                    this.scanPosition = xsp;
+                                    if (this.scanToken(this.tm.DOT)) {
+                                        this.scanPosition = xsp;
+                                        if (this.scanToken(this.tm.EQ)) {
+                                            this.scanPosition = xsp;
+                                            if (this.scanToken(this.tm.ESCAPED_CHAR)) {
+                                                this.scanPosition = xsp;
+                                                if (this.scanToken(this.tm.IMAGE_LABEL)) {
+                                                    this.scanPosition = xsp;
+                                                    if (this.scanToken(this.tm.GT)) {
+                                                        this.scanPosition = xsp;
+                                                        if (this.scanToken(this.tm.LBRACK)) {
+                                                            this.scanPosition = xsp;
+                                                            if (this.scanToken(this.tm.LPAREN)) {
+                                                                this.scanPosition = xsp;
+                                                                if (this.scanToken(this.tm.LT)) {
+                                                                    this.scanPosition = xsp;
+                                                                    if (this.scanToken(this.tm.RBRACK)) {
+                                                                        this.scanPosition = xsp;
+                                                                        if (this.scanToken(this.tm.UNDERSCORE)) {
+                                                                            this.scanPosition = xsp;
+                                                                            this.lookingAhead = true;
+                                                                            this.semanticLookAhead = !this.nextAfterSpace(this.tm.RPAREN);
+                                                                            this.lookingAhead = false;
+                                                                            return (!this.semanticLookAhead || this.scanWhitspaceToken());
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanImageElement: function() {
+        var xsp = scanPosition;
+        if (this.scanResourceElements()) {
+            this.scanPosition = xsp;
+            if (this.scanLooseChar()) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    scanResourceTextElements: function() {
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanResourceTextElement()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanResourceUrl: function() {
+        return this.scanToken(this.tm.LPAREN) || this.scanWhitspaceTokens() || this.scanResourceTextElements() || this.scanWhitspaceTokens()
+                || this.scanToken(this.tm.RPAREN);
+    },
+
+    scanLinkElement: function() {
+        var xsp = scanPosition;
+        if (this.scanImage()) {
+            this.scanPosition = xsp;
+            if (this.scanStrong()) {
+                this.scanPosition = xsp;
+                if (this.scanEm()) {
+                    this.scanPosition = xsp;
+                    if (this.scanCode()) {
+                        this.scanPosition = xsp;
+                        if (this.scanResourceElements()) {
+                            this.scanPosition = xsp;
+                            return this.scanLooseChar();
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanResourceElement: function() {
+        var xsp = scanPosition;
+        if (this.scanToken(this.tm.BACKSLASH)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.COLON)) {
+                this.scanPosition = xsp;
+                if (this.scanToken(this.tm.CHAR_SEQUENCE)) {
+                    this.scanPosition = xsp;
+                    if (this.scanToken(this.tm.DASH)) {
+                        this.scanPosition = xsp;
+                        if (this.scanToken(this.tm.DIGITS)) {
+                            this.scanPosition = xsp;
+                            if (this.scanToken(this.tm.DOT)) {
+                                this.scanPosition = xsp;
+                                if (this.scanToken(this.tm.EQ)) {
+                                    this.scanPosition = xsp;
+                                    if (this.scanToken(this.tm.ESCAPED_CHAR)) {
+                                        this.scanPosition = xsp;
+                                        if (this.scanToken(this.tm.IMAGE_LABEL)) {
+                                            this.scanPosition = xsp;
+                                            if (this.scanToken(this.tm.GT)) {
+                                                this.scanPosition = xsp;
+                                                if (this.scanToken(this.tm.LPAREN)) {
+                                                    this.scanPosition = xsp;
+                                                    if (this.scanToken(this.tm.LT)) {
+                                                        this.scanPosition = xsp;
+                                                        if (this.scanToken(this.tm.RPAREN)) {
+                                                            this.scanPosition = xsp;
+                                                            this.lookingAhead = true;
+                                                            this.semanticLookAhead = !this.nextAfterSpace(this.tm.RBRACK);
+                                                            this.lookingAhead = false;
+                                                            return (!this.semanticLookAhead || this.scanWhitspaceToken());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanResourceElements: function() {
+        if (this.scanResourceElement()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanResourceElement()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanLink: function() {
+        if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanLinkElement()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanLinkElement()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        if (this.scanWhitspaceTokens() || this.scanToken(this.tm.RBRACK)) {
+            return true;
+        }
+        xsp = this.scanPosition;
+        if (this.scanResourceUrl()) {
+            this.scanPosition = xsp;
+        }
+        return false;
+    },
+
+    scanImage: function() {
+        if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanToken(this.IMAGE_LABEL) || this.scanImageElement()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanImageElement()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        if (this.scanWhitspaceTokens() || this.scanToken(this.tm.RBRACK)) {
+            return true;
+        }
+        xsp = this.scanPosition;
+        if (this.scanResourceUrl()) {
+            this.scanPosition = xsp;
+        }
+        return false;
+    },
+
+    scanInlineElement: function() {
+        var xsp = scanPosition;
+        if (this.scanTextTokens()) {
+            this.scanPosition = xsp;
+            if (this.scanImage()) {
+                this.scanPosition = xsp;
+                if (this.scanLink()) {
+                    this.scanPosition = xsp;
+                    this.lookingAhead = true;
+                    this.semanticLookAhead = this.multilineAhead(this.tm.ASTERISK);
+                    this.lookingAhead = false;
+                    if (!this.semanticLookAhead || this.scanToken(this.tm.ASTERISK)) {
+                        this.scanPosition = xsp;
+                        this.lookingAhead = true;
+                        this.semanticLookAhead = this.multilineAhead(this.tm.UNDERSCORE);
+                        this.lookingAhead = false;
+                        if (!this.semanticLookAhead || this.scanToken(this.tm.UNDERSCORE)) {
+                            this.scanPosition = xsp;
+                            this.lookingAhead = true;
+                            this.semanticLookAhead = this.multilineAhead(this.tm.BACKTICK);
+                            this.lookingAhead = false;
+                            if (!this.semanticLookAhead || this.scanCodeMultiline()) {
+                                this.scanPosition = xsp;
+                                return this.scanLooseChar();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanParagraph: function() {
+        var xsp;
+        if (this.scanInlineElement()) {
+            return true;
+        }
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanInlineElement()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanForCodeLanguageElement: function() {
+        var xsp = scanPosition;
+        if (this.scanToken(this.tm.CHAR_SEQUENCE)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.BACKTICK)) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    scanForCodeLanguageElements: function() {
+        if (this.scanForCodeLanguageElement()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanForCodeLanguageElement()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanWhitspaceToken: function() {
+        var xsp = scanPosition;
+        if (this.scanToken(this.tm.SPACE)) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.TAB)) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    scanFencedCodeBlock: function() {
+        if (this.scanToken(this.tm.BACKTICK) || this.scanToken(this.tm.BACKTICK) || this.scanToken(this.tm.BACKTICK)) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanToken(this.tm.BACKTICK)) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        if (this.scanWhitspaceTokens()) {
+            return true;
+        }
+        xsp = this.scanPosition;
+        if (this.scanForCodeLanguageElements()) {
+            this.scanPosition = xsp;
+        }
+        xsp = this.scanPosition;
+        if (this.scanToken(this.tm.EOL) || this.scanWhitspaceTokens()) {
+            this.scanPosition = xsp;
+        }
+        return false;
+    },
+
+    scanBlockQuoteEmptyLines: function() {
+        return this.scanBlockQuoteEmptyLine() || this.scanToken(EOL);
+    },
+
+    scanBlockQuoteEmptyLine: function() {
+        if (this.scanToken(this.tm.EOL) || this.scanWhitspaceTokens() || this.scanToken(this.tm.GT) || this.scanWhitspaceTokens()) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanToken(this.tm.GT) || scanWhitspaceTokens()) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanForHeadersigns: function() {
+        if (this.scanToken(this.tm.EQ)) {
+            return true;
+        }
+        var xsp;
+        while (true) {
+            xsp = this.scanPosition;
+            if (this.scanToken(this.tm.EQ)) {
+                this.scanPosition = xsp;
+                break;
+            }
+        }
+        return false;
+    },
+
+    scanMoreBlockElements: function() {
+        var xsp = scanPosition;
+        this.lookingAhead = true;
+        this.semanticLookAhead = this.headingAhead(1);
+        this.lookingAhead = false;
+        if (!this.semanticLookAhead || this.scanForHeadersigns()) {
+            this.scanPosition = xsp;
+            if (this.scanToken(this.tm.GT)) {
+                this.scanPosition = xsp;
+                if (this.scanToken(this.tm.DASH)) {
+                    scanPosition = xsp;
+                    if (scanToken(DIGITS) || scanToken(DOT)) {
+                        scanPosition = xsp;
+                        if (scanFencedCodeBlock()) {
+                            scanPosition = xsp;
+                            return scanParagraph();
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    scanToken: function(kind) {
+        if (this.scanPosition == this.lastPosition) {
+            this.lookAhead--;
+            if (this.scanPosition.next == null) {
+                this.lastPosition = this.scanPosition = this.scanPosition.next = this.tm.getNextToken();
+            } else {
+                this.lastPosition = this.scanPosition = this.scanPosition.next;
+            }
+        } else {
+            this.scanPosition = this.scanPosition.next;
+        }
+        if (this.scanPosition.kind != kind) {
+            return true;
+        }
+        if (this.lookAhead == 0 && this.scanPosition == this.lastPosition) {
+            throw lookAheadSuccess;
+        }
+	      return false;
+    },
+
     getNextTokenKind: function() {
         if (this.nextTokenKind != -1) {
             return this.nextTokenKind;
@@ -3176,29 +3161,6 @@ koara.Token.prototype = {
 		
 }
 koara.TokenManager = function(stream) {
-	this.EOF = 0;
-	this.ASTERISK = 1;
-	this.BACKSLASH = 2;
-	this.BACKTICK = 3;
-	this.CHAR_SEQUENCE = 4;
-	this.COLON = 5;
-	this.DASH = 6;
-	this.DIGITS = 7;
-	this.DOT = 8;
-	
-	this.EQ = 10;
-	this.ESCAPED_CHAR = 11;
-	this.GT = 12;
-	this.IMAGE_LABEL = 13;
-	this.LBRACK = 14;
-	this.LPAREN = 15;
-	this.LT = 16;
-	this.RBRACK = 17;
-	this.RPAREN = 18;
-	this.SPACE = 19;
-	this.TAB = 20;
-	this.UNDERSCORE = 21;
-	
 	this.cs = stream;
 	this.jjrounds = [];
 	this.jjstateSet = [];
@@ -3208,277 +3170,275 @@ koara.TokenManager = function(stream) {
 koara.TokenManager.prototype = {
 	constructor: koara.TokenManager,
 	
+	EOF: 0,
+	ASTERISK: 1,
+	BACKSLASH: 2,
+	BACKTICK: 3,
+	CHAR_SEQUENCE: 4,
+	COLON: 5,
+	DASH: 6,
+	DIGITS: 7,
+	DOT: 8,
 	EOL: 9,
+	EQ: 10,
+	ESCAPED_CHAR: 11,
+	GT: 12,
+	IMAGE_LABEL: 13,
+	LBRACK: 14,
+	LPAREN: 15,
+	LT: 16,
+	RBRACK: 17,
+	RPAREN: 18,
+	SPACE: 19,
+	TAB: 20,
+	UNDERSCORE: 21,
 	
-	getNextToken: function() {
-		try {
-			curPos = 0;	
-			while(true) {
-				try {
-					curChar = this.cs.beginToken();
-				} catch(e) {
-					this.matchedKind = 0;
-                    this.matchedPos = -1;
-                    return this.fillToken();
-				}
-			}
-		} catch(e) {
-			return null;
-		}
-	}
-		
-}
-
-
-
-//    public Token getNextToken() {
+//	getNextToken: function() {
+//		try {
+//			curPos = 0;	
+//			while(true) {
+//				try {
+//					curChar = this.cs.beginToken();
+//				} catch(e) {
+//					this.matchedKind = 0;
+//                    this.matchedPos = -1;
+//                    return this.fillToken();
+//				}
+//			}
+//		} catch(e) {
+//			return null;
+//		}
+//	},
+//
+//    getNextToken: function() {
 //        try {
-//            int curPos = 0;
+//            var curPos = 0;
 //            while (true) {
 //                try {
-//                    curChar = cs.beginToken();
-//                } catch (java.io.IOException e) {
-//                    matchedKind = 0;
-//                    matchedPos = -1;
-//                    return fillToken();
+//                    curChar = this.cs.beginToken();
+//                } catch (e) {
+//                    this.matchedKind = 0;
+//                    this.matchedPos = -1;
+//                    return this.fillToken();
 //                }
 //
-//                matchedKind = Integer.MAX_VALUE;
-//                matchedPos = 0;
-//                curPos = moveStringLiteralDfa0_0();
-//                if (matchedKind != Integer.MAX_VALUE) {
-//                    if (matchedPos + 1 < curPos) {
-//                        cs.backup(curPos - matchedPos - 1);
+//                this.matchedKind = 2147483647;
+//                this.matchedPos = 0;
+//                curPos = this.moveStringLiteralDfa0_0();
+//                if (this.matchedKind != 2147483647) {
+//                    if (this.matchedPos + 1 < curPos) {
+//                        this.cs.backup(curPos - this.matchedPos - 1);
 //                    }
-//                    return fillToken();
+//                    return this.fillToken();
 //                }
 //            }
-//        } catch (IOException e) {
+//        } catch (e) {
 //            return null;
 //        }
-//    }
+//    },
 //
-//    private Token fillToken() {
-//        return new Token(matchedKind, cs.getBeginLine(), cs.getBeginColumn(), cs.getEndLine(), cs.getEndColumn(),
-//                cs.getImage());
-//    }
+//    fillToken: function() {
+//        return new Koara.Token(this.matchedKind, this.cs.getBeginLine(), this.cs.getBeginColumn(), this.cs.getEndLine(), this.cs.getEndColumn(),
+//                this.cs.getImage());
+//    },
 //
-//    private int moveStringLiteralDfa0_0() throws IOException {
-//        switch (curChar) {
-//        case 9:
-//            return startNfaWithStates(0, TAB, 8);
-//        case 32:
-//            return startNfaWithStates(0, SPACE, 8);
-//        case 40:
-//            return stopAtPos(0, LPAREN);
-//        case 41:
-//            return stopAtPos(0, RPAREN);
-//        case 42:
-//            return stopAtPos(0, ASTERISK);
-//        case 45:
-//            return stopAtPos(0, DASH);
-//        case 46:
-//            return stopAtPos(0, DOT);
-//        case 58:
-//            return stopAtPos(0, COLON);
-//        case 60:
-//            return stopAtPos(0, LT);
-//        case 61:
-//            return stopAtPos(0, EQ);
-//        case 62:
-//            return stopAtPos(0, GT);
-//        case 73:
-//            return moveStringLiteralDfa1_0(0x2000L);
-//        case 91:
-//            return stopAtPos(0, LBRACK);
-//        case 92:
-//            return startNfaWithStates(0, BACKSLASH, 7);
-//        case 93:
-//            return stopAtPos(0, RBRACK);
-//        case 95:
-//            return stopAtPos(0, UNDERSCORE);
-//        case 96:
-//            return stopAtPos(0, BACKTICK);
-//        case 105:
-//            return moveStringLiteralDfa1_0(0x2000L);
-//        default:
-//            return moveNfa(6, 0);
+//    moveStringLiteralDfa0_0: function {
+//        switch (this.curChar) {
+//        case 9: return this.startNfaWithStates(0, this.TAB, 8);
+//        case 32: return this.startNfaWithStates(0, this.SPACE, 8);
+//        case 40: return this.stopAtPos(0, this.LPAREN);
+//        case 41: return this.stopAtPos(0, this.RPAREN);
+//        case 42: return this.stopAtPos(0, this.ASTERISK);
+//        case 45: return this.stopAtPos(0, this.DASH);
+//        case 46: return this.stopAtPos(0, this.DOT);
+//        case 58: return this.stopAtPos(0, this.COLON);
+//        case 60: return this.stopAtPos(0, this.LT);
+//        case 61: return this.stopAtPos(0, this.EQ);
+//        case 62: return this.stopAtPos(0, this.GT);
+//        case 73: return this.moveStringLiteralDfa1_0(0x2000);
+//        case 91: return this.stopAtPos(0, this.LBRACK);
+//        case 92: return this.startNfaWithStates(0, this.BACKSLASH, 7);
+//        case 93: return this.stopAtPos(0, this.RBRACK);
+//        case 95: return this.stopAtPos(0, this.UNDERSCORE);
+//        case 96: return this.stopAtPos(0, this.BACKTICK);
+//        case 105: return this.moveStringLiteralDfa1_0(0x2000);
+//        default: return this.moveNfa(6, 0);
 //        }
-//    }
+//    },
 //
-//    private int startNfaWithStates(int pos, int kind, int state) {
-//        matchedKind = kind;
-//        matchedPos = pos;
+//    startNfaWithStates: function(pos, kind, state) {
+//        this.matchedKind = kind;
+//        this.matchedPos = pos;
 //        try {
-//            curChar = cs.readChar();
-//        } catch (IOException e) {
+//            this.curChar = this.cs.readChar();
+//        } catch (e) {
 //            return pos + 1;
 //        }
-//        return moveNfa(state, pos + 1);
-//    }
+//        return this.moveNfa(state, pos + 1);
+//    },
 //
-//    private int stopAtPos(int pos, int kind) {
-//        matchedKind = kind;
-//        matchedPos = pos;
+//    stopAtPos: function(pos, kind) {
+//        this.matchedKind = kind;
+//        this.matchedPos = pos;
 //        return pos + 1;
-//    }
+//    },
 //
-//    private int moveStringLiteralDfa1_0(long active) throws IOException {
-//        curChar = cs.readChar();
-//        if (curChar == 77 || curChar == 109) {
-//            return moveStringLiteralDfa2_0(active, 0x2000L);
+//    moveStringLiteralDfa1_0: function(active) {
+//        this.curChar = this.cs.readChar();
+//        if (this.curChar == 77 || this.curChar == 109) {
+//            return this.moveStringLiteralDfa2_0(active, 0x2000);
 //        }
-//        return startNfa(0, active);
-//    }
+//        return this.startNfa(0, active);
+//    },
 //
-//    private int moveStringLiteralDfa2_0(long old, long active) throws IOException {
-//        curChar = cs.readChar();
-//        if (curChar == 65 || curChar == 97) {
-//            return moveStringLiteralDfa3_0(active, 0x2000L);
+//    moveStringLiteralDfa2_0(old, active) {
+//        this.curChar = this.cs.readChar();
+//        if (this.curChar == 65 || this.curChar == 97) {
+//            return this.moveStringLiteralDfa3_0(active, 0x2000);
 //        }
-//        return startNfa(1, active);
+//        return this.startNfa(1, active);
 //
-//    }
+//    },
 //
-//    private int moveStringLiteralDfa3_0(long old, long active) throws IOException {
-//        curChar = cs.readChar();
-//        if (curChar == 71 || curChar == 103) {
-//            return moveStringLiteralDfa4_0(active, 0x2000L);
+//    moveStringLiteralDfa3_0(old, active) {
+//        this.curChar = this.cs.readChar();
+//        if (this.curChar == 71 || this.curChar == 103) {
+//            return this.moveStringLiteralDfa4_0(active, 0x2000);
 //        }
-//        return startNfa(2, active);
-//    }
+//        return this.startNfa(2, active);
+//    },
 //
-//    private int moveStringLiteralDfa4_0(long old, long active) throws IOException {
-//        curChar = cs.readChar();
-//        if (curChar == 69 || curChar == 101) {
-//            return moveStringLiteralDfa5_0(active, 0x2000L);
+//    moveStringLiteralDfa4_0(old, active) {
+//        this.curChar = this.cs.readChar();
+//        if (this.curChar == 69 || this.curChar == 101) {
+//            return this.moveStringLiteralDfa5_0(active, 0x2000);
 //        }
-//        return startNfa(3, active);
-//    }
+//        return this.startNfa(3, active);
+//    },
 //
-//    private int moveStringLiteralDfa5_0(long old, long active) throws IOException {
-//        curChar = cs.readChar();
-//        if (curChar == 58 && ((active & 0x2000L) != 0L)) {
-//            return stopAtPos(5, 13);
+//    moveStringLiteralDfa5_0(old, active) {
+//        this.curChar = this.cs.readChar();
+//        if (this.curChar == 58 && ((active & 0x2000) != 0)) {
+//            return this.stopAtPos(5, 13);
 //        }
-//        return startNfa(4, active);
-//    }
+//        return this.startNfa(4, active);
+//    },
 //
-//    private int startNfa(int pos, long active) {
-//        return moveNfa(stopStringLiteralDfa(pos, active), pos + 1);
-//    }
+//    startNfa: function(pos, active) {
+//        return this.moveNfa(this.stopStringLiteralDfa(pos, active), pos + 1);
+//    },
 //
-//    private int moveNfa(int startState, int curPos) {
-//    	int startsAt = 0;
-//        jjnewStateCnt = 8;
-//        int i = 1;
-//        jjstateSet[0] = startState;
-//        int kind = 0x7fffffff;
+//    moveNfa: function(startState, curPos) {
+//    	var startsAt = 0;
+//        this.jjnewStateCnt = 8;
+//        var i = 1;
+//        this.jjstateSet[0] = startState;
+//        var kind = 0x7fffffff;
 //        while (true) {
-//            if (++round == 0x7fffffff) {
-//                round = 0x80000001;
+//            if (++this.round == 0x7fffffff) {
+//                this.round = 0x80000001;
 //            }            
-//            if (curChar < 64) {
-//                long l = 1L << curChar;
+//            if (this.curChar < 64) {
+//                var l = 1L << this.curChar;
 //                do {
-//                    switch (jjstateSet[--i]) {
+//                    switch (this.jjstateSet[--i]) {
 //                    case 6:
-//                        if ((0x880098feffffd9ffL & l) != 0L) {
+//                        if ((0x880098feffffd9ff & l) != 0) {
 //                            if (kind > 4) {
 //                                kind = 4;
 //                            }
-//                            checkNAdd(0);
-//                        } else if ((0x3ff000000000000L & l) != 0L) {
+//                            this.checkNAdd(0);
+//                        } else if ((0x3ff000000000000 & l) != 0) {
 //                            if (kind > 7) {
 //                                kind = 7;
 //                            }
-//                            checkNAdd(1);
-//                        } else if ((0x2400L & l) != 0L) {
+//                            this.checkNAdd(1);
+//                        } else if ((0x2400 & l) != 0L) {
 //                            if (kind > 9) {
 //                                kind = 9;
 //                            }
-//                        } else if ((0x100000200L & l) != 0L) {
-//                            checkNAddStates(0, 2);
+//                        } else if ((0x100000200 & l) != 0) {
+//                            this.checkNAddStates(0, 2);
 //                        }
-//                        if (curChar == 13) {
-//                            jjstateSet[jjnewStateCnt++] = 4;
+//                        if (this.curChar == 13) {
+//                            this.jjstateSet[this.jjnewStateCnt++] = 4;
 //                        }
 //                        break;
 //                    case 8:
-//                        if ((0x2400L & l) != 0L) {
+//                        if ((0x2400 & l) != 0) {
 //                            if (kind > 9) {
 //                                kind = 9;
 //                            }
-//                        } else if ((0x100000200L & l) != 0L) {
-//                            checkNAddStates(0, 2);
+//                        } else if ((0x100000200 & l) != 0) {
+//                            this.checkNAddStates(0, 2);
 //                        }
-//                        if (curChar == 13) {
-//                            jjstateSet[jjnewStateCnt++] = 4;
+//                        if (this.curChar == 13) {
+//                            this.jjstateSet[this.jjnewStateCnt++] = 4;
 //                        }
 //                        break;
 //                    case 0:
-//                        if ((0x880098feffffd9ffL & l) != 0L) {
+//                        if ((0x880098feffffd9ff & l) != 0) {
 //                            kind = 4;
-//                            checkNAdd(0);
+//                            this.checkNAdd(0);
 //                        }
 //                        break;
 //                    case 1:
-//                        if ((0x3ff000000000000L & l) != 0L) {
+//                        if ((0x3ff000000000000 & l) != 0) {
 //                            if (kind > 7) {
 //                                kind = 7;
 //                            }
-//                            checkNAdd(1);
+//                            this.checkNAdd(1);
 //                        }
 //                        break;
 //                    case 2:
-//                        if ((0x100000200L & l) != 0L) {
-//                            checkNAddStates(0, 2);
+//                        if ((0x100000200 & l) != 0) {
+//                            this.checkNAddStates(0, 2);
 //                        }
 //                        break;
 //                    case 3:
-//                        if ((0x2400L & l) != 0L && kind > 9) {
+//                        if ((0x2400 & l) != 0 && kind > 9) {
 //                            kind = 9;
 //                        }
 //                        break;
 //                    case 4:
-//                        if (curChar == 10 && kind > 9) {
+//                        if (this.curChar == 10 && kind > 9) {
 //                            kind = 9;
 //                        }
 //                        break;
 //                    case 5:
-//                        if (curChar == 13) {
-//                            jjstateSet[jjnewStateCnt++] = 4;
+//                        if (this.curChar == 13) {
+//                            this.jjstateSet[this.jjnewStateCnt++] = 4;
 //                        }
 //                        break;
 //                    case 7:
-//                        if ((0x77ff670000000000L & l) != 0L && kind > 11) {
+//                        if ((0x77ff670000000000 & l) != 0 && kind > 11) {
 //                            kind = 11;
 //                        }
 //                        break;
 //                    }
 //                } while (i != startsAt);
-//            } else if (curChar < 128) {
-//                long l = 1L << (curChar & 077);
+//            } else if (this.curChar < 128) {
+//                var l = 1 << (this.curChar & 077);
 //                do {
-//                    switch (jjstateSet[--i]) {
+//                    switch (this.jjstateSet[--i]) {
 //                    case 6:
-//                        if (l != 0L) {
+//                        if (l != 0) {
 //                            if (kind > 4) {
 //                                kind = 4;
 //                            }
-//                            checkNAdd(0);
-//                        } else if (curChar == 92) {
-//                            jjstateSet[jjnewStateCnt++] = 7;
+//                            this.checkNAdd(0);
+//                        } else if (this.curChar == 92) {
+//                            this.jjstateSet[this.jjnewStateCnt++] = 7;
 //                        }
 //                        break;
 //                    case 0:
-//                        if ((0xfffffffe47ffffffL & l) != 0L) {
+//                        if ((0xfffffffe47ffffff & l) != 0) {
 //                            kind = 4;
-//                            checkNAdd(0);
+//                            this.checkNAdd(0);
 //                        }
 //                        break;
 //                    case 7:
-//                        if ((0x1b8000000L & l) != 0L && kind > 11) {
+//                        if ((0x1b8000000 & l) != 0 && kind > 11) {
 //                            kind = 11;
 //                        }
 //                        break;
@@ -3486,80 +3446,79 @@ koara.TokenManager.prototype = {
 //                } while (i != startsAt);
 //            } else {
 //                do {
-//                    switch (jjstateSet[--i]) {
+//                    switch (this.jjstateSet[--i]) {
 //                    case 6:
 //                    case 0:
 //                        if (kind > 4) {
 //                            kind = 4;
 //                        }
-//                        checkNAdd(0);
+//                        this.checkNAdd(0);
 //                        break;
 //                    }
 //                } while (i != startsAt);
 //            }
 //            if (kind != 0x7fffffff) {
-//                matchedKind = kind;
-//                matchedPos = curPos;
+//                this.matchedKind = kind;
+//                this.matchedPos = curPos;
 //                kind = 0x7fffffff;
 //            }
-//            ++curPos;
+//            ++this.curPos;
 //            
-//            
-//            if ((i = jjnewStateCnt) == (startsAt = 8 - (jjnewStateCnt = startsAt))) {
+//            if ((i = this.jjnewStateCnt) == (startsAt = 8 - (this.jjnewStateCnt = startsAt))) {
 //                return curPos;
 //            }
 //            try {
-//                curChar = cs.readChar();
-//            } catch (IOException e) {
+//                curChar = this.cs.readChar();
+//            } catch (e) {
 //                return curPos;
 //            }
 //        }
-//    }
+//    },
 //
-//    private void checkNAddStates(int start, int end) {
+//    checkNAddStates: function(start, end) {
 //        do {
-//            checkNAdd(jjnextStates[start]);
+//            this.checkNAdd(this.jjnextStates[start]);
 //        } while (start++ != end);
-//    }
+//    },
 //
-//    private void checkNAdd(int state) {
-//        if (jjrounds[state] != round) {
-//            jjstateSet[jjnewStateCnt++] = state;
-//            jjrounds[state] = round;
+//    checkNAdd(state) {
+//        if (this.jjrounds[state] != this.round) {
+//            this.jjstateSet[this.jjnewStateCnt++] = state;
+//            this.jjrounds[state] = this.round;
 //        }
-//    }
+//    },
 //
-//    private int stopStringLiteralDfa(int pos, long active) {
+//    stopStringLiteralDfa(pos, active) {
 //        if (pos == 0) {
-//            if ((active & 0x2000L) != 0L) {
-//                matchedKind = 4;
+//            if ((active & 0x2000) != 0) {
+//                this.matchedKind = 4;
 //                return 0;
-//            } else if ((active & 0x180000L) != 0L) {
+//            } else if ((active & 0x180000) != 0) {
 //                return 8;
-//            } else if ((active & 0x4L) != 0L) {
+//            } else if ((active & 0x4) != 0) {
 //                return 7;
 //            }
-//        } else if (pos == 1 && (active & 0x2000L) != 0L) {
-//            matchedKind = 4;
-//            matchedPos = 1;
+//        } else if (pos == 1 && (active & 0x2000) != 0) {
+//            this.matchedKind = 4;
+//            this.matchedPos = 1;
 //            return 0;
-//        } else if (pos == 2 && (active & 0x2000L) != 0L) {
-//            matchedKind = 4;
-//            matchedPos = 2;
+//        } else if (pos == 2 && (active & 0x2000) != 0) {
+//            this.matchedKind = 4;
+//            this.matchedPos = 2;
 //            return 0;
-//        } else if (pos == 3 && (active & 0x2000L) != 0L) {
-//            matchedKind = 4;
-//            matchedPos = 3;
+//        } else if (pos == 3 && (active & 0x2000) != 0) {
+//            this.matchedKind = 4;
+//            this.matchedPos = 3;
 //            return 0;
-//        } else if (pos == 4 && (active & 0x2000L) != 0L) {
-//            matchedKind = 4;
-//            matchedPos = 4;
+//        } else if (pos == 4 && (active & 0x2000) != 0L) {
+//            this.matchedKind = 4;
+//            this.matchedPos = 4;
 //            return 0;
 //        }
 //        return -1;
 //    }
-//
-//}
+
+}
 
 koara.TreeState = function() {
 	this.nodes = [];
