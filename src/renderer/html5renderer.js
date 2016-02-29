@@ -4,17 +4,11 @@ koara.Html5Renderer.prototype = {
 	constructor: koara.Html5Renderer,
 	
 	visitDocument: function(node) {
-		this.output = 'x';
+		this.output = '';
 		node.childrenAccept(this);
 	}
 }
 
-//public class Html5Renderer implements Renderer {
-//
-//	private StringBuffer out;
-//	private int level;
-//	private Stack<Integer> listSequence = new Stack<Integer>();
-//
 //	public void visit(Heading node) {
 //		out.append(indent() + "<h" + node.getValue() + ">");
 //		node.childrenAccept(this);
@@ -163,8 +157,4 @@ koara.Html5Renderer.prototype = {
 //		return new String(buf);
 //	}
 //	
-//	public String getOutput() {
-//        return out.toString().trim();
-//    }
-//
 //}

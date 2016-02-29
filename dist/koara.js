@@ -210,17 +210,11 @@ koara.Html5Renderer.prototype = {
 	constructor: koara.Html5Renderer,
 	
 	visitDocument: function(node) {
-		this.output = 'x';
+		this.output = '';
 		node.childrenAccept(this);
 	}
 }
 
-//public class Html5Renderer implements Renderer {
-//
-//	private StringBuffer out;
-//	private int level;
-//	private Stack<Integer> listSequence = new Stack<Integer>();
-//
 //	public void visit(Heading node) {
 //		out.append(indent() + "<h" + node.getValue() + ">");
 //		node.childrenAccept(this);
@@ -369,10 +363,6 @@ koara.Html5Renderer.prototype = {
 //		return new String(buf);
 //	}
 //	
-//	public String getOutput() {
-//        return out.toString().trim();
-//    }
-//
 //}
 koara.CharStream = function(reader) {
 	this.available = 4096;
@@ -533,133 +523,121 @@ koara.Parser.prototype = {
 	},
 	
 	parseReader: function(reader) {
-//		this.cs = new koara.CharStream(reader);
-//		this.tm = new koara.TokenManager(this.cs);
-//		token = new koara.Token();
-//		tree = new koara.TreeState();
-//		this.nextTokenKind = -1;
-//		
-//		document = new koara.Document();
-//		tree.openScope();
-//		while(this.getNextTokenKind() == this.tm.EOL) {
-//			this.consumeToken(this.tm.EOL);
-//		}
-//		this.whiteSpace();
-//		if (this.hasAnyBlockElementsAhead()) {
-//			this.blockElement();
-//			while (this.blockAhead(0)) {
-//				while (this.getNextTokenKind() == this.tm.EOL) {
-//                    this.consumeToken(this.tm.EOL);
-//                    this.whiteSpace();
-//				}
-//                this.blockElement();
-//            }
-//            while (this.getNextTokenKind() == this.tm.EOL) {
-//                this.consumeToken(this.tm.EOL);
-//            }
-//            this.whiteSpace();
-//        }
-//        this.consumeToken(this.tm.EOF);
-//        this.tree.closeScope(document);
-      return document;
+		this.cs = new koara.CharStream(reader);
+		this.tm = new koara.TokenManager(this.cs);
+		token = new koara.Token();
+		tree = new koara.TreeState();
+		this.nextTokenKind = -1;
+		
+		document = new koara.Document();
+		tree.openScope();
+		while(this.getNextTokenKind() == this.tm.EOL) {
+			this.consumeToken(this.tm.EOL);
+		}
+		this.whiteSpace();
+		if (this.hasAnyBlockElementsAhead()) {
+			this.blockElement();
+			while (this.blockAhead(0)) {
+				while (this.getNextTokenKind() == this.tm.EOL) {
+                    this.consumeToken(this.tm.EOL);
+                    this.whiteSpace();
+				}
+                this.blockElement();
+              }
+              while (this.getNextTokenKind() == this.tm.EOL) {
+                this.consumeToken(this.tm.EOL);
+            }
+            this.whiteSpace();
+        }
+        this.consumeToken(this.tm.EOF);
+        this.tree.closeScope(document);
+        return document;
 	},
 	
 	blockElement: function() {
-//		this.currentBlockLevel++;
-//		if(modules.contains(Module.HEADINGS)) {
-//			
-//		}
-	}
-}
+        this.currentBlockLevel++;
+//      if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
+          this.heading();
+//      } else if (modules.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
+          this.blockQuote();
+//      } else if (modules.contains(Module.LISTS) && getNextTokenKind() == DASH) {
+          this.unorderedList();
+//      } else if (modules.contains(Module.LISTS) && hasOrderedListAhead()) {
+          this.orderedList();
+//      } else if (modules.contains(Module.CODE) && hasFencedCodeBlockAhead()) {
+          this.fencedCodeBlock();
+//      } else {
+          this.paragraph();
+//      }
+        this.currentBlockLevel--;
+	},
 
+    heading: function() {
+        heading = new koara.Heading();
+        this.tree.openScope();
+        headingLevel = 0;
 
-
-
-
-//    private void blockElement() {
-//        currentBlockLevel++;
-//        if (modules.contains(Module.HEADINGS) && headingAhead(1)) {
-//            heading();
-//        } else if (modules.contains(Module.BLOCKQUOTES) && getNextTokenKind() == GT) {
-//            blockQuote();
-//        } else if (modules.contains(Module.LISTS) && getNextTokenKind() == DASH) {
-//            unorderedList();
-//        } else if (modules.contains(Module.LISTS) && hasOrderedListAhead()) {
-//            orderedList();
-//        } else if (modules.contains(Module.CODE) && hasFencedCodeBlockAhead()) {
-//            fencedCodeBlock();
-//        } else {
-//            paragraph();
-//        }
-//        currentBlockLevel--;
-//    }
-//
-//    private void heading() {
-//        Heading heading = new Heading();
-//        tree.openScope();
-//        int headingLevel = 0;
-//
-//        while (getNextTokenKind() == EQ) {
-//            consumeToken(EQ);
-//            headingLevel++;
-//        }
-//        whiteSpace();
-//        while (headingHasInlineElementsAhead()) {
-//            if (hasTextAhead()) {
-//                text();
+        while (this.getNextTokenKind() == this.tm.EQ) {
+            this.consumeToken(this.tm.EQ);
+            headingLevel++;
+        }
+        this.whiteSpace();
+        while (this.headingHasInlineElementsAhead()) {
+            if (this.hasTextAhead()) {
+                this.text();
 //            } else if (modules.contains(Module.IMAGES) && hasImageAhead()) {
-//                image();
+                this.image();
 //            } else if (modules.contains(Module.LINKS) && hasLinkAhead()) {
-//                link();
+                this.link();
 //            } else if (modules.contains(Module.FORMATTING) && hasStrongAhead()) {
-//                strong();
+                this.strong();
 //            } else if (modules.contains(Module.FORMATTING) && hasEmAhead()) {
-//                em();
+                this.em();
 //            } else if (modules.contains(Module.CODE) && hasCodeAhead()) {
-//                code();
+                this.code();
 //            } else {
-//                looseChar();
+                this.looseChar();
 //            }
-//        }
-//        heading.setValue(headingLevel);
-//        tree.closeScope(heading);
-//    }
-//
-//    private void blockQuote() {
-//        BlockQuote blockQuote = new BlockQuote();
-//        tree.openScope();
-//        currentQuoteLevel++;
-//        consumeToken(GT);
-//        while (blockQuoteHasEmptyLineAhead()) {
-//            blockQuoteEmptyLine();
-//        }
-//        whiteSpace();
-//        if (blockQuoteHasAnyBlockElementseAhead()) {
-//            blockElement();
-//            while (blockAhead(0)) {
-//                while (getNextTokenKind() == EOL) {
-//                    consumeToken(EOL);
-//                    whiteSpace();
-//                    blockQuotePrefix();
-//                }
-//                blockElement();
-//            }
-//        }
-//        while (hasBlockQuoteEmptyLinesAhead()) {
-//            blockQuoteEmptyLine();
-//        }
-//        currentQuoteLevel--;
-//        tree.closeScope(blockQuote);
-//    }
-//
-//    private void blockQuotePrefix() {
-//        int i = 0;
-//        do {
-//            consumeToken(GT);
-//            whiteSpace();
-//        } while (++i < currentQuoteLevel);
-//    }
-//
+          }
+          heading.setValue(headingLevel);
+          this.tree.closeScope(heading);
+    },
+
+    blockQuote: function() {
+        blockQuote = new koara.BlockQuote();
+        this.tree.openScope();
+        this.currentQuoteLevel++;
+        this.consumeToken(this.tm.GT);
+        while (this.blockQuoteHasEmptyLineAhead()) {
+            this.blockQuoteEmptyLine();
+        }
+        this.whiteSpace();
+        if (this.blockQuoteHasAnyBlockElementseAhead()) {
+            this.blockElement();
+            while (this.blockAhead(0)) {
+                while (this.getNextTokenKind() == EOL) {
+                    this.consumeToken(EOL);
+                    this.whiteSpace();
+                    this.blockQuotePrefix();
+                }
+                this.blockElement();
+            }
+        }
+        while (this.hasBlockQuoteEmptyLinesAhead()) {
+            this.blockQuoteEmptyLine();
+        }
+        this.currentQuoteLevel--;
+        tree.closeScope(blockQuote);
+      },
+
+      blockQuotePrefix: function() {
+        i = 0;
+        do {
+            consumeToken(this.tm.GT);
+            this.whiteSpace();
+        } while (++i < this.currentQuoteLevel);
+      },
+
 //    private void blockQuoteEmptyLine() {
 //        consumeToken(EOL);
 //        whiteSpace();
@@ -3152,48 +3130,44 @@ koara.Parser.prototype = {
 //        return false;
 //    }
 //
-//    private int getNextTokenKind() {
-//        if (nextTokenKind != -1) {
-//            return nextTokenKind;
-//        } else if ((nextToken = token.next) == null) {
-//            token.next = tm.getNextToken();
-//            return (nextTokenKind = token.next.kind);
-//        }
-//        return (nextTokenKind = nextToken.kind);
-//    }
-//
-//    private Token consumeToken(int kind) {
-//        Token old = token;
-//        if (token.next != null) {
-//            token = token.next;
-//        } else {
-//            token = token.next = tm.getNextToken();
-//        }
-//        nextTokenKind = -1;
-//        if (token.kind == kind) {
-//            return token;
-//        }
-//        token = old;
-//        return token;
-//    }
-//
-//    private Token getToken(int index) {
-//        Token t = lookingAhead ? scanPosition : token;
-//        for (int i = 0; i < index; i++) {
-//            if (t.next != null) {
-//                t = t.next;
-//            } else {
-//                t = t.next = tm.getNextToken();
-//            }
-//        }
-//        return t;
-//    }
-//
-//    public void setModules(Module... modules) {
-//        this.modules = Arrays.asList(modules);
-//    }
-//
-//}
+    getNextTokenKind: function() {
+        if (this.nextTokenKind != -1) {
+            return this.nextTokenKind;
+        } else if ((this.nextToken = this.token.next) == null) {
+            this.token.next = this.tm.getNextToken();
+            return (this.nextTokenKind = this.token.next.kind);
+        }
+        return (nextTokenKind = nextToken.kind);
+    },
+
+    consumeToken: function(kind) {
+        old = this.token;
+        if (this.token.next != null) {
+            this.token = this.token.next;
+        } else {
+            this.token = this.token.next = this.tm.getNextToken();
+        }
+        this.nextTokenKind = -1;
+        if (this.token.kind == kind) {
+            return this.token;
+        }
+        this.token = old;
+        return this.token;
+    },
+
+    getToken: function(index) {
+        t = this.lookingAhead ? this.scanPosition : this.token;
+        for (var i = 0; i < index; i++) {
+            if (t.next != null) {
+                t = t.next;
+            } else {
+                t = t.next = this.tm.getNextToken();
+            }
+        }
+        return t;
+    }
+
+}
 
 koara.Token = function() {}
 
