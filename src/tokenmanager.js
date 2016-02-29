@@ -31,29 +31,12 @@ koara.TokenManager.prototype = {
 	TAB: 20,
 	UNDERSCORE: 21,
 	
-	getNextToken: function() {
-		try {
-			curPos = 0;	
-			while(true) {
-				try {
-					curChar = this.cs.beginToken();
-				} catch(e) {
-					this.matchedKind = 0;
-                    this.matchedPos = -1;
-                    return this.fillToken();
-				}
-			}
-		} catch(e) {
-			return null;
-		}
-	},
-
     getNextToken: function() {
         try {
             var curPos = 0;
             while (true) {
                 try {
-                    curChar = this.cs.beginToken();
+                    this.curChar = this.cs.beginToken();
                 } catch (e) {
                     this.matchedKind = 0;
                     this.matchedPos = -1;
@@ -63,6 +46,7 @@ koara.TokenManager.prototype = {
                 this.matchedKind = 2147483647;
                 this.matchedPos = 0;
                 curPos = this.moveStringLiteralDfa0_0();
+
                 if (this.matchedKind != 2147483647) {
                     if (this.matchedPos + 1 < curPos) {
                         this.cs.backup(curPos - this.matchedPos - 1);
@@ -76,12 +60,12 @@ koara.TokenManager.prototype = {
     },
 
     fillToken: function() {
-        return new Koara.Token(this.matchedKind, this.cs.getBeginLine(), this.cs.getBeginColumn(), this.cs.getEndLine(), this.cs.getEndColumn(),
+        return new koara.Token(this.matchedKind, this.cs.getBeginLine(), this.cs.getBeginColumn(), this.cs.getEndLine(), this.cs.getEndColumn(),
                 this.cs.getImage());
     },
 
     moveStringLiteralDfa0_0: function() {
-        switch (this.curChar) {
+        switch (this.curChar.charCodeAt(0)) {
         case 9: return this.startNfaWithStates(0, this.TAB, 8);
         case 32: return this.startNfaWithStates(0, this.SPACE, 8);
         case 40: return this.stopAtPos(0, this.LPAREN);
@@ -122,8 +106,8 @@ koara.TokenManager.prototype = {
     },
 
     moveStringLiteralDfa1_0: function(active) {
-        this.curChar = this.cs.readChar();
-        if (this.curChar == 77 || this.curChar == 109) {
+    	this.curChar = this.cs.readChar();
+        if (this.curChar.charCodeAt(0) == 77 || this.curChar.charCodeAt(0) == 109) {
             return this.moveStringLiteralDfa2_0(active, 0x2000);
         }
         return this.startNfa(0, active);
@@ -131,7 +115,7 @@ koara.TokenManager.prototype = {
 
     moveStringLiteralDfa2_0: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar == 65 || this.curChar == 97) {
+        if (this.curChar.charCodeAt(0) == 65 || this.curChar.charCodeAt(0) == 97) {
             return this.moveStringLiteralDfa3_0(active, 0x2000);
         }
         return this.startNfa(1, active);
@@ -140,7 +124,7 @@ koara.TokenManager.prototype = {
 
     moveStringLiteralDfa3_0: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar == 71 || this.curChar == 103) {
+        if (this.curChar.charCodeAt(0) == 71 || this.curChar.charCodeAt(0) == 103) {
             return this.moveStringLiteralDfa4_0(active, 0x2000);
         }
         return this.startNfa(2, active);
@@ -148,7 +132,7 @@ koara.TokenManager.prototype = {
 
     moveStringLiteralDfa4_0: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar == 69 || this.curChar == 101) {
+        if (this.curChar.charCodeAt(0) == 69 || this.curChar.charCodeAt(0) == 101) {
             return this.moveStringLiteralDfa5_0(active, 0x2000);
         }
         return this.startNfa(3, active);
@@ -156,7 +140,7 @@ koara.TokenManager.prototype = {
 
     moveStringLiteralDfa5_0: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar == 58 && ((active & 0x2000) != 0)) {
+        if (this.curChar.charCodeAt(0) == 58 && ((active & 0x2000) != 0)) {
             return this.stopAtPos(5, 13);
         }
         return this.startNfa(4, active);
@@ -176,8 +160,8 @@ koara.TokenManager.prototype = {
             if (++this.round == 0x7fffffff) {
                 this.round = 0x80000001;
             }            
-            if (this.curChar < 64) {
-                var l = 1 << this.curChar;
+            if (this.curChar.charCodeAt(0) < 64) {
+                var l = 1 << this.curChar.charCodeAt(0);
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
@@ -198,7 +182,7 @@ koara.TokenManager.prototype = {
                         } else if ((0x100000200 & l) != 0) {
                             this.checkNAddStates(0, 2);
                         }
-                        if (this.curChar == 13) {
+                        if (this.curChar.charCodeAt(0) == 13) {
                             this.jjstateSet[this.jjnewStateCnt++] = 4;
                         }
                         break;
@@ -210,7 +194,7 @@ koara.TokenManager.prototype = {
                         } else if ((0x100000200 & l) != 0) {
                             this.checkNAddStates(0, 2);
                         }
-                        if (this.curChar == 13) {
+                        if (this.curChar.charCodeAt(0) == 13) {
                             this.jjstateSet[this.jjnewStateCnt++] = 4;
                         }
                         break;
@@ -239,12 +223,12 @@ koara.TokenManager.prototype = {
                         }
                         break;
                     case 4:
-                        if (this.curChar == 10 && kind > 9) {
+                        if (this.curChar.charCodeAt(0) == 10 && kind > 9) {
                             kind = 9;
                         }
                         break;
                     case 5:
-                        if (this.curChar == 13) {
+                        if (this.curChar.charCodeAt(0) == 13) {
                             this.jjstateSet[this.jjnewStateCnt++] = 4;
                         }
                         break;
@@ -255,8 +239,9 @@ koara.TokenManager.prototype = {
                         break;
                     }
                 } while (i != startsAt);
-            } else if (this.curChar < 128) {
-                var l = 1 << (this.curChar & 077);
+            } else if (this.curChar.charCodeAt(0) < 128) {
+            	var l = (1 << (this.curChar.charCodeAt(0) & 077));
+            	
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
@@ -265,12 +250,12 @@ koara.TokenManager.prototype = {
                                 kind = 4;
                             }
                             this.checkNAdd(0);
-                        } else if (this.curChar == 92) {
+                        } else if (this.curChar.charCodeAt(0) == 92) {
                             this.jjstateSet[this.jjnewStateCnt++] = 7;
                         }
                         break;
-                    case 0:
-                        if ((0xfffffffe47ffffff & l) != 0) {
+                    case 0: 
+                        if ((-7381975041 & l) != 0) {
                             kind = 4;
                             this.checkNAdd(0);
                         }
@@ -295,18 +280,19 @@ koara.TokenManager.prototype = {
                     }
                 } while (i != startsAt);
             }
+            
             if (kind != 0x7fffffff) {
                 this.matchedKind = kind;
                 this.matchedPos = curPos;
                 kind = 0x7fffffff;
             }
-            ++this.curPos;
+            ++curPos;
             
             if ((i = this.jjnewStateCnt) == (startsAt = 8 - (this.jjnewStateCnt = startsAt))) {
                 return curPos;
             }
             try {
-                curChar = this.cs.readChar();
+                this.curChar = this.cs.readChar();
             } catch (e) {
                 return curPos;
             }

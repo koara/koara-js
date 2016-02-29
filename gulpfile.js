@@ -38,6 +38,7 @@ gulp.task('scripts', function() {
       'src/ast/listitem.js',
       'src/ast/paragraph.js',
       'src/ast/strong.js',
+      'src/ast/text.js',
       'src/io/*.js',
       'src/renderer/*.js',
       'src/*.js'
@@ -56,5 +57,5 @@ gulp.task('serve', ['default'], function() {
 });
 
 gulp.task('test', ['scripts'], function () {
-	return gulp.src('test/*.js').pipe(jasmine());
+	return gulp.src('test/com*.js').pipe(jasmine({verbose: true, includeStackTrace: true}));
 })

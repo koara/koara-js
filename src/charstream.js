@@ -36,6 +36,7 @@ koara.CharStream.prototype = {
 		if (++this.bufpos >= this.maxNextCharInd) {
 			this.fillBuff();
 		}
+
 		var c = this.buffer[this.bufpos];
 		this.updateLineColumn(c);
 		return c;
@@ -53,11 +54,10 @@ koara.CharStream.prototype = {
 				this.available = this.bufsize;
 			}
 		}
-		var i;
+		var i=0;
 		try {
-			if ((i = this.reader.read(this.buffer, this.maxNextCharInd,
-				this.available - this.maxNextCharInd)) == -1) {
-				throw "IOException";
+			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) == -1) {
+				throw new Error("IOException");
 			} else {
 				this.maxNextCharInd += i;
 			}
@@ -72,8 +72,8 @@ koara.CharStream.prototype = {
 	},
 	
 	backup: function(amount) {
-		this.inBuf += this.amount;
-		if ((this.bufpos -= this.amount) < 0) {
+		this.inBuf += amount;
+		if ((this.bufpos -= amount) < 0) {
 			this.bufpos += this.bufsize;
 		}
 	},

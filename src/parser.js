@@ -13,12 +13,13 @@ koara.Parser.prototype = {
 	parseReader: function(reader) {
 		this.cs = new koara.CharStream(reader);
 		this.tm = new koara.TokenManager(this.cs);
-		var token = new koara.Token();
-		var tree = new koara.TreeState();
+		this.token = new koara.Token();
+		this.tree = new koara.TreeState();
 		this.nextTokenKind = -1;
 		
 		document = new koara.Document();
-		tree.openScope();
+		this.tree.openScope();
+		
 		while(this.getNextTokenKind() == this.tm.EOL) {
 			this.consumeToken(this.tm.EOL);
 		}
@@ -46,9 +47,9 @@ koara.Parser.prototype = {
         this.currentBlockLevel++;
         if (this.modules.indexOf("headings") >= 0 && this.headingAhead(1)) {
           this.heading();
-        } else if (this.modules.indexOf("blockquotes") >= 0 && this.getNextTokenKind() == GT) {
+        } else if (this.modules.indexOf("blockquotes") >= 0 && this.getNextTokenKind() == this.tm.GT) {
           this.blockQuote();
-        } else if (this.modules.indexOf("lists") >= 0 && thsi.getNextTokenKind() == DASH) {
+        } else if (this.modules.indexOf("lists") >= 0 && this.getNextTokenKind() == this.tm.DASH) {
           this.unorderedList();
         } else if (this.modules.indexOf("lists") >= 0 && this.hasOrderedListAhead()) {
           this.orderedList();
@@ -218,7 +219,7 @@ koara.Parser.prototype = {
 
     fencedCodeBlock: function() {
         var codeBlock = new CodeBlock();
-        tree.openScope();
+        this.tree.openScope();
         var s = '';
         var beginColumn = this.consumeToken(this.tm.BACKTICK).beginColumn;
         do {
@@ -369,7 +370,7 @@ koara.Parser.prototype = {
             case this.tm.EQ:
                 s += this.consumeToken(this.tm.EQ).image;
                 break;
-            case ESCAPED_CHAR:
+            case this.tm.ESCAPED_CHAR:
                 s += this.consumeToken(this.tm.ESCAPED_CHAR).image.substring(1);
                 break;
             case this.tm.GT:
@@ -391,7 +392,7 @@ koara.Parser.prototype = {
                 s += consumeToken(RPAREN).image;
                 break;
             default:
-                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+                if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
                     switch (this.getNextTokenKind()) {
                     case this.tm.SPACE:
                         s += this.consumeToken(this.tm.SPACE).image;
@@ -405,7 +406,7 @@ koara.Parser.prototype = {
             }
         }
         text.value = s;
-        tree.closeScope(text);
+        this.tree.closeScope(text);
     },
 
     image: function() {
@@ -629,7 +630,7 @@ koara.Parser.prototype = {
             text.value = this.consumeToken(this.tm.UNDERSCORE).image;
             break;
         }
-        tree.closeScope(text);
+        this.tree.closeScope(text);
     },
 
     lineBreak: function() {
@@ -725,20 +726,20 @@ koara.Parser.prototype = {
 
       inline: function() {
     	  do {
-    		  if (this.hasInlineTextAhead()) {
-    			  text();
+    		if (this.hasInlineTextAhead()) {
+    			  this.text();
             } else if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
-                  image();
+                  this.image();
             } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
-                  link();
+                  this.link();
             } else if (modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.ASTERISK)) {
-                  strongMultiline();
+                  this.strongMultiline();
             } else if (modules.indexOf("formatting") >= 0 && multilineAhead(UNDERSCORE)) {
-                  emMultiline();
+                  this.emMultiline();
             } else if (modules.indexOf("code") >= 0 && multilineAhead(this.tm.BACKTICK)) {
-                  codeMultiline();
+                  this.codeMultiline();
             } else {
-                 looseChar();
+                 this.looseChar();
             }
           } while (this.hasInlineElementAhead());
       },
@@ -1128,7 +1129,7 @@ koara.Parser.prototype = {
     },
 
     whiteSpace: function() {
-        while (this.getNextTokenKind() == this.tm.SPACE || this.tm.getNextTokenKind() == this.tm.TAB) {
+        while (this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) {
             this.consumeToken(this.getNextTokenKind());
         }
     },
@@ -1179,7 +1180,7 @@ koara.Parser.prototype = {
                 if (t.kind == token) {
                     return true;
                 } else if (t.kind == this.tm.EOL) {
-                    i = this.skip(i + 1, this.tm.SPACE, this.tm.TAB);
+                    i = this.skip(i + 1, [this.tm.SPACE, this.tm.TAB]);
                     var quoteLevel = this.newQuoteLevel(i);
                     if (quoteLevel == this.currentQuoteLevel) {
                         i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
@@ -1264,8 +1265,8 @@ koara.Parser.prototype = {
     },
 
     nextAfterSpace: function(tokens) {
-        var i = this.skip(1, this.tm.SPACE, this.tm.TAB);
-        return Arrays.asList(tokens).contains(getToken(i).kind);
+        var i = this.skip(1, [this.tm.SPACE, this.tm.TAB]);
+        return tokens.indexOf(this.getToken(i).kind) >= 0;
     },
 
     newQuoteLevel: function(offset) {
@@ -1284,7 +1285,7 @@ koara.Parser.prototype = {
     skip: function(offset, tokens) {
         for (var i = offset;; i++) {
             var t = this.getToken(i);
-            if (!Arrays.asList(tokens).contains(t.kind) || t.kind == EOF) {
+            if (tokens.indexOf(t.kind) == -1 || t.kind == EOF) {
                 return i;
             }
         }
@@ -1952,7 +1953,7 @@ koara.Parser.prototype = {
         while (true) {
             xsp = this.scanPosition;
             if (this.scanEmElements()) {
-                thsi.scanPosition = xsp;
+                this.scanPosition = xsp;
                 break;
             }
         }
@@ -2610,14 +2611,14 @@ koara.Parser.prototype = {
         if (this.lookAhead == 0 && this.scanPosition == this.lastPosition) {
             throw lookAheadSuccess;
         }
-	      return false;
+	    return false;
     },
 
     getNextTokenKind: function() {
-        if (this.nextTokenKind != -1) {
+    	if (this.nextTokenKind != -1) {
             return this.nextTokenKind;
         } else if ((this.nextToken = this.token.next) == null) {
-            this.token.next = this.tm.getNextToken();
+        	this.token.next = this.tm.getNextToken();
             return (this.nextTokenKind = this.token.next.kind);
         }
         return (nextTokenKind = nextToken.kind);

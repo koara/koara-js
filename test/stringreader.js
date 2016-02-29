@@ -1,9 +1,9 @@
 'use strict';
 
-var koara = require('../dist/koara.js');
-var buffer;
 
 describe("StringReader", function() {
+	var koara = require('../dist/koara.js');
+	var buffer;
 
 	beforeEach(function() {
 		buffer = [];
