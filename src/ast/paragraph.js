@@ -1,10 +1,7 @@
 koara.Paragraph = function() {}
 koara.Paragraph.prototype = new koara.BlockElement();
+koara.Paragraph.prototype.constructor = koara.Paragraph;
 
-koara.Paragraph.prototype = {
-	constructor: koara.Paragraph,
-	
-	accept: function(renderer) {
-		renderer.visit(this)
-	}
+koara.Paragraph.prototype.accept = function(renderer) {
+	renderer.visitParagraph(this)
 }

@@ -15,10 +15,10 @@ koara.TreeState.prototype = {
 	
 	closeScope: function(n) {
 		a = this.nodeArity();
-		this.currentMark = marks.pop(); // currentMark = marks.remove(marks.size() - 1);
+		this.currentMark = this.marks.pop(); // currentMark = marks.remove(marks.size() - 1);
 		while (a-- > 0) {
           c = this.popNode();
-          c.setParent(n);
+          c.parent = n;
           n.add(c, a);
         }
 		this.pushNode(n);
@@ -35,12 +35,12 @@ koara.TreeState.prototype = {
 	}, 
 	
     popNode: function() {
-    	--nodesOnStack;
-    	return nodes.pop();
+    	--this.nodesOnStack;
+    	return this.nodes.pop();
     },
     
     pushNode: function(n) {
-    	this.nodes.add(n);
+    	this.nodes.push(n);
     	 ++this.nodesOnStack;
     }
 		

@@ -17,6 +17,9 @@ koara.Parser.prototype = {
 		this.tree = new koara.TreeState();
 		this.nextTokenKind = -1;
 		
+		
+		console.log('--- ' + this.getNextTokenKind());
+		
 		document = new koara.Document();
 		this.tree.openScope();
 		
@@ -291,7 +294,7 @@ koara.Parser.prototype = {
 		                s += this.consumeToken(this.tm.BACKTICK).image;
 		                break;
 		            default:
-		                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+		                if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
 		                    switch (this.getNextTokenKind()) {
 		                    case this.tm.SPACE:
 		                        s += this.consumeToken(this.tm.SPACE).image;
@@ -326,7 +329,6 @@ koara.Parser.prototype = {
         } else {
             paragraph = new koara.BlockElement();
         }
-
         this.tree.openScope();
         this.inline();
         while (this.textAhead()) {
@@ -405,6 +407,9 @@ koara.Parser.prototype = {
                 }
             }
         }
+        
+        
+        
         text.value = s;
         this.tree.closeScope(text);
     },
@@ -440,13 +445,13 @@ koara.Parser.prototype = {
         this.consumeToken(this.tm.LBRACK);
         this.whiteSpace();
         while (this.linkHasAnyElements()) {
-            if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+            if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            } else if (modules.indexOf("formatting") >= 0 && this.hasStrongAhead()) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.hasStrongAhead()) {
                 this.strong();
-            } else if (modules.indexOf("formatting") >= 0 && this.hasEmAhead()) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.hasEmAhead()) {
                 this.em();
-            } else if (modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
             } else if (this.hasResourceTextAhead()) {
                 this.resourceText();
@@ -503,11 +508,11 @@ koara.Parser.prototype = {
         while (this.emHasElements()) {
             if (this.hasTextAhead()) {
                 this.text();
-            } else if (modules.indexOf("images") >= 0 && this.hasImage()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImage()) {
                 this.image();
-            } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            } else if (modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
             } else if (this.emHasStrongWithinEm()) {
                 this.strongWithinEm();
@@ -614,7 +619,7 @@ koara.Parser.prototype = {
     },
 
    looseChar: function() {
-        var text = new Text();
+        var text = new koara.Text();
         this.tree.openScope();
         switch (this.getNextTokenKind()) {
         case this.tm.ASTERISK:
@@ -728,15 +733,15 @@ koara.Parser.prototype = {
     	  do {
     		if (this.hasInlineTextAhead()) {
     			  this.text();
-            } else if (modules.indexOf("images") >= 0 && this.hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                   this.image();
-            } else if (modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                   this.link();
-            } else if (modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.ASTERISK)) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.ASTERISK)) {
                   this.strongMultiline();
-            } else if (modules.indexOf("formatting") >= 0 && multilineAhead(UNDERSCORE)) {
+            } else if (this.modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.UNDERSCORE)) {
                   this.emMultiline();
-            } else if (modules.indexOf("code") >= 0 && multilineAhead(this.tm.BACKTICK)) {
+            } else if (this.modules.indexOf("code") >= 0 && this.multilineAhead(this.tm.BACKTICK)) {
                   this.codeMultiline();
             } else {
                  this.looseChar();
@@ -1059,7 +1064,7 @@ koara.Parser.prototype = {
                 this.text();
             } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            } else if (this.this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
                 this.link();
             } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
                 this.code();
@@ -1250,15 +1255,15 @@ koara.Parser.prototype = {
         if (this.getNextTokenKind() == this.tm.EOL && this.getToken(2).kind != this.tm.EOL) {
             var i = skip(2, this.tm.SPACE, this.tm.TAB);
             var quoteLevel = this.newQuoteLevel(i);
-            if (quoteLevel == this.currentQuoteLevel || !modules.contains(Module.BLOCKQUOTES)) {
+            if (quoteLevel == this.currentQuoteLevel || !this.modules.contains(Module.BLOCKQUOTES)) {
                 i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
 
                 var t = this.getToken(i);
-                return this.getToken(i).kind != this.tm.EOL && !(modules.contains(Module.LISTS) && t.kind == this.tm.DASH)
-                        && !(modules.contains(Module.LISTS) && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
+                return this.getToken(i).kind != this.tm.EOL && !(this.modules.contains(Module.LISTS) && t.kind == this.tm.DASH)
+                        && !(this.modules.contains(Module.LISTS) && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
                         && !(this.getToken(i).kind == this.tm.BACKTICK && this.getToken(i + 1).kind == this.tm.BACKTICK
                                 && this.getToken(i + 2).kind == this.tm.BACKTICK)
-                        && !(modules.contains(Module.HEADINGS) && this.headingAhead(i));
+                        && !(this.modules.contains(Module.HEADINGS) && this.headingAhead(i));
             }
         }
         return false;
@@ -1494,8 +1499,8 @@ koara.Parser.prototype = {
     },
 
     resourceHasElementAhead: function() {
-        lookAhead = 2;
-        lastPosition = scanPosition = token;
+        this.lookAhead = 2;
+        this.lastPosition = this.scanPosition = this.token;
         try {
             return !scanResourceElement();
         } catch (ls) {
@@ -1614,8 +1619,8 @@ koara.Parser.prototype = {
     },
 
     emWithinStrongMultilineContentHasElementsAhead: function() {
-        lookAhead = 1;
-        lastPosition = scanPosition = token;
+        this.lookAhead = 1;
+        this.lastPosition = this.scanPosition = this.token;
         try {
             return !scanEmWithinStrongMultilineContent();
         } catch (ls) {
@@ -1664,11 +1669,14 @@ koara.Parser.prototype = {
     },
 
     textHasTokensAhead: function() {
+    	console.log('1');
         this.lookAhead = 1;
         this.lastPosition = this.scanPosition = this.token;
         try {
+        	console.log('2');
             return !this.scanText();
         } catch (ls) {
+        	console.log('3' + ls);
             return true;
         }
     },
@@ -1719,7 +1727,7 @@ koara.Parser.prototype = {
                                                             if (this.scanToken(this.tm.RPAREN)) {
                                                                 this.scanPosition = xsp;
                                                                 this.lookingAhead = true;
-                                                                this.semanticLookAhead = !this.nextAfterSpace(this.tm.EOL, this.tm.EOF);
+                                                                this.semanticLookAhead = !this.nextAfterSpace([this.tm.EOL, this.tm.EOF]);
                                                                 this.lookingAhead = false;
                                                                 return (!this.semanticLookAhead || this.scanWhitspaceToken());
                                                             }
@@ -1755,7 +1763,7 @@ koara.Parser.prototype = {
     },
 
     scanCodeTextTokens: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanToken(this.tm.ASTERISK)) {
             this.scanPosition = xsp;
             if (this.scanToken(this.tm.BACKSLASH)) {
@@ -1791,7 +1799,7 @@ koara.Parser.prototype = {
                                                                         if (this.scanToken(this.tm.UNDERSCORE)) {
                                                                             this.scanPosition = xsp;
                                                                             this.lookingAhead = true;
-                                                                            this.semanticLookAhead = !this.nextAfterSpace(this.tm.EOL, this.tm.EOF);
+                                                                            this.semanticLookAhead = !this.nextAfterSpace([this.tm.EOL, this.tm.EOF]);
                                                                             this.lookingAhead = false;
                                                                             return (!this.semanticLookAhead || this.scanWhitspaceToken());
                                                                         }
@@ -1824,7 +1832,7 @@ koara.Parser.prototype = {
         }
         var xsp;
         while (true) {
-            xsp = scanPosition;
+            xsp = this.scanPosition;
             if (this.hasCodeTextOnNextLineAhead()) {
                 this.scanPosition = xsp;
                 break;
@@ -1919,7 +1927,7 @@ koara.Parser.prototype = {
     },
 
     scanEmElements: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -1961,7 +1969,7 @@ koara.Parser.prototype = {
     },
 
     scanEmWithinStrongMultilineContent: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -2015,7 +2023,7 @@ koara.Parser.prototype = {
     },
 
     scanEmMultilineContentElements: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -2084,7 +2092,7 @@ koara.Parser.prototype = {
     },
 
     scanStrongElements: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -2129,7 +2137,7 @@ koara.Parser.prototype = {
     },
 
     scanStrongWithinEmMultilineElements: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -2183,7 +2191,7 @@ koara.Parser.prototype = {
     },
 
     scanStrongMultilineElements: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -2210,7 +2218,7 @@ koara.Parser.prototype = {
     },
 
     scanResourceTextElement: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanToken(this.tm.ASTERISK)) {
             this.scanPosition = xsp;
             if (this.scanToken(this.tm.BACKSLASH)) {
@@ -2246,7 +2254,7 @@ koara.Parser.prototype = {
                                                                         if (this.scanToken(this.tm.UNDERSCORE)) {
                                                                             this.scanPosition = xsp;
                                                                             this.lookingAhead = true;
-                                                                            this.semanticLookAhead = !this.nextAfterSpace(this.tm.RPAREN);
+                                                                            this.semanticLookAhead = !this.nextAfterSpace([this.tm.RPAREN]);
                                                                             this.lookingAhead = false;
                                                                             return (!this.semanticLookAhead || this.scanWhitspaceToken());
                                                                         }
@@ -2270,7 +2278,7 @@ koara.Parser.prototype = {
     },
 
     scanImageElement: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanResourceElements()) {
             this.scanPosition = xsp;
             if (this.scanLooseChar()) {
@@ -2298,7 +2306,7 @@ koara.Parser.prototype = {
     },
 
     scanLinkElement: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanImage()) {
             this.scanPosition = xsp;
             if (this.scanStrong()) {
@@ -2319,7 +2327,7 @@ koara.Parser.prototype = {
     },
 
     scanResourceElement: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanToken(this.tm.BACKSLASH)) {
             this.scanPosition = xsp;
             if (this.scanToken(this.tm.COLON)) {
@@ -2347,7 +2355,7 @@ koara.Parser.prototype = {
                                                         if (this.scanToken(this.tm.RPAREN)) {
                                                             this.scanPosition = xsp;
                                                             this.lookingAhead = true;
-                                                            this.semanticLookAhead = !this.nextAfterSpace(this.tm.RBRACK);
+                                                            this.semanticLookAhead = !this.nextAfterSpace([this.tm.RBRACK]);
                                                             this.lookingAhead = false;
                                                             return (!this.semanticLookAhead || this.scanWhitspaceToken());
                                                         }
@@ -2426,7 +2434,7 @@ koara.Parser.prototype = {
     },
 
     scanInlineElement: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanTextTokens()) {
             this.scanPosition = xsp;
             if (this.scanImage()) {
@@ -2474,7 +2482,7 @@ koara.Parser.prototype = {
     },
 
     scanForCodeLanguageElement: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanToken(this.tm.CHAR_SEQUENCE)) {
             this.scanPosition = xsp;
             if (this.scanToken(this.tm.BACKTICK)) {
@@ -2500,7 +2508,7 @@ koara.Parser.prototype = {
     },
 
     scanWhitspaceToken: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         if (this.scanToken(this.tm.SPACE)) {
             this.scanPosition = xsp;
             if (this.scanToken(this.tm.TAB)) {
@@ -2571,7 +2579,7 @@ koara.Parser.prototype = {
     },
 
     scanMoreBlockElements: function() {
-        var xsp = scanPosition;
+        var xsp = this.scanPosition;
         this.lookingAhead = true;
         this.semanticLookAhead = this.headingAhead(1);
         this.lookingAhead = false;
@@ -2580,12 +2588,12 @@ koara.Parser.prototype = {
             if (this.scanToken(this.tm.GT)) {
                 this.scanPosition = xsp;
                 if (this.scanToken(this.tm.DASH)) {
-                    scanPosition = xsp;
+                    this.scanPosition = xsp;
                     if (scanToken(DIGITS) || scanToken(DOT)) {
-                        scanPosition = xsp;
+                        this.scanPosition = xsp;
                         if (scanFencedCodeBlock()) {
-                            scanPosition = xsp;
-                            return scanParagraph();
+                            this.scanPosition = xsp;
+                            return this.scanParagraph();
                         }
                     }
                 }
@@ -2621,7 +2629,7 @@ koara.Parser.prototype = {
         	this.token.next = this.tm.getNextToken();
             return (this.nextTokenKind = this.token.next.kind);
         }
-        return (nextTokenKind = nextToken.kind);
+        return (this.nextTokenKind = this.nextToken.kind);
     },
 
     consumeToken: function(kind) {

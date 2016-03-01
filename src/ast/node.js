@@ -1,12 +1,13 @@
 koara.Node = function() {
 	this.children = [];
+	this.value = '';
 }
 
 koara.Node.prototype = {
 	constructor: koara.Node, 
 	
 	add: function(n, i) {
-		children.push(n);
+		this.children.push(n);
 	}, 
 	
 	childrenAccept: function(renderer) {

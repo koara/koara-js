@@ -1,4 +1,6 @@
-koara.Html5Renderer = function() {}
+koara.Html5Renderer = function() {
+	this.level = 0;
+}
 
 koara.Html5Renderer.prototype = {
 	constructor: koara.Html5Renderer,
@@ -6,8 +8,7 @@ koara.Html5Renderer.prototype = {
 	visitDocument: function(node) {
 		this.output = '';
 		node.childrenAccept(this);
-	}
-}
+	},
 
 //	public void visit(Heading node) {
 //		out.append(indent() + "<h" + node.getValue() + ">");
@@ -69,16 +70,16 @@ koara.Html5Renderer.prototype = {
 //		if(!node.isNested()) { out.append("\n"); }
 //	}
 //
-//	public void visit(Paragraph node) {
-//		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
-//			node.childrenAccept(this);
-//		} else {
-//			out.append(indent() + "<p>");
-//			node.childrenAccept(this);
-//			out.append("</p>\n");
-//			if(!node.isNested()) { out.append("\n"); }
-//		}
-//	}
+	visitParagraph: function(node) {
+		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
+			node.childrenAccept(this);
+		} else {
+			this.output += this.indent() + "<p>";
+			node.childrenAccept(this);
+			this.output += "</p>\n";
+			if(!node.isNested()) { this.output += "\n"; }
+		}
+	},
 //	
 //	@Override
 //	public void visit(BlockElement node) {
@@ -121,10 +122,13 @@ koara.Html5Renderer.prototype = {
 //		out.append("</code>");
 //	}
 //		
-//	public void visit(Text node) {
-//		out.append(escape(node.getValue().toString()));
-//	}
-//	
+	visitText: function(node) {
+		
+		console.log('//' + JSON.stringify(node));
+		
+		this.output += node.value;
+	},
+	
 //	public String escape(String text) {
 //		return text.replaceAll("&", "&amp;")
 //				.replaceAll("<", "&lt;")
@@ -148,13 +152,13 @@ koara.Html5Renderer.prototype = {
 //				.replaceAll("\\\\", "%5C");
 //	}
 //	
-//	public String indent() {
-//		int repeat = level * 2;
-//	    final char[] buf = new char[repeat];
-//		for (int i = repeat - 1; i >= 0; i--) {
-//		 buf[i] = ' ';
-//		} 
-//		return new String(buf);
-//	}
-//	
-//}
+	indent: function() {
+		var repeat = this.level * 2;
+	    var buf = [];
+		for (var i = repeat - 1; i >= 0; i--) {
+		 buf.push(' ');
+		} 
+		return new String(buf);
+	}
+	
+}
