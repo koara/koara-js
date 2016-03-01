@@ -123,9 +123,6 @@ koara.Html5Renderer.prototype = {
 //	}
 //		
 	visitText: function(node) {
-		
-		console.log('//' + JSON.stringify(node));
-		
 		this.output += node.value;
 	},
 	

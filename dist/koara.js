@@ -331,9 +331,6 @@ koara.Html5Renderer.prototype = {
 //	}
 //		
 	visitText: function(node) {
-		
-		console.log('//' + JSON.stringify(node));
-		
 		this.output += node.value;
 	},
 	
@@ -524,10 +521,7 @@ koara.Parser.prototype = {
 		this.token = new koara.Token();
 		this.tree = new koara.TreeState();
 		this.nextTokenKind = -1;
-		
-		
-		console.log('--- ' + this.getNextTokenKind());
-		
+
 		document = new koara.Document();
 		this.tree.openScope();
 		
@@ -1707,7 +1701,7 @@ koara.Parser.prototype = {
                     } else {
                         return false;
                     }
-                } else if (t.kind == this.EOF) {
+                } else if (t.kind == this.tm.EOF) {
                     return false;
                 }
             }
@@ -1798,7 +1792,7 @@ koara.Parser.prototype = {
     skip: function(offset, tokens) {
         for (var i = offset;; i++) {
             var t = this.getToken(i);
-            if (tokens.indexOf(t.kind) == -1 || t.kind == EOF) {
+            if (tokens.indexOf(t.kind) == -1 || t.kind == this.tm.EOF) {
                 return i;
             }
         }
@@ -2177,14 +2171,11 @@ koara.Parser.prototype = {
     },
 
     textHasTokensAhead: function() {
-    	console.log('1');
         this.lookAhead = 1;
         this.lastPosition = this.scanPosition = this.token;
         try {
-        	console.log('2');
             return !this.scanText();
         } catch (ls) {
-        	console.log('3' + ls);
             return true;
         }
     },
@@ -3125,7 +3116,7 @@ koara.Parser.prototype = {
             return true;
         }
         if (this.lookAhead == 0 && this.scanPosition == this.lastPosition) {
-            throw lookAheadSuccess;
+            throw this.lookAheadSuccess;
         }
 	    return false;
     },
@@ -3169,7 +3160,14 @@ koara.Parser.prototype = {
 
 }
 
-koara.Token = function() {}
+koara.Token = function(kind, beginLine, beginColumn, endLine, endColumn, image) {
+	this.kind = kind;
+	this.beginLine = beginLine;
+	this.beginColumn = beginColumn;
+    this.endLine = endLine;
+	this.endColumn = endColumn;
+	this.image = image;
+}
 
 koara.Token.prototype = {
 	constructor: koara.Token
