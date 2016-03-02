@@ -19,7 +19,7 @@ koara.TreeState.prototype = {
 		while (a-- > 0) {
           c = this.popNode();
           c.parent = n;
-          n.add(c, a);
+          n.add(c);
         }
 		this.pushNode(n);
 	},

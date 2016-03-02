@@ -4,4 +4,4 @@ koara.Text.prototype.constructor = koara.Text;
 
 koara.Text.prototype.accept = function(renderer) {
 	renderer.visitText(this);
-}
+};

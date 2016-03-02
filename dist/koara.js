@@ -7,49 +7,40 @@ if (typeof exports != 'undefined' && !exports.nodeType) {
   exports.koara = koara;
 } 
 koara.Node = function() {
-	this.children = [];
-	this.value = '';
+  this.children = [];
 }
-
-koara.Node.prototype = {
-	constructor: koara.Node, 
-	
-	add: function(n, i) {
-		this.children.push(n);
-	}, 
-	
-	childrenAccept: function(renderer) {
-		for(var i=0; i < this.children.length; i++) {
-			this.children[i].accept(renderer);
-		}
+   
+koara.Node.prototype.add = function(n) {
+	this.children.push(n);
+};
+   
+koara.Node.prototype.childrenAccept = function(renderer) {
+	for(var i=0; i < this.children.length; i++) {
+		this.children[i].accept(renderer);
 	}
-	
-}
+};
 koara.Document = function() {}
 koara.Document.prototype = new koara.Node();
+koara.Document.prototype.constructor = koara.Document;
 
-koara.Document.prototype = {
-	constructor: koara.Document,
-	
-	accept: function(renderer) {
-		renderer.visitDocument(this)
-	}
-}
+koara.Document.prototype.accept = function(renderer) {
+	renderer.visitDocument(this)
+};
 koara.BlockElement = function() {}
 koara.BlockElement.prototype = new koara.Node();
 koara.BlockElement.prototype.constructor = koara.BlockElement;
 
 koara.BlockElement.prototype.isNested = function() {
 	return !(this.parent instanceof koara.Document);
-}
+};
 
 koara.BlockElement.prototype.isSingleChild = function() {
 	return this.parent.children.length == 1;
-}
+};
 
 koara.BlockElement.prototype.accept = function(renderer) {
 	renderer.visit(this);
-}
+};
 koara.BlockQuote = function() {}
 koara.BlockQuote.prototype = new koara.BlockElement();
 
@@ -157,8 +148,8 @@ koara.Paragraph.prototype = new koara.BlockElement();
 koara.Paragraph.prototype.constructor = koara.Paragraph;
 
 koara.Paragraph.prototype.accept = function(renderer) {
-	renderer.visitParagraph(this)
-}
+	renderer.visitParagraph(this);
+};
 koara.Strong = function() {}
 koara.Strong.prototype = new koara.Node();
 
@@ -175,7 +166,7 @@ koara.Text.prototype.constructor = koara.Text;
 
 koara.Text.prototype.accept = function(renderer) {
 	renderer.visitText(this);
-}
+};
 'use strict';
 
 koara.StringReader = function(text) {
@@ -519,7 +510,7 @@ koara.Parser.prototype = {
 		this.tree = new koara.TreeState();
 		this.nextTokenKind = -1;
 
-		document = new koara.Document();
+		var document = new koara.Document();
 		this.tree.openScope();
 		
 		while(this.getNextTokenKind() == this.tm.EOL) {
@@ -3536,7 +3527,7 @@ koara.TreeState.prototype = {
 		while (a-- > 0) {
           c = this.popNode();
           c.parent = n;
-          n.add(c, a);
+          n.add(c);
         }
 		this.pushNode(n);
 	},

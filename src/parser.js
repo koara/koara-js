@@ -17,7 +17,7 @@ koara.Parser.prototype = {
 		this.tree = new koara.TreeState();
 		this.nextTokenKind = -1;
 
-		document = new koara.Document();
+		var document = new koara.Document();
 		this.tree.openScope();
 		
 		while(this.getNextTokenKind() == this.tm.EOL) {
