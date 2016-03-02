@@ -100,12 +100,12 @@ koara.CharStream.prototype = {
 	},
 	
 	getImage: function() {
-		if (this.bufpos >= this.tokenBegin) {
-			return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('');
-		} else {
-			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
-					+ this.buffer.slice(0, this.bufpos + 1).join('');
-		}
+			if (this.bufpos >= this.tokenBegin) {
+				return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('')
+			} else {
+				return this.buffer.slice(this.tokenBegin, (this.bufsize - this.tokenBegin)).join('')
+						+ this.buffer.slice(0, (this.bufpos + 1)).join('');
+			}
 	}, 
 	
 	getBeginColumn: function() {

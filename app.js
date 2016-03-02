@@ -5,6 +5,4 @@ if (typeof exports != 'undefined' && !exports.nodeType) {
     exports = module.exports = koara;
   }
   exports.koara = koara;
-} else {
-  root.koara = koara;
-}
+} 

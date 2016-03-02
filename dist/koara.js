@@ -5,9 +5,7 @@ if (typeof exports != 'undefined' && !exports.nodeType) {
     exports = module.exports = koara;
   }
   exports.koara = koara;
-} else {
-  root.koara = koara;
-}
+} 
 koara.Node = function() {
 	this.children = [];
 	this.value = '';
@@ -27,17 +25,16 @@ koara.Node.prototype = {
 	}
 	
 }
-'use strict';
-
 koara.Document = function() {}
 koara.Document.prototype = new koara.Node();
-koara.Document.prototype.constructor = koara.Document;
 
-koara.Document.prototype.accept = function(renderer) {
-	renderer.visitDocument(this);
-};
-
-
+koara.Document.prototype = {
+	constructor: koara.Document,
+	
+	accept: function(renderer) {
+		renderer.visitDocument(this)
+	}
+}
 koara.BlockElement = function() {}
 koara.BlockElement.prototype = new koara.Node();
 koara.BlockElement.prototype.constructor = koara.BlockElement;
@@ -469,12 +466,12 @@ koara.CharStream.prototype = {
 	},
 	
 	getImage: function() {
-		if (this.bufpos >= this.tokenBegin) {
-			return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('');
-		} else {
-			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
-					+ this.buffer.slice(0, this.bufpos + 1).join('');
-		}
+			if (this.bufpos >= this.tokenBegin) {
+				return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('')
+			} else {
+				return this.buffer.slice(this.tokenBegin, (this.bufsize - this.tokenBegin)).join('')
+						+ this.buffer.slice(0, (this.bufpos + 1)).join('');
+			}
 	}, 
 	
 	getBeginColumn: function() {
@@ -3171,7 +3168,6 @@ koara.Token = function(kind, beginLine, beginColumn, endLine, endColumn, image) 
 
 koara.Token.prototype = {
 	constructor: koara.Token
-		
 }
 koara.TokenManager = function(stream) {
 	this.cs = stream;

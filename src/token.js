@@ -9,5 +9,4 @@ koara.Token = function(kind, beginLine, beginColumn, endLine, endColumn, image) 
 
 koara.Token.prototype = {
 	constructor: koara.Token
-		
 }
