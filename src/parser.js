@@ -1157,20 +1157,20 @@ koara.Parser.prototype = {
                 do {
                     t = this.getToken(i++);
                     if (t.kind == this.tm.GT) {
-                        if (t.beginColumn == 1 && currentBlockLevel > 0 && currentQuoteLevel == 0) {
+                        if (t.beginColumn == 1 && this.currentBlockLevel > 0 && this.currentQuoteLevel == 0) {
                             return false;
                         }
                         quoteLevel++;
                     }
                 } while (t.kind == this.tm.GT || t.kind == this.tm.SPACE || t.kind == this.tm.TAB);
-                if (quoteLevel > currentQuoteLevel) {
+                if (quoteLevel > this.currentQuoteLevel) {
                     return true;
                 }
-                if (quoteLevel < currentQuoteLevel) {
+                if (quoteLevel < this.currentQuoteLevel) {
                     return false;
                 }
             } while (t.kind == this.tm.EOL);
-            return t.kind != this.tm.EOF && (currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2);
+            return t.kind != this.tm.EOF && (this.currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2);
         }
         return false;
     },
