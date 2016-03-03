@@ -133,10 +133,10 @@ koara.Html5Renderer.prototype = {
 //				.replaceAll("\"", "&quot;");
 //	}
 //	
-//	public void visit(LineBreak node) {
-//		out.append("<br>\n" + indent());
-//		node.childrenAccept(this);
-//	}
+	visitLineBreak: function(node) {
+		this.out += "<br>\n" + this.indent();
+		node.childrenAccept(this);
+	},
 //	
 //	public String escapeUrl(String text) {
 //		return text.replaceAll(" ", "%20")
@@ -155,7 +155,7 @@ koara.Html5Renderer.prototype = {
 		for (var i = repeat - 1; i >= 0; i--) {
 		 buf.push(' ');
 		} 
-		return new String(buf);
+		return buf.join('');
 	},
 	
 	getOutput: function() {

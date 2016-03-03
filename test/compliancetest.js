@@ -8,8 +8,8 @@ for(i in modules) {
     describe(modules[i], function() {
 	    testcases = fs.readdirSync(testSuiteFolder + '/' + modules[i] + '/koara');
 	    for(j in testcases) {
-            if(path.extname(testcases[i]) === ".kd") {
-            	var testcase = testcases[i].substr(0, testcases[i].length-3);
+            if(path.extname(testcases[j]) === ".kd") {
+            	var testcase = testcases[j].substr(0, testcases[j].length-3);
                 it(testcase + " to HTML", function() {
                 	var kd = fs.readFileSync(testSuiteFolder + '/' + modules[i] + '/koara/' + testcase + ".kd");
                 	var html = fs.readFileSync(testSuiteFolder + '/' + modules[i] + '/html5/' + testcase + ".htm");

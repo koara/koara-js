@@ -2,8 +2,8 @@ koara.Node = function() {
   this.children = [];
 }
    
-koara.Node.prototype.add = function(n) {
-	this.children.push(n);
+koara.Node.prototype.add = function(n, i) {
+	this.children[i] = n;
 };
    
 koara.Node.prototype.childrenAccept = function(renderer) {

@@ -636,7 +636,7 @@ koara.Parser.prototype = {
     },
 
     lineBreak: function() {
-        var linebreak = new LineBreak();
+        var linebreak = new koara.LineBreak();
         this.tree.openScope();
         while (this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) {
             this.consumeToken(this.getNextTokenKind());
@@ -1250,17 +1250,17 @@ koara.Parser.prototype = {
 
     textAhead: function() {
         if (this.getNextTokenKind() == this.tm.EOL && this.getToken(2).kind != this.tm.EOL) {
-            var i = skip(2, this.tm.SPACE, this.tm.TAB);
+            var i = this.skip(2, [this.tm.SPACE, this.tm.TAB]);
             var quoteLevel = this.newQuoteLevel(i);
-            if (quoteLevel == this.currentQuoteLevel || !this.modules.contains(Module.BLOCKQUOTES)) {
-                i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+            if (quoteLevel == this.currentQuoteLevel || !this.modules.indexOf('blockquotes') >= 0) {
+                i = this.skip(i, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
 
                 var t = this.getToken(i);
-                return this.getToken(i).kind != this.tm.EOL && !(this.modules.contains(Module.LISTS) && t.kind == this.tm.DASH)
-                        && !(this.modules.contains(Module.LISTS) && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
+                return this.getToken(i).kind != this.tm.EOL && !(this.modules.indexOf('lists') >= 0 && t.kind == this.tm.DASH)
+                        && !(this.modules.indexOf('lists') >= 0 && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
                         && !(this.getToken(i).kind == this.tm.BACKTICK && this.getToken(i + 1).kind == this.tm.BACKTICK
                                 && this.getToken(i + 2).kind == this.tm.BACKTICK)
-                        && !(this.modules.contains(Module.HEADINGS) && this.headingAhead(i));
+                        && !(this.modules.indexOf('headings') >= 0 && this.headingAhead(i));
             }
         }
         return false;

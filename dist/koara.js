@@ -10,8 +10,8 @@ koara.Node = function() {
   this.children = [];
 }
    
-koara.Node.prototype.add = function(n) {
-	this.children.push(n);
+koara.Node.prototype.add = function(n, i) {
+	this.children[i] = n;
 };
    
 koara.Node.prototype.childrenAccept = function(renderer) {
@@ -105,14 +105,11 @@ koara.Image.prototype = {
 }
 koara.LineBreak = function() {}
 koara.LineBreak.prototype = new koara.Node();
+koara.LineBreak.prototype.constructor = koara.LineBreak;
 
-koara.LineBreak.prototype = {
-	constructor: koara.LineBreak,
-	
-	accept: function(renderer) {
-		renderer.visit(this)
-	}
-}
+koara.LineBreak.prototype.accept = function(renderer) {
+	renderer.visitLineBreak(this);
+};
 koara.Link = function() {}
 koara.Link.prototype = new koara.Node();
 
@@ -329,10 +326,10 @@ koara.Html5Renderer.prototype = {
 //				.replaceAll("\"", "&quot;");
 //	}
 //	
-//	public void visit(LineBreak node) {
-//		out.append("<br>\n" + indent());
-//		node.childrenAccept(this);
-//	}
+	visitLineBreak: function(node) {
+		this.out += "<br>\n" + this.indent();
+		node.childrenAccept(this);
+	},
 //	
 //	public String escapeUrl(String text) {
 //		return text.replaceAll(" ", "%20")
@@ -351,7 +348,7 @@ koara.Html5Renderer.prototype = {
 		for (var i = repeat - 1; i >= 0; i--) {
 		 buf.push(' ');
 		} 
-		return new String(buf);
+		return buf.join('');
 	},
 	
 	getOutput: function() {
@@ -1133,7 +1130,7 @@ koara.Parser.prototype = {
     },
 
     lineBreak: function() {
-        var linebreak = new LineBreak();
+        var linebreak = new koara.LineBreak();
         this.tree.openScope();
         while (this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) {
             this.consumeToken(this.getNextTokenKind());
@@ -1747,17 +1744,17 @@ koara.Parser.prototype = {
 
     textAhead: function() {
         if (this.getNextTokenKind() == this.tm.EOL && this.getToken(2).kind != this.tm.EOL) {
-            var i = skip(2, this.tm.SPACE, this.tm.TAB);
+            var i = this.skip(2, [this.tm.SPACE, this.tm.TAB]);
             var quoteLevel = this.newQuoteLevel(i);
-            if (quoteLevel == this.currentQuoteLevel || !this.modules.contains(Module.BLOCKQUOTES)) {
-                i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+            if (quoteLevel == this.currentQuoteLevel || !this.modules.indexOf('blockquotes') >= 0) {
+                i = this.skip(i, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
 
                 var t = this.getToken(i);
-                return this.getToken(i).kind != this.tm.EOL && !(this.modules.contains(Module.LISTS) && t.kind == this.tm.DASH)
-                        && !(this.modules.contains(Module.LISTS) && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
+                return this.getToken(i).kind != this.tm.EOL && !(this.modules.indexOf('lists') >= 0 && t.kind == this.tm.DASH)
+                        && !(this.modules.indexOf('lists') >= 0 && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
                         && !(this.getToken(i).kind == this.tm.BACKTICK && this.getToken(i + 1).kind == this.tm.BACKTICK
                                 && this.getToken(i + 2).kind == this.tm.BACKTICK)
-                        && !(this.modules.contains(Module.HEADINGS) && this.headingAhead(i));
+                        && !(this.modules.indexOf('headings') >= 0 && this.headingAhead(i));
             }
         }
         return false;
@@ -3531,7 +3528,7 @@ koara.TreeState.prototype = {
 		while (a-- > 0) {
           c = this.popNode();
           c.parent = n;
-          n.add(c);
+          n.add(c, a);
         }
 		this.pushNode(n);
 	},
