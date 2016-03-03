@@ -202,7 +202,7 @@ koara.Html5Renderer.prototype = {
 	constructor: koara.Html5Renderer,
 	
 	visitDocument: function(node) {
-		this.output = '';
+		this.out = '';
 		node.childrenAccept(this);
 	},
 
@@ -270,10 +270,10 @@ koara.Html5Renderer.prototype = {
 		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
 			node.childrenAccept(this);
 		} else {
-			this.output += this.indent() + "<p>";
+			this.out += this.indent() + "<p>";
 			node.childrenAccept(this);
-			this.output += "</p>\n";
-			if(!node.isNested()) { this.output += "\n"; }
+			this.out += "</p>\n";
+			if(!node.isNested()) { this.out += "\n"; }
 		}
 	},
 //	
@@ -319,7 +319,7 @@ koara.Html5Renderer.prototype = {
 //	}
 //		
 	visitText: function(node) {
-		this.output += node.value;
+		this.out += node.value;
 	},
 	
 //	public String escape(String text) {
@@ -352,6 +352,10 @@ koara.Html5Renderer.prototype = {
 		 buf.push(' ');
 		} 
 		return new String(buf);
+	},
+	
+	getOutput: function() {
+		return this.out.trim();
 	}
 	
 }
@@ -458,7 +462,7 @@ koara.CharStream.prototype = {
 	
 	getImage: function() {
 			if (this.bufpos >= this.tokenBegin) {
-				return this.buffer.slice(this.tokenBegin, this.bufpos - this.tokenBegin + 1).join('')
+				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join('')
 			} else {
 				return this.buffer.slice(this.tokenBegin, (this.bufsize - this.tokenBegin)).join('')
 						+ this.buffer.slice(0, (this.bufpos + 1)).join('');

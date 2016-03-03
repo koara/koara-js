@@ -6,7 +6,7 @@ koara.Html5Renderer.prototype = {
 	constructor: koara.Html5Renderer,
 	
 	visitDocument: function(node) {
-		this.output = '';
+		this.out = '';
 		node.childrenAccept(this);
 	},
 
@@ -74,10 +74,10 @@ koara.Html5Renderer.prototype = {
 		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
 			node.childrenAccept(this);
 		} else {
-			this.output += this.indent() + "<p>";
+			this.out += this.indent() + "<p>";
 			node.childrenAccept(this);
-			this.output += "</p>\n";
-			if(!node.isNested()) { this.output += "\n"; }
+			this.out += "</p>\n";
+			if(!node.isNested()) { this.out += "\n"; }
 		}
 	},
 //	
@@ -123,7 +123,7 @@ koara.Html5Renderer.prototype = {
 //	}
 //		
 	visitText: function(node) {
-		this.output += node.value;
+		this.out += node.value;
 	},
 	
 //	public String escape(String text) {
@@ -156,6 +156,10 @@ koara.Html5Renderer.prototype = {
 		 buf.push(' ');
 		} 
 		return new String(buf);
+	},
+	
+	getOutput: function() {
+		return this.out.trim();
 	}
 	
 }
