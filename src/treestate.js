@@ -14,7 +14,7 @@ koara.TreeState.prototype = {
 	},
 	
 	closeScope: function(n) {
-		a = this.nodeArity();
+		var a = this.nodeArity();
 		this.currentMark = this.marks.pop(); // currentMark = marks.remove(marks.size() - 1);
 		while (a-- > 0) {
           c = this.popNode();

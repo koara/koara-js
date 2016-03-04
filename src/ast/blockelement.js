@@ -7,7 +7,7 @@ koara.BlockElement.prototype.isNested = function() {
 };
 
 koara.BlockElement.prototype.isSingleChild = function() {
-	return this.parent.children.length == 1;
+	return this.parent.children.length === 1;
 };
 
 koara.BlockElement.prototype.accept = function(renderer) {

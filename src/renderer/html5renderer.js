@@ -151,7 +151,7 @@ koara.Html5Renderer.prototype = {
 //	
 	indent: function() {
 		var repeat = this.level * 2;
-	    var buf = [];
+        var buf = [];
 		for (var i = repeat - 1; i >= 0; i--) {
 		 buf.push(' ');
 		} 

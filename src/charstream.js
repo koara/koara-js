@@ -28,7 +28,7 @@ koara.CharStream.prototype = {
 	readChar: function() {
 		if (this.inBuf > 0) {
 			--this.inBuf;
-			if (++this.bufpos == this.bufsize) {
+			if (++this.bufpos === this.bufsize) {
 				this.bufpos = 0;
 			}
 			return this.buffer[this.bufpos];
@@ -43,8 +43,8 @@ koara.CharStream.prototype = {
 	},
 	
 	fillBuff: function() {
-		if (this.maxNextCharInd == this.available) {
-			if (this.available == this.bufsize) {
+		if (this.maxNextCharInd === this.available) {
+			if (this.available === this.bufsize) {
 				this.bufpos = 0;
 				this.maxNextCharInd = 0;
 				if (this.tokenBegin > 2048) {
@@ -56,7 +56,7 @@ koara.CharStream.prototype = {
 		}
 		var i=0;
 		try {
-			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) == -1) {
+			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) === -1) {
 				throw new Error("IOException");
 			} else {
 				this.maxNextCharInd += i;
@@ -64,7 +64,7 @@ koara.CharStream.prototype = {
 		} catch (e) {
 			--this.bufpos;
 			this.backup(0);
-			if (this.tokenBegin == -1) {
+			if (this.tokenBegin === -1) {
 				this.tokenBegin = this.bufpos;
 			}
 			throw e;
@@ -94,6 +94,8 @@ koara.CharStream.prototype = {
 			this.column--;
 			this.column += this.tabSize - this.column % this.tabSize;
 			break;
+		default: 
+			break;
 		}
 		this.bufline[this.bufpos] = this.line;
 		this.bufcolumn[this.bufpos] = this.column;
@@ -102,10 +104,9 @@ koara.CharStream.prototype = {
 	getImage: function() {
 			if (this.bufpos >= this.tokenBegin) {
 				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join('')
-			} else {
-				return this.buffer.slice(this.tokenBegin, (this.bufsize - this.tokenBegin)).join('')
-						+ this.buffer.slice(0, (this.bufpos + 1)).join('');
-			}
+			} 
+			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
+						+ this.buffer.slice(0, this.bufpos + 1).join('');
 	}, 
 	
 	getBeginColumn: function() {

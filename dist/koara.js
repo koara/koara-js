@@ -1,7 +1,7 @@
 var koara = {}
 
-if (typeof exports != 'undefined' && !exports.nodeType) {
-  if (typeof module != 'undefined' && !module.nodeType && module.exports) {
+if (typeof exports !== 'undefined' && !exports.nodeType) {
+  if (typeof module !== 'undefined' && !module.nodeType && module.exports) {
     exports = module.exports = koara;
   }
   exports.koara = koara;
@@ -35,7 +35,7 @@ koara.BlockElement.prototype.isNested = function() {
 };
 
 koara.BlockElement.prototype.isSingleChild = function() {
-	return this.parent.children.length == 1;
+	return this.parent.children.length === 1;
 };
 
 koara.BlockElement.prototype.accept = function(renderer) {
@@ -344,7 +344,7 @@ koara.Html5Renderer.prototype = {
 //	
 	indent: function() {
 		var repeat = this.level * 2;
-	    var buf = [];
+        var buf = [];
 		for (var i = repeat - 1; i >= 0; i--) {
 		 buf.push(' ');
 		} 
@@ -386,7 +386,7 @@ koara.CharStream.prototype = {
 	readChar: function() {
 		if (this.inBuf > 0) {
 			--this.inBuf;
-			if (++this.bufpos == this.bufsize) {
+			if (++this.bufpos === this.bufsize) {
 				this.bufpos = 0;
 			}
 			return this.buffer[this.bufpos];
@@ -401,8 +401,8 @@ koara.CharStream.prototype = {
 	},
 	
 	fillBuff: function() {
-		if (this.maxNextCharInd == this.available) {
-			if (this.available == this.bufsize) {
+		if (this.maxNextCharInd === this.available) {
+			if (this.available === this.bufsize) {
 				this.bufpos = 0;
 				this.maxNextCharInd = 0;
 				if (this.tokenBegin > 2048) {
@@ -414,7 +414,7 @@ koara.CharStream.prototype = {
 		}
 		var i=0;
 		try {
-			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) == -1) {
+			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) === -1) {
 				throw new Error("IOException");
 			} else {
 				this.maxNextCharInd += i;
@@ -422,7 +422,7 @@ koara.CharStream.prototype = {
 		} catch (e) {
 			--this.bufpos;
 			this.backup(0);
-			if (this.tokenBegin == -1) {
+			if (this.tokenBegin === -1) {
 				this.tokenBegin = this.bufpos;
 			}
 			throw e;
@@ -452,6 +452,8 @@ koara.CharStream.prototype = {
 			this.column--;
 			this.column += this.tabSize - this.column % this.tabSize;
 			break;
+		default: 
+			break;
 		}
 		this.bufline[this.bufpos] = this.line;
 		this.bufcolumn[this.bufpos] = this.column;
@@ -460,10 +462,9 @@ koara.CharStream.prototype = {
 	getImage: function() {
 			if (this.bufpos >= this.tokenBegin) {
 				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join('')
-			} else {
-				return this.buffer.slice(this.tokenBegin, (this.bufsize - this.tokenBegin)).join('')
-						+ this.buffer.slice(0, (this.bufpos + 1)).join('');
-			}
+			} 
+			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
+						+ this.buffer.slice(0, this.bufpos + 1).join('');
 	}, 
 	
 	getBeginColumn: function() {
@@ -492,7 +493,7 @@ koara.LookaheadSuccess.prototype = {
 	constructor: koara.LookaheadSuccess
 		
 }
-koara.Parser = function() {
+koara.Parser = function() {	
 	this.lookAheadSuccess = new koara.LookaheadSuccess();
 	this.modules = ['paragraphs', 'headings', 'lists', 'links', 'images', 'formatting', 'blockquotes', 'code'];
 }
@@ -501,7 +502,7 @@ koara.Parser.prototype = {
 	constructor: koara.Parser,
 	
 	parse: function(text) {
-		return this.parseReader(new koara.StringReader(text))
+		return this.parseReader(new koara.StringReader(text));
 	},
 	
 	parseReader: function(reader) {
@@ -514,20 +515,20 @@ koara.Parser.prototype = {
 		var document = new koara.Document();
 		this.tree.openScope();
 		
-		while(this.getNextTokenKind() == this.tm.EOL) {
+		while(this.getNextTokenKind() === this.tm.EOL) {
 			this.consumeToken(this.tm.EOL);
 		}
 		this.whiteSpace();
 		if (this.hasAnyBlockElementsAhead()) {
 			this.blockElement();
 			while (this.blockAhead(0)) {
-				while (this.getNextTokenKind() == this.tm.EOL) {
+				while (this.getNextTokenKind() === this.tm.EOL) {
                     this.consumeToken(this.tm.EOL);
                     this.whiteSpace();
 				}
                 this.blockElement();
               }
-              while (this.getNextTokenKind() == this.tm.EOL) {
+              while (this.getNextTokenKind() === this.tm.EOL) {
                 this.consumeToken(this.tm.EOL);
             }
             this.whiteSpace();
@@ -541,9 +542,9 @@ koara.Parser.prototype = {
         this.currentBlockLevel++;
         if (this.modules.indexOf("headings") >= 0 && this.headingAhead(1)) {
           this.heading();
-        } else if (this.modules.indexOf("blockquotes") >= 0 && this.getNextTokenKind() == this.tm.GT) {
+        } else if (this.modules.indexOf("blockquotes") >= 0 && this.getNextTokenKind() === this.tm.GT) {
           this.blockQuote();
-        } else if (this.modules.indexOf("lists") >= 0 && this.getNextTokenKind() == this.tm.DASH) {
+        } else if (this.modules.indexOf("lists") >= 0 && this.getNextTokenKind() === this.tm.DASH) {
           this.unorderedList();
         } else if (this.modules.indexOf("lists") >= 0 && this.hasOrderedListAhead()) {
           this.orderedList();
@@ -560,7 +561,7 @@ koara.Parser.prototype = {
         this.tree.openScope();
         var headingLevel = 0;
 
-        while (this.getNextTokenKind() == this.tm.EQ) {
+        while (this.getNextTokenKind() === this.tm.EQ) {
             this.consumeToken(this.tm.EQ);
             headingLevel++;
         }
@@ -598,7 +599,7 @@ koara.Parser.prototype = {
         if (this.blockQuoteHasAnyBlockElementseAhead()) {
             this.blockElement();
             while (this.blockAhead(0)) {
-                while (this.getNextTokenKind() == this.tm.EOL) {
+                while (this.getNextTokenKind() === this.tm.EOL) {
                     this.consumeToken(EOL);
                     this.whiteSpace();
                     this.blockQuotePrefix();
@@ -610,7 +611,7 @@ koara.Parser.prototype = {
             this.blockQuoteEmptyLine();
         }
         this.currentQuoteLevel--;
-        tree.closeScope(blockQuote);
+        this.tree.closeScope(blockQuote);
       },
 
       blockQuotePrefix: function() {
@@ -625,26 +626,26 @@ koara.Parser.prototype = {
           this.consumeToken(this.tm.EOL);
           this.whiteSpace();
           do {
-        	  this.consumeToken(this.tm.GT);
-        	  this.whiteSpace();
-          } while (this.getNextTokenKind() == this.tm.GT);
+              this.consumeToken(this.tm.GT);
+              this.whiteSpace();
+          } while (this.getNextTokenKind() === this.tm.GT);
       },
 
       unorderedList: function() {
-    	  var list = new koara.ListBlock(false);
-    	  this.tree.openScope();
-    	  listBeginColumn = this.unorderedListItem();
-    	  while (this.listItemAhead(this.listBeginColumn, false)) {
-    		  while (this.getNextTokenKind() == this.tm.EOL) {
-    			  this.consumeToken(this.tm.EOL);
-    		  }
-    		  this.whiteSpace();
-    		  if (this.currentQuoteLevel > 0) {
-    			  this.blockQuotePrefix();
-    		  }
-    		  this.unorderedListItem();
-    	  }
-    	  this.tree.closeScope(list);
+          var list = new koara.ListBlock(false);
+          this.tree.openScope();
+          var listBeginColumn = this.unorderedListItem();
+          while (this.listItemAhead(this.listBeginColumn, false)) {
+              while (this.getNextTokenKind() === this.tm.EOL) {
+                  this.consumeToken(this.tm.EOL);
+              }
+              this.whiteSpace();
+              if (this.currentQuoteLevel > 0) {
+                  this.blockQuotePrefix();
+              }
+              this.unorderedListItem();
+          }
+          this.tree.closeScope(list);
       },
 
       unorderedListItem: function() {
@@ -654,16 +655,16 @@ koara.Parser.prototype = {
           var t = consumeToken(this.tm.DASH);
           this.whiteSpace();
           if (this.listItemHasInlineElements()) {
-        	  this.blockElement();
+              this.blockElement();
               while (this.blockAhead(t.beginColumn)) {
-                 while (this.getNextTokenKind() == this.tm.EOL) {
-                	  this.consumeToken(this.tm.EOL);
-                	  this.whiteSpace();
-                	  if (this.currentQuoteLevel > 0) {
-                		  this.blockQuotePrefix();
-                	  }
+                 while (this.getNextTokenKind() === this.tm.EOL) {
+                     this.consumeToken(this.tm.EOL);
+                     this.whiteSpace();
+                     if (this.currentQuoteLevel > 0) {
+                         this.blockQuotePrefix();
+                     }
                  }
-                 blockElement();
+                 this.blockElement();
               }
           }
           this.tree.closeScope(listItem);
@@ -675,7 +676,7 @@ koara.Parser.prototype = {
         this.tree.openScope();
         var listBeginColumn = this.orderedListItem();
         while (this.listItemAhead(listBeginColumn, true)) {
-            while (this.getNextTokenKind() == this.tm.EOL) {
+            while (this.getNextTokenKind() === this.tm.EOL) {
                 this.consumeToken(this.tm.EOL);
             }
             this.whiteSpace();
@@ -696,7 +697,7 @@ koara.Parser.prototype = {
         if (this.listItemHasInlineElements()) {
             this.blockElement();
             while (this.blockAhead(t.beginColumn)) {
-                while (this.getNextTokenKind() == this.tm.EOL) {
+                while (this.getNextTokenKind() === this.tm.EOL) {
                     this.consumeToken(this.tm.EOL);
                     this.whiteSpace();
                     if (this.currentQuoteLevel > 0) {
@@ -707,7 +708,7 @@ koara.Parser.prototype = {
             }
         }
         listItem.number = t.image;
-        tree.closeScope(listItem);
+        this.tree.closeScope(listItem);
         return t.beginColumn;
     },
 
@@ -718,99 +719,99 @@ koara.Parser.prototype = {
         var beginColumn = this.consumeToken(this.tm.BACKTICK).beginColumn;
         do {
             this.consumeToken(BACKTICK);
-        } while (this.getNextTokenKind() == this.tm.BACKTICK);
+        } while (this.getNextTokenKind() === this.tm.BACKTICK);
         	this.whiteSpace();
-        	if (this.getNextTokenKind() == this.tm.CHAR_SEQUENCE) {
+        	if (this.getNextTokenKind() === this.tm.CHAR_SEQUENCE) {
         		this.codeBlock.language = this.codeLanguage();
         	}
-        	if (this.getNextTokenKind() != this.tm.EOF && !this.fencesAhead()) {
-        	  this.consumeToken(this.tm.EOL);
-        	  this.levelWhiteSpace(this.beginColumn);
+        	if (this.getNextTokenKind() !== this.tm.EOF && !this.fencesAhead()) {
+                this.consumeToken(this.tm.EOL);
+                this.levelWhiteSpace(this.beginColumn);
         	}
         
-        	while (this.getNextTokenKind() != this.tm.EOF && (this.getNextTokenKind() != this.tm.EOL || !this.fencesAhead())) {
+        	while (this.getNextTokenKind() !== this.tm.EOF && (this.getNextTokenKind() !== this.tm.EOL || !this.fencesAhead())) {
         		switch (this.getNextTokenKind()) {
         			case this.tm.CHAR_SEQUENCE:
 	        			s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
 	        			break;
         			case this.tm.ASTERISK:
-		                s += this.consumeToken(this.tm.ASTERISK).image;
-		                break;
+                        s += this.consumeToken(this.tm.ASTERISK).image;
+                        break;
         			case this.tm.BACKSLASH:
         				s += this.consumeToken(this.tm.BACKSLASH).image;
         				break;
-		            case this.tm.COLON:
-		                s += this.consumeToken(this.tm.COLON).image;
-		                break;
-		            case this.tm.DASH:
-		                s += this.consumeToken(this.tm.DASH).image;
-		                break;
-		            case this.tm.DIGITS:
-		                s += this.consumeToken(this.tm.DIGITS).image;
-		                break;
-		            case this.tm.DOT:
-		                s += this.consumeToken(this.tm.DOT).image;
-		                break;
-		            case this.tm.EQ:
-		                s += this.consumeToken(this.tm.EQ).image;
-		                break;
-		            case this.tm.ESCAPED_CHAR:
-		                s += this.consumeToken(this.tm.ESCAPED_CHAR).image;
-		                break;
-		            case this.tm.IMAGE_LABEL:
-		                s += this.consumeToken(this.tm.IMAGE_LABEL).image;
-		                break;
-		            case this.tm.LT:
-		                s += this.consumeToken(this.tm.LT).image;
-		                break;
-		            case this.tm.GT:
-		                s += this.consumeToken(this.tm.GT).image;
-		                break;
-		            case this.tm.LBRACK:
-		                s += this.consumeToken(this.tm.LBRACK).image;
-		                break;
-		            case this.tm.RBRACK:
-		                s += this.consumeToken(this.tm.RBRACK).image;
-		                break;
-		            case this.tm.LPAREN:
-		                s += this.consumeToken(this.tm.LPAREN).image;
-		                break;
-		            case this.tm.RPAREN:
-		                s += this.consumeToken(this.tm.RPAREN).image;
-		                break;
-		            case this.tm.UNDERSCORE:
-		                s += this.consumeToken(this.tm.UNDERSCORE).image;
-		                break;
-		            case this.tm.BACKTICK:
-		                s += this.consumeToken(this.tm.BACKTICK).image;
-		                break;
-		            default:
-		                if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
-		                    switch (this.getNextTokenKind()) {
-		                    case this.tm.SPACE:
-		                        s += this.consumeToken(this.tm.SPACE).image;
-		                        break;
-		                    case this.tm.TAB:
-		                        consumeToken(this.tm.TAB);
-		                        s += "    ";
-		                        break;
-		                    }
-		                } else if (!this.fencesAhead()) {
-		                    this.consumeToken(this.tm.EOL);
-		                    s += "\n";
-		                    this.levelWhiteSpace(this.beginColumn);
-		                }
-		            }
+                    case this.tm.COLON:
+                        s += this.consumeToken(this.tm.COLON).image;
+                        break;
+                    case this.tm.DASH:
+                        s += this.consumeToken(this.tm.DASH).image;
+                        break;
+                    case this.tm.DIGITS:
+                        s += this.consumeToken(this.tm.DIGITS).image;
+                        break;
+                    case this.tm.DOT:
+                        s += this.consumeToken(this.tm.DOT).image;
+                        break;
+                    case this.tm.EQ:
+                        s += this.consumeToken(this.tm.EQ).image;
+                        break;
+                    case this.tm.ESCAPED_CHAR:
+                        s += this.consumeToken(this.tm.ESCAPED_CHAR).image;
+                        break;
+                    case this.tm.IMAGE_LABEL:
+                        s += this.consumeToken(this.tm.IMAGE_LABEL).image;
+                        break;
+                    case this.tm.LT:
+                        s += this.consumeToken(this.tm.LT).image;
+                        break;
+                    case this.tm.GT:
+                        s += this.consumeToken(this.tm.GT).image;
+                        break;
+                    case this.tm.LBRACK:
+                        s += this.consumeToken(this.tm.LBRACK).image;
+                        break;
+                    case this.tm.RBRACK:
+                        s += this.consumeToken(this.tm.RBRACK).image;
+                        break;
+                    case this.tm.LPAREN:
+                        s += this.consumeToken(this.tm.LPAREN).image;
+                        break;
+                    case this.tm.RPAREN:
+                        s += this.consumeToken(this.tm.RPAREN).image;
+                        break;
+                    case this.tm.UNDERSCORE:
+                        s += this.consumeToken(this.tm.UNDERSCORE).image;
+                        break;
+                    case this.tm.BACKTICK:
+                        s += this.consumeToken(this.tm.BACKTICK).image;
+                        break;
+                    default:
+                        if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
+                            switch (this.getNextTokenKind()) {
+                            case this.tm.SPACE:
+                                s += this.consumeToken(this.tm.SPACE).image;
+                                break;
+                            case this.tm.TAB:
+                                this.consumeToken(this.tm.TAB);
+                                s += "    ";
+                                break;
+                            }
+                        } else if (!this.fencesAhead()) {
+                            this.consumeToken(this.tm.EOL);
+                            s += "\n";
+                            this.levelWhiteSpace(this.beginColumn);
+                        }
+                }
         	}
         	if (this.fencesAhead()) {
         		this.consumeToken(this.tm.EOL);
         		this.whiteSpace();
-        		while (this.getNextTokenKind() == this.tm.BACKTICK) {
+        		while (this.getNextTokenKind() === this.tm.BACKTICK) {
         			this.consumeToken(BACKTICK);
         		}
         }
         codeBlock.setValue(s.toString());
-        tree.closeScope(codeBlock);
+        this.tree.closeScope(codeBlock);
     },
 
     paragraph: function() {
@@ -826,7 +827,7 @@ koara.Parser.prototype = {
             this.lineBreak();
             this.whiteSpace();
             if (this.modules.indexOf("blockquotes") >= 0) {
-                while (this.getNextTokenKind() == this.tm.GT) {
+                while (this.getNextTokenKind() === this.tm.GT) {
                     this.consumeToken(this.tm.GT);
                     this.whiteSpace();
                 }
@@ -899,8 +900,6 @@ koara.Parser.prototype = {
             }
         }
         
-        
-        
         text.value = s;
         this.tree.closeScope(text);
     },
@@ -956,7 +955,7 @@ koara.Parser.prototype = {
             ref = this.resourceUrl();
         }
         link.value = ref;
-        tree.closeScope(link);
+        this.tree.closeScope(link);
     },
 
     strong: function() {
@@ -1016,7 +1015,7 @@ koara.Parser.prototype = {
                     this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 }
             }
@@ -1026,7 +1025,7 @@ koara.Parser.prototype = {
     },
 
     code: function() {
-        var code = new Code();
+        var code = new koara.Code();
         this.tree.openScope();
         this.consumeToken(this.tm.BACKTICK);
         this.codeText();
@@ -1035,7 +1034,7 @@ koara.Parser.prototype = {
     },
 
     codeText: function() {
-        var text = new Text();
+        var text = new koara.Text();
         this.tree.openScope();
         var s = '';
         do {
@@ -1132,7 +1131,7 @@ koara.Parser.prototype = {
     lineBreak: function() {
         var linebreak = new koara.LineBreak();
         this.tree.openScope();
-        while (this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) {
+        while (this.getNextTokenKind() === this.tm.SPACE || this.getNextTokenKind() === this.tm.TAB) {
             this.consumeToken(this.getNextTokenKind());
         }
         this.consumeToken(this.tm.EOL);
@@ -1141,10 +1140,10 @@ koara.Parser.prototype = {
 
     levelWhiteSpace: function(threshold) {
         var currentPos = 1;
-        while (this.getNextTokenKind() == this.tm.GT) {
+        while (this.getNextTokenKind() === this.tm.GT) {
             this.consumeToken(this.getNextTokenKind());
         }
-        while ((this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) && currentPos < (threshold - 1)) {
+        while ((this.getNextTokenKind() === this.tm.SPACE || this.getNextTokenKind() === this.tm.TAB) && currentPos < threshold - 1) {
             currentPos = this.consumeToken(this.getNextTokenKind()).beginColumn;
         }
     },
@@ -1216,35 +1215,35 @@ koara.Parser.prototype = {
             default:
                 break;
             }
-          } while (this.getNextTokenKind() != this.tm.EOL && this.getNextTokenKind() != this.tm.EOF);
+          } while (this.getNextTokenKind() !== this.tm.EOL && this.getNextTokenKind() !== this.tm.EOF);
           return s;
       },
 
       inline: function() {
-    	  do {
+          do {
     		if (this.hasInlineTextAhead()) {
-    			  this.text();
+                this.text();
             } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
-                  this.image();
+                this.image();
             } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
-                  this.link();
+                this.link();
             } else if (this.modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.ASTERISK)) {
-                  this.strongMultiline();
+                this.strongMultiline();
             } else if (this.modules.indexOf("formatting") >= 0 && this.multilineAhead(this.tm.UNDERSCORE)) {
-                  this.emMultiline();
+                this.emMultiline();
             } else if (this.modules.indexOf("code") >= 0 && this.multilineAhead(this.tm.BACKTICK)) {
-                  this.codeMultiline();
+                this.codeMultiline();
             } else {
-                 this.looseChar();
+                this.looseChar();
             }
           } while (this.hasInlineElementAhead());
       },
 
       resourceText: function() {
-    	  var text = new Text();
-    	  this.tree.openScope();
-    	  var s = '';
-    	  do {
+          var text = new Text();
+          this.tree.openScope();
+          var s = '';
+          do {
             switch (this.getNextTokenKind()) {
             case this.tm.CHAR_SEQUENCE:
         		s += this.consumeToken(this.tm.CHAR_SEQUENCE).image;
@@ -1614,7 +1613,7 @@ koara.Parser.prototype = {
         while (this.textAhead()) {
             this.lineBreak();
             this.whiteSpace();
-            while (this.getNextTokenKind() == this.tm.GT) {
+            while (this.getNextTokenKind() === this.tm.GT) {
                 this.consumeToken(this.tm.GT);
                 this.whiteSpace();
             }
@@ -1625,7 +1624,7 @@ koara.Parser.prototype = {
     },
 
     whiteSpace: function() {
-        while (this.getNextTokenKind() == this.tm.SPACE || this.getNextTokenKind() == this.tm.TAB) {
+        while (this.getNextTokenKind() === this.tm.SPACE || this.getNextTokenKind() === this.tm.TAB) {
             this.consumeToken(this.getNextTokenKind());
         }
     },
@@ -1642,7 +1641,7 @@ koara.Parser.prototype = {
 
     blockAhead: function(blockBeginColumn) {
         var quoteLevel;
-        if (this.getNextTokenKind() == this.tm.EOL) {
+        if (this.getNextTokenKind() === this.tm.EOL) {
             var t;
             var i = 2;
             var quoteLevel = 0;
@@ -1650,47 +1649,47 @@ koara.Parser.prototype = {
                 quoteLevel = 0;
                 do {
                     t = this.getToken(i++);
-                    if (t.kind == this.tm.GT) {
-                        if (t.beginColumn == 1 && this.currentBlockLevel > 0 && this.currentQuoteLevel == 0) {
+                    if (t.kind === this.tm.GT) {
+                        if (t.beginColumn === 1 && this.currentBlockLevel > 0 && this.currentQuoteLevel === 0) {
                             return false;
                         }
                         quoteLevel++;
                     }
-                } while (t.kind == this.tm.GT || t.kind == this.tm.SPACE || t.kind == this.tm.TAB);
+                } while (t.kind === this.tm.GT || t.kind === this.tm.SPACE || t.kind === this.tm.TAB);
                 if (quoteLevel > this.currentQuoteLevel) {
                     return true;
                 }
                 if (quoteLevel < this.currentQuoteLevel) {
                     return false;
                 }
-            } while (t.kind == this.tm.EOL);
-            return t.kind != this.tm.EOF && (this.currentBlockLevel == 0 || t.beginColumn >= blockBeginColumn + 2);
+            } while (t.kind === this.tm.EOL);
+            return t.kind !== this.tm.EOF && (this.currentBlockLevel === 0 || t.beginColumn >= blockBeginColumn + 2);
         }
         return false;
     },
 
     multilineAhead: function(token) {
-        if (this.getNextTokenKind() == token && this.getToken(2).kind != token && this.getToken(2).kind != this.tm.EOL) {
+        if (this.getNextTokenKind() === token && this.getToken(2).kind !== token && this.getToken(2).kind !== this.tm.EOL) {
             for (var i = 2;; i++) {
                 var t = this.getToken(i);
-                if (t.kind == token) {
+                if (t.kind === token) {
                     return true;
-                } else if (t.kind == this.tm.EOL) {
+                } else if (t.kind === this.tm.EOL) {
                     i = this.skip(i + 1, [this.tm.SPACE, this.tm.TAB]);
                     var quoteLevel = this.newQuoteLevel(i);
-                    if (quoteLevel == this.currentQuoteLevel) {
+                    if (quoteLevel === this.currentQuoteLevel) {
                         i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
-                        if (this.getToken(i).kind == token || this.getToken(i).kind == this.tm.EOL || this.getToken(i).kind == this.tm.DASH
-                                || (this.getToken(i).kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
-                                || (getToken(i).kind == this.tm.BACKTICK && getToken(i + 1).kind == this.tm.BACKTICK
-                                        && getToken(i + 2).kind == this.tm.BACKTICK)
+                        if (this.getToken(i).kind === token || this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.DASH
+                                || (this.getToken(i).kind === this.tm.DIGITS && this.getToken(i + 1).kind === this.tm.DOT)
+                                || (getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK
+                                        && getToken(i + 2).kind === this.tm.BACKTICK)
                                 || this.headingAhead(i)) {
                             return false;
                         }
                     } else {
                         return false;
                     }
-                } else if (t.kind == this.tm.EOF) {
+                } else if (t.kind === this.tm.EOF) {
                     return false;
                 }
             }
@@ -1699,21 +1698,21 @@ koara.Parser.prototype = {
     },
 
     fencesAhead: function() {
-        if (this.getNextTokenKind() == this.tm.EOL) {
+        if (this.getNextTokenKind() === this.tm.EOL) {
             var i = skip(2, this.tm.SPACE, this.tm.TAB, this.tm.GT);
-            if (this.getToken(i).kind == this.tm.BACKTICK && getToken(i + 1).kind == this.tm.BACKTICK && getToken(i + 2).kind == this.tm.BACKTICK) {
+            if (this.getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK && getToken(i + 2).kind === this.tm.BACKTICK) {
                 i = skip(i + 3, this.tm.SPACE, this.tm.TAB);
-                return this.getToken(i).kind == this.tm.EOL || this.getToken(i).kind == this.tm.EOF;
+                return this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.EOF;
             }
         }
         return false;
     },
 
     headingAhead: function(offset) {
-        if (this.getToken(offset).kind == this.tm.EQ) {
+        if (this.getToken(offset).kind === this.tm.EQ) {
             var heading = 1;
             for (var i = (offset + 1);; i++) {
-                if (this.getToken(i).kind != this.tm.EQ) {
+                if (this.getToken(i).kind !== this.tm.EQ) {
                     return true;
                 }
                 if (++heading > 6) {
@@ -1725,17 +1724,17 @@ koara.Parser.prototype = {
     },
 
     listItemAhead: function(listBeginColumn, ordered) {
-        if (this.getNextTokenKind() == this.tm.EOL) {
+        if (this.getNextTokenKind() === this.tm.EOL) {
             for (var i = 2, eol = 1;; i++) {
                 var t = this.getToken(i);
 
-                if (t.kind == this.tm.EOL && ++eol > 2) {
+                if (t.kind === this.tm.EOL && ++eol > 2) {
                     return false;
-                } else if (t.kind != this.tm.SPACE && t.kind != this.tm.TAB && t.kind != this.tm.GT && t.kind != this.tm.EOL) {
+                } else if (t.kind !== this.tm.SPACE && t.kind !== this.tm.TAB && t.kind !== this.tm.GT && t.kind !== this.tm.EOL) {
                     if (ordered) {
-                        return (t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT && t.beginColumn >= listBeginColumn);
+                        return (t.kind === this.tm.DIGITS && this.getToken(i + 1).kind === this.tm.DOT && t.beginColumn >= listBeginColumn);
                     }
-                    return t.kind == this.tm.DASH && t.beginColumn >= listBeginColumn;
+                    return t.kind === this.tm.DASH && t.beginColumn >= listBeginColumn;
                 }
             }
         }
@@ -1743,17 +1742,17 @@ koara.Parser.prototype = {
     },
 
     textAhead: function() {
-        if (this.getNextTokenKind() == this.tm.EOL && this.getToken(2).kind != this.tm.EOL) {
+        if (this.getNextTokenKind() === this.tm.EOL && this.getToken(2).kind !== this.tm.EOL) {
             var i = this.skip(2, [this.tm.SPACE, this.tm.TAB]);
             var quoteLevel = this.newQuoteLevel(i);
-            if (quoteLevel == this.currentQuoteLevel || !this.modules.indexOf('blockquotes') >= 0) {
+            if (quoteLevel === this.currentQuoteLevel || !this.modules.indexOf('blockquotes') >= 0) {
                 i = this.skip(i, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
 
                 var t = this.getToken(i);
-                return this.getToken(i).kind != this.tm.EOL && !(this.modules.indexOf('lists') >= 0 && t.kind == this.tm.DASH)
-                        && !(this.modules.indexOf('lists') >= 0 && t.kind == this.tm.DIGITS && this.getToken(i + 1).kind == this.tm.DOT)
-                        && !(this.getToken(i).kind == this.tm.BACKTICK && this.getToken(i + 1).kind == this.tm.BACKTICK
-                                && this.getToken(i + 2).kind == this.tm.BACKTICK)
+                return this.getToken(i).kind !== this.tm.EOL && !(this.modules.indexOf('lists') >= 0 && t.kind === this.tm.DASH)
+                        && !(this.modules.indexOf('lists') >= 0 && t.kind === this.tm.DIGITS && this.getToken(i + 1).kind === this.tm.DOT)
+                        && !(this.getToken(i).kind === this.tm.BACKTICK && this.getToken(i + 1).kind === this.tm.BACKTICK
+                                && this.getToken(i + 2).kind === this.tm.BACKTICK)
                         && !(this.modules.indexOf('headings') >= 0 && this.headingAhead(i));
             }
         }
@@ -1769,9 +1768,9 @@ koara.Parser.prototype = {
         var quoteLevel = 0;
         for (var i = offset;; i++) {
             var t = this.getToken(i);
-            if (t.kind == this.tm.GT) {
+            if (t.kind === this.tm.GT) {
                 quoteLevel++;
-            } else if (t.kind != this.tm.SPACE && t.kind != this.tm.TAB) {
+            } else if (t.kind !== this.tm.SPACE && t.kind !== this.tm.TAB) {
                 return quoteLevel;
             }
 
@@ -1781,7 +1780,7 @@ koara.Parser.prototype = {
     skip: function(offset, tokens) {
         for (var i = offset;; i++) {
             var t = this.getToken(i);
-            if (tokens.indexOf(t.kind) == -1 || t.kind == this.tm.EOF) {
+            if (tokens.indexOf(t.kind) === -1 || t.kind === this.tm.EOF) {
                 return i;
             }
         }
@@ -3091,7 +3090,7 @@ koara.Parser.prototype = {
     },
 
     scanToken: function(kind) {
-        if (this.scanPosition == this.lastPosition) {
+        if (this.scanPosition === this.lastPosition) {
             this.lookAhead--;
             if (this.scanPosition.next == null) {
                 this.lastPosition = this.scanPosition = this.scanPosition.next = this.tm.getNextToken();
@@ -3101,17 +3100,17 @@ koara.Parser.prototype = {
         } else {
             this.scanPosition = this.scanPosition.next;
         }
-        if (this.scanPosition.kind != kind) {
+        if (this.scanPosition.kind !== kind) {
             return true;
         }
-        if (this.lookAhead == 0 && this.scanPosition == this.lastPosition) {
+        if (this.lookAhead === 0 && this.scanPosition === this.lastPosition) {
             throw this.lookAheadSuccess;
         }
 	    return false;
     },
 
     getNextTokenKind: function() {
-    	if (this.nextTokenKind != -1) {
+    	if (this.nextTokenKind !== -1) {
             return this.nextTokenKind;
         } else if ((this.nextToken = this.token.next) == null) {
         	this.token.next = this.tm.getNextToken();
@@ -3122,13 +3121,13 @@ koara.Parser.prototype = {
 
     consumeToken: function(kind) {
         old = this.token;
-        if (this.token.next != null) {
+        if (this.token.next !== null) {
             this.token = this.token.next;
         } else {
             this.token = this.token.next = this.tm.getNextToken();
         }
         this.nextTokenKind = -1;
-        if (this.token.kind == kind) {
+        if (this.token.kind === kind) {
             return this.token;
         }
         this.token = old;
@@ -3208,9 +3207,9 @@ koara.TokenManager.prototype = {
 
                 this.matchedKind = 2147483647;
                 this.matchedPos = 0;
-                curPos = this.moveStringLiteralDfa0_0();
+                curPos = this.moveStringLiteralDfa0();
 
-                if (this.matchedKind != 2147483647) {
+                if (this.matchedKind !== 2147483647) {
                     if (this.matchedPos + 1 < curPos) {
                         this.cs.backup(curPos - this.matchedPos - 1);
                     }
@@ -3227,7 +3226,7 @@ koara.TokenManager.prototype = {
                 this.cs.getImage());
     },
 
-    moveStringLiteralDfa0_0: function() {
+    moveStringLiteralDfa0: function() {
         switch (this.curChar.charCodeAt(0)) {
         case 9: return this.startNfaWithStates(0, this.TAB, 8);
         case 32: return this.startNfaWithStates(0, this.SPACE, 8);
@@ -3240,13 +3239,13 @@ koara.TokenManager.prototype = {
         case 60: return this.stopAtPos(0, this.LT);
         case 61: return this.stopAtPos(0, this.EQ);
         case 62: return this.stopAtPos(0, this.GT);
-        case 73: return this.moveStringLiteralDfa1_0(0x2000);
+        case 73: return this.moveStringLiteralDfa1(0x2000);
         case 91: return this.stopAtPos(0, this.LBRACK);
         case 92: return this.startNfaWithStates(0, this.BACKSLASH, 7);
         case 93: return this.stopAtPos(0, this.RBRACK);
         case 95: return this.stopAtPos(0, this.UNDERSCORE);
         case 96: return this.stopAtPos(0, this.BACKTICK);
-        case 105: return this.moveStringLiteralDfa1_0(0x2000);
+        case 105: return this.moveStringLiteralDfa1(0x2000);
         default: return this.moveNfa(6, 0);
         }
     },
@@ -3268,42 +3267,42 @@ koara.TokenManager.prototype = {
         return pos + 1;
     },
 
-    moveStringLiteralDfa1_0: function(active) {
+    moveStringLiteralDfa1: function(active) {
     	this.curChar = this.cs.readChar();
-        if (this.curChar.charCodeAt(0) == 77 || this.curChar.charCodeAt(0) == 109) {
-            return this.moveStringLiteralDfa2_0(active, 0x2000);
+        if (this.curChar.charCodeAt(0) === 77 || this.curChar.charCodeAt(0) === 109) {
+            return this.moveStringLiteralDfa2(active, 0x2000);
         }
         return this.startNfa(0, active);
     },
 
-    moveStringLiteralDfa2_0: function(old, active) {
+    moveStringLiteralDfa2: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar.charCodeAt(0) == 65 || this.curChar.charCodeAt(0) == 97) {
-            return this.moveStringLiteralDfa3_0(active, 0x2000);
+        if (this.curChar.charCodeAt(0) === 65 || this.curChar.charCodeAt(0) === 97) {
+            return this.moveStringLiteralDfa3(active, 0x2000);
         }
         return this.startNfa(1, active);
 
     },
 
-    moveStringLiteralDfa3_0: function(old, active) {
+    moveStringLiteralDfa3: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar.charCodeAt(0) == 71 || this.curChar.charCodeAt(0) == 103) {
-            return this.moveStringLiteralDfa4_0(active, 0x2000);
+        if (this.curChar.charCodeAt(0) === 71 || this.curChar.charCodeAt(0) === 103) {
+            return this.moveStringLiteralDfa4(active, 0x2000);
         }
         return this.startNfa(2, active);
     },
 
-    moveStringLiteralDfa4_0: function(old, active) {
+    moveStringLiteralDfa4: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar.charCodeAt(0) == 69 || this.curChar.charCodeAt(0) == 101) {
-            return this.moveStringLiteralDfa5_0(active, 0x2000);
+        if (this.curChar.charCodeAt(0) === 69 || this.curChar.charCodeAt(0) === 101) {
+            return this.moveStringLiteralDfa5(active, 0x2000);
         }
         return this.startNfa(3, active);
     },
 
-    moveStringLiteralDfa5_0: function(old, active) {
+    moveStringLiteralDfa5: function(old, active) {
         this.curChar = this.cs.readChar();
-        if (this.curChar.charCodeAt(0) == 58 && ((active & 0x2000) != 0)) {
+        if (this.curChar.charCodeAt(0) === 58 && ((active & 0x2000) !== 0)) {
             return this.stopAtPos(5, 13);
         }
         return this.startNfa(4, active);
@@ -3317,58 +3316,59 @@ koara.TokenManager.prototype = {
     	var startsAt = 0;
         this.jjnewStateCnt = 8;
         var i = 1;
+        var l;
         this.jjstateSet[0] = startState;
         var kind = 0x7fffffff;
         while (true) {
-            if (++this.round == 0x7fffffff) {
+            if (++this.round === 0x7fffffff) {
                 this.round = 0x80000001;
             }            
             if (this.curChar.charCodeAt(0) < 64) {
-                var l = 1 << this.curChar.charCodeAt(0);
+                l = 1 << this.curChar.charCodeAt(0);
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
-                        if ((0x880098feffffd9ff & l) != 0) {
+                        if ((0x880098feffffd9ff & l) !== 0) {
                             if (kind > 4) {
                                 kind = 4;
                             }
                             this.checkNAdd(0);
-                        } else if ((0x3ff000000000000 & l) != 0) {
+                        } else if ((0x3ff000000000000 & l) !== 0) {
                             if (kind > 7) {
                                 kind = 7;
                             }
                             this.checkNAdd(1);
-                        } else if ((0x2400 & l) != 0) {
+                        } else if ((0x2400 & l) !== 0) {
                             if (kind > 9) {
                                 kind = 9;
                             }
-                        } else if ((0x100000200 & l) != 0) {
+                        } else if ((0x100000200 & l) !== 0) {
                             this.checkNAddStates(0, 2);
                         }
-                        if (this.curChar.charCodeAt(0) == 13) {
+                        if (this.curChar.charCodeAt(0) === 13) {
                             this.jjstateSet[this.jjnewStateCnt++] = 4;
                         }
                         break;
                     case 8:
-                        if ((0x2400 & l) != 0) {
+                        if ((0x2400 & l) !== 0) {
                             if (kind > 9) {
                                 kind = 9;
                             }
-                        } else if ((0x100000200 & l) != 0) {
+                        } else if ((0x100000200 & l) !== 0) {
                             this.checkNAddStates(0, 2);
                         }
-                        if (this.curChar.charCodeAt(0) == 13) {
+                        if (this.curChar.charCodeAt(0) === 13) {
                             this.jjstateSet[this.jjnewStateCnt++] = 4;
                         }
                         break;
                     case 0:
-                        if ((0x880098feffffd9ff & l) != 0) {
+                        if ((0x880098feffffd9ff & l) !== 0) {
                             kind = 4;
                             this.checkNAdd(0);
                         }
                         break;
                     case 1:
-                        if ((0x3ff000000000000 & l) != 0) {
+                        if ((0x3ff000000000000 & l) !== 0) {
                             if (kind > 7) {
                                 kind = 7;
                             }
@@ -3376,60 +3376,60 @@ koara.TokenManager.prototype = {
                         }
                         break;
                     case 2:
-                        if ((0x100000200 & l) != 0) {
+                        if ((0x100000200 & l) !== 0) {
                             this.checkNAddStates(0, 2);
                         }
                         break;
                     case 3:
-                        if ((0x2400 & l) != 0 && kind > 9) {
+                        if ((0x2400 & l) !== 0 && kind > 9) {
                             kind = 9;
                         }
                         break;
                     case 4:
-                        if (this.curChar.charCodeAt(0) == 10 && kind > 9) {
+                        if (this.curChar.charCodeAt(0) === 10 && kind > 9) {
                             kind = 9;
                         }
                         break;
                     case 5:
-                        if (this.curChar.charCodeAt(0) == 13) {
+                        if (this.curChar.charCodeAt(0) === 13) {
                             this.jjstateSet[this.jjnewStateCnt++] = 4;
                         }
                         break;
                     case 7:
-                        if ((0x77ff670000000000 & l) != 0 && kind > 11) {
+                        if ((0x77ff670000000000 & l) !== 0 && kind > 11) {
                             kind = 11;
                         }
                         break;
                     }
-                } while (i != startsAt);
+                } while (i !== startsAt);
             } else if (this.curChar.charCodeAt(0) < 128) {
-            	var l = (1 << (this.curChar.charCodeAt(0) & 077));
+                l = (1 << (this.curChar.charCodeAt(0) & 077));
             	
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
-                        if (l != 0) {
+                        if (l !== 0) {
                             if (kind > 4) {
                                 kind = 4;
                             }
                             this.checkNAdd(0);
-                        } else if (this.curChar.charCodeAt(0) == 92) {
+                        } else if (this.curChar.charCodeAt(0) === 92) {
                             this.jjstateSet[this.jjnewStateCnt++] = 7;
                         }
                         break;
                     case 0: 
-                        if ((-7381975041 & l) != 0) {
+                        if ((-7381975041 & l) !== 0) {
                             kind = 4;
                             this.checkNAdd(0);
                         }
                         break;
                     case 7:
-                        if ((0x1b8000000 & l) != 0 && kind > 11) {
+                        if ((0x1b8000000 & l) !== 0 && kind > 11) {
                             kind = 11;
                         }
                         break;
                     }
-                } while (i != startsAt);
+                } while (i !== startsAt);
             } else {
                 do {
                     switch (this.jjstateSet[--i]) {
@@ -3441,17 +3441,17 @@ koara.TokenManager.prototype = {
                         this.checkNAdd(0);
                         break;
                     }
-                } while (i != startsAt);
+                } while (i !== startsAt);
             }
             
-            if (kind != 0x7fffffff) {
+            if (kind !== 0x7fffffff) {
                 this.matchedKind = kind;
                 this.matchedPos = curPos;
                 kind = 0x7fffffff;
             }
             ++curPos;
             
-            if ((i = this.jjnewStateCnt) == (startsAt = 8 - (this.jjnewStateCnt = startsAt))) {
+            if ((i = this.jjnewStateCnt) === (startsAt = 8 - (this.jjnewStateCnt = startsAt))) {
                 return curPos;
             }
             try {
@@ -3465,39 +3465,39 @@ koara.TokenManager.prototype = {
     checkNAddStates: function(start, end) {
         do {
             this.checkNAdd(this.jjnextStates[start]);
-        } while (start++ != end);
+        } while (start++ !== end);
     },
 
     checkNAdd: function(state) {
-        if (this.jjrounds[state] != this.round) {
+        if (this.jjrounds[state] !== this.round) {
             this.jjstateSet[this.jjnewStateCnt++] = state;
             this.jjrounds[state] = this.round;
         }
     },
 
     stopStringLiteralDfa: function(pos, active) {
-        if (pos == 0) {
-            if ((active & 0x2000) != 0) {
+        if (pos === 0) {
+            if ((active & 0x2000) !== 0) {
                 this.matchedKind = 4;
                 return 0;
-            } else if ((active & 0x180000) != 0) {
+            } else if ((active & 0x180000) !== 0) {
                 return 8;
-            } else if ((active & 0x4) != 0) {
+            } else if ((active & 0x4) !== 0) {
                 return 7;
             }
-        } else if (pos == 1 && (active & 0x2000) != 0) {
+        } else if (pos === 1 && (active & 0x2000) !== 0) {
             this.matchedKind = 4;
             this.matchedPos = 1;
             return 0;
-        } else if (pos == 2 && (active & 0x2000) != 0) {
+        } else if (pos === 2 && (active & 0x2000) !== 0) {
             this.matchedKind = 4;
             this.matchedPos = 2;
             return 0;
-        } else if (pos == 3 && (active & 0x2000) != 0) {
+        } else if (pos === 3 && (active & 0x2000) !== 0) {
             this.matchedKind = 4;
             this.matchedPos = 3;
             return 0;
-        } else if (pos == 4 && (active & 0x2000) != 0) {
+        } else if (pos === 4 && (active & 0x2000) !== 0) {
             this.matchedKind = 4;
             this.matchedPos = 4;
             return 0;
@@ -3523,7 +3523,7 @@ koara.TreeState.prototype = {
 	},
 	
 	closeScope: function(n) {
-		a = this.nodeArity();
+		var a = this.nodeArity();
 		this.currentMark = this.marks.pop(); // currentMark = marks.remove(marks.size() - 1);
 		while (a-- > 0) {
           c = this.popNode();
