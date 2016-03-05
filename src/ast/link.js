@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Link = function() {}
 koara.Link.prototype = new koara.Node();
 

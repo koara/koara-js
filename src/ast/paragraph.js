@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Paragraph = function() {}
 koara.Paragraph.prototype = new koara.BlockElement();
 koara.Paragraph.prototype.constructor = koara.Paragraph;

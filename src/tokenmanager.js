@@ -1,3 +1,5 @@
+"use strict";
+
 koara.TokenManager = function(stream) {
 	this.cs = stream;
 	this.jjrounds = [];
@@ -241,7 +243,7 @@ koara.TokenManager.prototype = {
                     }
                 } while (i !== startsAt);
             } else if (this.curChar.charCodeAt(0) < 128) {
-                l = (1 << (this.curChar.charCodeAt(0) & 077));
+                l = (1 << (this.curChar.charCodeAt(0) & 77));
             	
                 do {
                     switch (this.jjstateSet[--i]) {

@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Parser = function() {	
 	this.lookAheadSuccess = new koara.LookaheadSuccess();
 	this.modules = ['paragraphs', 'headings', 'lists', 'links', 'images', 'formatting', 'blockquotes', 'code'];
@@ -140,7 +142,7 @@ koara.Parser.prototype = {
           var list = new koara.ListBlock(false);
           this.tree.openScope();
           var listBeginColumn = this.unorderedListItem();
-          while (this.listItemAhead(this.listBeginColumn, false)) {
+          while (this.listItemAhead(listBeginColumn, false)) {
               while (this.getNextTokenKind() === this.tm.EOL) {
                   this.consumeToken(this.tm.EOL);
               }
@@ -231,7 +233,7 @@ koara.Parser.prototype = {
         	}
         	if (this.getNextTokenKind() !== this.tm.EOF && !this.fencesAhead()) {
                 this.consumeToken(this.tm.EOL);
-                this.levelWhiteSpace(this.beginColumn);
+                this.levelWhiteSpace(beginColumn);
         	}
         
         	while (this.getNextTokenKind() !== this.tm.EOF && (this.getNextTokenKind() !== this.tm.EOL || !this.fencesAhead())) {
@@ -320,12 +322,7 @@ koara.Parser.prototype = {
     },
 
     paragraph: function() {
-        var paragraph;
-        if (this.modules.indexOf("paragraphs") >= 0) {
-            paragraph = new koara.Paragraph();
-        } else {
-            paragraph = new koara.BlockElement();
-        }
+        var paragraph = this.modules.indexOf("paragraphs") >= 0 ? new koara.Paragraph() : new koara.BlockElement();
         this.tree.openScope();
         this.inline();
         while (this.textAhead()) {
@@ -897,11 +894,11 @@ koara.Parser.prototype = {
               this.lineBreak();
               this.strongMultilineContent();
           }
-	    this.consumeToken(this.tm.ASTERISK);
-	    this.tree.closeScope(this.tm.strong);
-	  },
+          this.consumeToken(this.tm.ASTERISK);
+          this.tree.closeScope(strong);
+      },
 
-   	  strongMultilineContent: function() {
+      strongMultilineContent: function() {
         do {
             if (this.hasTextAhead()) {
                 this.text();
@@ -909,7 +906,7 @@ koara.Parser.prototype = {
                 this.image();
             } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
             } else if (this.hasEmWithinStrongMultiline()) {
                 this.emWithinStrongMultiline();
@@ -927,9 +924,9 @@ koara.Parser.prototype = {
                 }
             }
         } while (this.strongMultilineHasElementsAhead());
-   	  },
+      },
 
-   	  strongWithinEmMultiline: function() {
+      strongWithinEmMultiline: function() {
         var strong = new Strong();
         this.tree.openScope();
         this.consumeToken(this.tm.ASTERISK);
@@ -939,18 +936,18 @@ koara.Parser.prototype = {
             this.strongWithinEmMultilineContent();
         }
         this.consumeToken(this.tm.ASTERISK);
-        this.tree.closeScope(this.tm.strong);
-   	  },
+        this.tree.closeScope(strong);
+      },
 
-   	  strongWithinEmMultilineContent: function() {
+      strongWithinEmMultilineContent: function() {
         do {
             if (this.hasTextAhead()) {
                 this.text();
             } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -977,9 +974,9 @@ koara.Parser.prototype = {
                this.text();
             } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                this.image();
-            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                this.link();
-            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -1016,11 +1013,11 @@ koara.Parser.prototype = {
         do {
             if (this.hasTextAhead()) {
                 this.text();
-            } else if (this.modules.indexOf("images") >= 0  && this.hasImageAhead()) {
+            } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            } else if (this.modules.indexOf("code") >= 0  && this.multilineAhead(this.tm.BACKTICK)) {
+            } else if (this.modules.indexOf("code") >= 0 && this.multilineAhead(this.tm.BACKTICK)) {
                 this.codeMultiline();
             } else if (this.hasStrongWithinEmMultilineAhead()) {
                 this.strongWithinEmMultiline();
@@ -1059,9 +1056,9 @@ koara.Parser.prototype = {
                 this.text();
             } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -1088,9 +1085,9 @@ koara.Parser.prototype = {
                 this.text();
             } else if (this.modules.indexOf("images") >= 0 && this.hasImageAhead()) {
                 this.image();
-            } else if (this.modules.indexOf("links") >= 0  && this.hasLinkAhead()) {
+            } else if (this.modules.indexOf("links") >= 0 && this.hasLinkAhead()) {
                 this.link();
-            } else if (this.modules.indexOf("code") >= 0  && this.hasCodeAhead()) {
+            } else if (this.modules.indexOf("code") >= 0 && this.hasCodeAhead()) {
                 this.code();
             } else {
                 switch (this.getNextTokenKind()) {
@@ -1145,11 +1142,11 @@ koara.Parser.prototype = {
     },
 
     blockAhead: function(blockBeginColumn) {
-        var quoteLevel;
+        var quoteLevel = 0;
         if (this.getNextTokenKind() === this.tm.EOL) {
-            var t;
+            var t = null;
             var i = 2;
-            var quoteLevel = 0;
+            quoteLevel = 0;
             do {
                 quoteLevel = 0;
                 do {
@@ -1740,10 +1737,10 @@ koara.Parser.prototype = {
     },
 
     scanTextTokens: function() {
+    	var xsp = null;
         if (this.scanText()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanText()) {
@@ -1819,10 +1816,10 @@ koara.Parser.prototype = {
     },
 
     scanCodeMultiline: function() {
+    	var xsp = null;
         if (scanToken(this.tm.BACKTICK) || this.scanCodeTextTokensAhead()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.hasCodeTextOnNextLineAhead()) {
@@ -1834,10 +1831,10 @@ koara.Parser.prototype = {
     },
 
     scanCodeTextTokensAhead: function() {
+    	var xsp = null;
         if (this.scanCodeTextTokens()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanCodeTextTokens()) {
@@ -1849,10 +1846,10 @@ koara.Parser.prototype = {
     },
 
     hasCodeTextOnNextLineAhead: function() {
+    	var xsp = null;
         if (this.scanWhitespaceTokenBeforeEol()) {
            return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanToken(this.tm.GT)) {
@@ -1864,7 +1861,7 @@ koara.Parser.prototype = {
     },
 
     scanWhitspaceTokens: function() {
-        var xsp;
+        var xsp = null;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanWhitspaceToken()) {
@@ -1904,10 +1901,10 @@ koara.Parser.prototype = {
     },
 
     scanEmWithinStrong: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.UNDERSCORE) || this.scanEmWithinStrongElements()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanEmWithinStrongElements()) {
@@ -1946,10 +1943,10 @@ koara.Parser.prototype = {
     },
 
     scanEm: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.UNDERSCORE) || this.scanEmElements()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanEmElements()) {
@@ -1985,10 +1982,10 @@ koara.Parser.prototype = {
     },
 
     hasNoEmWithinStrongMultilineContentAhead: function() {
+    	var xsp = null;
         if (this.scanEmWithinStrongMultilineContent()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanEmWithinStrongMultilineContent()) {
@@ -2000,10 +1997,10 @@ koara.Parser.prototype = {
     },
 
     scanEmWithinStrongMultiline: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.UNDERSCORE) || this.hasNoEmWithinStrongMultilineContentAhead()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanWhitespaceTokenBeforeEol() || this.hasNoEmWithinStrongMultilineContentAhead()) {
@@ -2069,10 +2066,10 @@ koara.Parser.prototype = {
     },
 
     scanStrongWithinEm: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.ASTERISK) || this.scanStrongWithinEmElements()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanStrongWithinEmElements()) {
@@ -2114,10 +2111,10 @@ koara.Parser.prototype = {
     },
 
     scanStrong: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.ASTERISK) || this.scanStrongElements()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanStrongElements()) {
@@ -2153,10 +2150,10 @@ koara.Parser.prototype = {
     },
 
     scanForMoreStrongWithinEmMultilineElements: function() {
+    	var xsp = null;
         if (this.scanStrongWithinEmMultilineElements()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanStrongWithinEmMultilineElements()) {
@@ -2168,10 +2165,10 @@ koara.Parser.prototype = {
     },
 
     scanStrongWithinEmMultiline: function() {
+    	var xsp = null;
         if (this.scanToken(ASTERISK) || this.scanForMoreStrongWithinEmMultilineElements()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanWhitespaceTokenBeforeEol() || this.scanForMoreStrongWithinEmMultilineElements()) {
@@ -2281,7 +2278,7 @@ koara.Parser.prototype = {
     },
 
     scanResourceTextElements: function() {
-        var xsp;
+        var xsp = null;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanResourceTextElement()) {
@@ -2367,10 +2364,10 @@ koara.Parser.prototype = {
     },
 
     scanResourceElements: function() {
+    	var xsp = null;
         if (this.scanResourceElement()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanResourceElement()) {
@@ -2382,10 +2379,10 @@ koara.Parser.prototype = {
     },
 
     scanLink: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanLinkElement()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanLinkElement()) {
@@ -2404,10 +2401,10 @@ koara.Parser.prototype = {
     },
 
     scanImage: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanToken(this.IMAGE_LABEL) || this.scanImageElement()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanImageElement()) {
@@ -2459,7 +2456,7 @@ koara.Parser.prototype = {
     },
 
     scanParagraph: function() {
-        var xsp;
+        var xsp = null;
         if (this.scanInlineElement()) {
             return true;
         }
@@ -2485,10 +2482,10 @@ koara.Parser.prototype = {
     },
 
     scanForCodeLanguageElements: function() {
+    	var xsp = null;
         if (this.scanForCodeLanguageElement()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanForCodeLanguageElement()) {
@@ -2511,10 +2508,10 @@ koara.Parser.prototype = {
     },
 
     scanFencedCodeBlock: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.BACKTICK) || this.scanToken(this.tm.BACKTICK) || this.scanToken(this.tm.BACKTICK)) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanToken(this.tm.BACKTICK)) {
@@ -2541,10 +2538,10 @@ koara.Parser.prototype = {
     },
 
     scanBlockQuoteEmptyLine: function() {
+    	var xsp = null;
         if (this.scanToken(this.tm.EOL) || this.scanWhitspaceTokens() || this.scanToken(this.tm.GT) || this.scanWhitspaceTokens()) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanToken(this.tm.GT) || scanWhitspaceTokens()) {
@@ -2556,10 +2553,10 @@ koara.Parser.prototype = {
     },
 
     scanForHeadersigns: function() {
+    	var xsp = null	;
         if (this.scanToken(this.tm.EQ)) {
             return true;
         }
-        var xsp;
         while (true) {
             xsp = this.scanPosition;
             if (this.scanToken(this.tm.EQ)) {
@@ -2611,7 +2608,7 @@ koara.Parser.prototype = {
         if (this.lookAhead === 0 && this.scanPosition === this.lastPosition) {
             throw this.lookAheadSuccess;
         }
-	    return false;
+        return false;
     },
 
     getNextTokenKind: function() {

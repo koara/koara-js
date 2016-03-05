@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Code = function() {}
 koara.Code.prototype = new koara.Node();
 

@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Heading = function() {}
 koara.Heading.prototype = new koara.BlockElement();
 

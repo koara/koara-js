@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Token = function(kind, beginLine, beginColumn, endLine, endColumn, image) {
 	this.kind = kind;
 	this.beginLine = beginLine;

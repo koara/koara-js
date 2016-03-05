@@ -1,3 +1,5 @@
+"use strict";
+
 koara.TreeState = function() {
 	this.nodes = [];
 	this.marks = [];

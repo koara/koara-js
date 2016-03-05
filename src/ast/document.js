@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Document = function() {}
 koara.Document.prototype = new koara.Node();
 koara.Document.prototype.constructor = koara.Document;

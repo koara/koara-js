@@ -1,3 +1,5 @@
+"use strict";
+
 koara.ListItem = function() {}
 koara.ListItem.prototype = new koara.Node();
 

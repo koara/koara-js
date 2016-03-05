@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 koara.StringReader = function(text) {
 	this.index = 0;

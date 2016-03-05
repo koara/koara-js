@@ -1,3 +1,5 @@
+"use strict";
+
 koara.LookaheadSuccess = function() {}
 
 koara.LookaheadSuccess.prototype = {

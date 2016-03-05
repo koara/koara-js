@@ -1,3 +1,5 @@
+"use strict";
+
 koara.BlockQuote = function() {}
 koara.BlockQuote.prototype = new koara.BlockElement();
 

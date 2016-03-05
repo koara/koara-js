@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Node = function() {
   this.children = [];
 }

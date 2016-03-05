@@ -14,7 +14,7 @@ gulp.task('default', ['build']);
 gulp.task('build', ['lint', 'scripts', 'test']);
 
 gulp.task('lint', function() {
-  return gulp.src(['**/*.js', '!gulpfile.js', '!node_modules/**', '!dist/**'])
+  return gulp.src(['src/**/*.js', '!gulpfile.js', '!node_modules/**', '!dist/**'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());

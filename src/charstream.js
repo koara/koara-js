@@ -1,3 +1,5 @@
+"use strict";
+
 koara.CharStream = function(reader) {
 	this.available = 4096;
 	this.bufsize = 4096;
@@ -7,7 +9,7 @@ koara.CharStream = function(reader) {
 	this.bufline = [];
 	this.column = 0;
 	this.line = 1;
-	this.prevCharIsLF;
+	this.prevCharIsLF = false;
 	this.reader = reader;
 	this.buffer = [];
 	this.maxNextCharInd = 0;

@@ -1,3 +1,5 @@
+"use strict";
+
 koara.Html5Renderer = function() {
 	this.level = 0;
 }

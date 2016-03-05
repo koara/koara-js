@@ -1,3 +1,5 @@
+"use strict";
+
 koara.CodeBlock = function() {}
 koara.CodeBlock.prototype = new koara.BlockElement();
 
