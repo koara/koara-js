@@ -1,6 +1,6 @@
 "use strict";
 
-koara.BlockElement = function() {}
+koara.BlockElement = function() {};
 koara.BlockElement.prototype = new koara.Node();
 koara.BlockElement.prototype.constructor = koara.BlockElement;
 

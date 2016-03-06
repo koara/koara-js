@@ -2,13 +2,13 @@
 
 koara.Html5Renderer = function() {
 	this.level = 0;
-}
+};
 
 koara.Html5Renderer.prototype = {
 	constructor: koara.Html5Renderer,
-	
+
 	visitDocument: function(node) {
-		this.out = '';
+		this.out = "";
 		node.childrenAccept(this);
 	},
 
@@ -18,7 +18,7 @@ koara.Html5Renderer.prototype = {
 //		out.append("</h" + node.getValue() + ">\n");
 //		if(!node.isNested()) { out.append("\n"); }
 //	}
-//	
+//
 //	public void visit(BlockQuote node) {
 //		out.append(indent() + "<blockquote>");
 //		if(node.getChildren() != null && node.getChildren().length > 0) { out.append("\n"); }
@@ -28,7 +28,7 @@ koara.Html5Renderer.prototype = {
 //		out.append(indent() + "</blockquote>\n");
 //		if(!node.isNested()) { out.append("\n"); }
 //	}
-//	
+//
 //	public void visit(ListBlock node) {
 //		listSequence.push(0);
 //		String tag = node.isOrdered() ? "ol" : "ul";
@@ -40,9 +40,9 @@ koara.Html5Renderer.prototype = {
 //		if(!node.isNested()) { out.append("\n"); }
 //		listSequence.pop();
 //	}
-//	
+//
 //	public void visit(ListItem node) {
-//		Integer seq = listSequence.peek() + 1;		
+//		Integer seq = listSequence.peek() + 1;
 //		listSequence.set(listSequence.size() - 1, seq);
 //		out.append(indent() + "<li");
 //		if(node.getNumber() != null && (seq != node.getNumber())) {
@@ -52,7 +52,7 @@ koara.Html5Renderer.prototype = {
 //		out.append(">");
 //		if(node.getChildren() != null) {
 //			boolean block = (node.getChildren()[0].getClass() == Paragraph.class || node.getChildren()[0].getClass() == BlockElement.class);
-//			
+//
 //			if(node.getChildren().length > 1 || !block) { out.append("\n"); }
 //			level++;
 //			node.childrenAccept(this);
@@ -61,7 +61,7 @@ koara.Html5Renderer.prototype = {
 //		}
 //		out.append("</li>\n");
 //	}
-//	
+//
 //	public void visit(CodeBlock node) {
 //		out.append(indent() + "<pre><code");
 //		if(node.getLanguage() != null) {
@@ -73,16 +73,18 @@ koara.Html5Renderer.prototype = {
 //	}
 //
 	visitParagraph: function(node) {
-		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
+		if (node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
 			node.childrenAccept(this);
 		} else {
 			this.out += this.indent() + "<p>";
 			node.childrenAccept(this);
 			this.out += "</p>\n";
-			if(!node.isNested()) { this.out += "\n"; }
+			if (!node.isNested()) {
+				this.out += "\n";
+			}
 		}
 	},
-//	
+//
 //	@Override
 //	public void visit(BlockElement node) {
 //		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
@@ -93,53 +95,53 @@ koara.Html5Renderer.prototype = {
 //			if(!node.isNested()) { out.append("\n"); }
 //		}
 //	}
-//		
+//
 //	public void visit(Image node) {
 //		out.append("<img src=\"" + escapeUrl(node.getValue().toString()) + "\" alt=\"");
 //		node.childrenAccept(this);
 //		out.append("\" />");
 //	}
-//	
+//
 //	public void visit(Link node) {
 //		out.append("<a href=\"" + escapeUrl(node.getValue().toString()) + "\">");
 //		node.childrenAccept(this);
 //		out.append("</a>");
 //	}
-//	
+//
 //	public void visit(Strong node) {
 //		out.append("<strong>");
 //		node.childrenAccept(this);
 //		out.append("</strong>");
 //	}
-//	
+//
 //	public void visit(Em node) {
 //		out.append("<em>");
 //		node.childrenAccept(this);
 //		out.append("</em>");
 //	}
-//	
+//
 //	public void visit(Code node) {
 //		out.append("<code>");
 //		node.childrenAccept(this);
 //		out.append("</code>");
 //	}
-//		
+//
 	visitText: function(node) {
 		this.out += node.value;
 	},
-	
+
 //	public String escape(String text) {
 //		return text.replaceAll("&", "&amp;")
 //				.replaceAll("<", "&lt;")
 //				.replaceAll(">", "&gt;")
 //				.replaceAll("\"", "&quot;");
 //	}
-//	
+//
 	visitLineBreak: function(node) {
 		this.out += "<br>\n" + this.indent();
 		node.childrenAccept(this);
 	},
-//	
+//
 //	public String escapeUrl(String text) {
 //		return text.replaceAll(" ", "%20")
 //				.replaceAll("\"", "%22")
@@ -150,18 +152,19 @@ koara.Html5Renderer.prototype = {
 //				.replaceAll("\\]", "%5D")
 //				.replaceAll("\\\\", "%5C");
 //	}
-//	
+//
 	indent: function() {
 		var repeat = this.level * 2;
         var buf = [];
+
 		for (var i = repeat - 1; i >= 0; i--) {
-		 buf.push(' ');
-		} 
-		return buf.join('');
+            buf.push(" ");
+		}
+		return buf.join("");
 	},
-	
+
 	getOutput: function() {
-		return this.out.trim();
+        return this.out.trim();
 	}
-	
-}
+
+};

@@ -7,8 +7,8 @@ koara.Token = function(kind, beginLine, beginColumn, endLine, endColumn, image) 
     this.endLine = endLine;
 	this.endColumn = endColumn;
 	this.image = image;
-}
+};
 
 koara.Token.prototype = {
 	constructor: koara.Token
-}
+};

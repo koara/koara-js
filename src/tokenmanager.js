@@ -5,11 +5,11 @@ koara.TokenManager = function(stream) {
 	this.jjrounds = [];
 	this.jjstateSet = [];
 	this.jjnextStates = [2, 3, 5];
-}
+};
 
 koara.TokenManager.prototype = {
 	constructor: koara.TokenManager,
-	
+
 	EOF: 0,
 	ASTERISK: 1,
 	BACKSLASH: 2,
@@ -32,10 +32,11 @@ koara.TokenManager.prototype = {
 	SPACE: 19,
 	TAB: 20,
 	UNDERSCORE: 21,
-	
+
     getNextToken: function() {
         try {
             var curPos = 0;
+
             while (true) {
                 try {
                     this.curChar = this.cs.beginToken();
@@ -108,7 +109,7 @@ koara.TokenManager.prototype = {
     },
 
     moveStringLiteralDfa1: function(active) {
-    	this.curChar = this.cs.readChar();
+        this.curChar = this.cs.readChar();
         if (this.curChar.charCodeAt(0) === 77 || this.curChar.charCodeAt(0) === 109) {
             return this.moveStringLiteralDfa2(active, 0x2000);
         }
@@ -153,16 +154,17 @@ koara.TokenManager.prototype = {
     },
 
     moveNfa: function(startState, curPos) {
-    	var startsAt = 0;
         this.jjnewStateCnt = 8;
-        var i = 1;
-        var l;
         this.jjstateSet[0] = startState;
+        var startsAt = 0;
+        var i = 1;
+        var l = null;
         var kind = 0x7fffffff;
+
         while (true) {
             if (++this.round === 0x7fffffff) {
                 this.round = 0x80000001;
-            }            
+            }
             if (this.curChar.charCodeAt(0) < 64) {
                 l = 1 << this.curChar.charCodeAt(0);
                 do {
@@ -244,7 +246,7 @@ koara.TokenManager.prototype = {
                 } while (i !== startsAt);
             } else if (this.curChar.charCodeAt(0) < 128) {
                 l = (1 << (this.curChar.charCodeAt(0) & 77));
-            	
+
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
@@ -257,7 +259,7 @@ koara.TokenManager.prototype = {
                             this.jjstateSet[this.jjnewStateCnt++] = 7;
                         }
                         break;
-                    case 0: 
+                    case 0:
                         if ((-7381975041 & l) !== 0) {
                             kind = 4;
                             this.checkNAdd(0);
@@ -283,14 +285,14 @@ koara.TokenManager.prototype = {
                     }
                 } while (i !== startsAt);
             }
-            
+
             if (kind !== 0x7fffffff) {
                 this.matchedKind = kind;
                 this.matchedPos = curPos;
                 kind = 0x7fffffff;
             }
             ++curPos;
-            
+
             if ((i = this.jjnewStateCnt) === (startsAt = 8 - (this.jjnewStateCnt = startsAt))) {
                 return curPos;
             }
@@ -345,4 +347,4 @@ koara.TokenManager.prototype = {
         return -1;
     }
 
-}
+};

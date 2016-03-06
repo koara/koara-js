@@ -23,6 +23,7 @@ koara.CharStream.prototype = {
 	beginToken: function() {
 		this.tokenBegin = -1;
 		var c = this.readChar();
+		
 		this.tokenBegin = this.bufpos;
 		return c;
 	},
@@ -40,6 +41,7 @@ koara.CharStream.prototype = {
 		}
 
 		var c = this.buffer[this.bufpos];
+		
 		this.updateLineColumn(c);
 		return c;
 	},
@@ -57,6 +59,7 @@ koara.CharStream.prototype = {
 			}
 		}
 		var i=0;
+		
 		try {
 			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) === -1) {
 				throw new Error("IOException");
@@ -126,7 +129,4 @@ koara.CharStream.prototype = {
 	getEndLine: function() {
 		return this.tokenBegin in this.bufline ? this.bufline[this.tokenBegin] : 0;
 	}
-}		
-		
-
-
+}
