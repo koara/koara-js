@@ -9,28 +9,36 @@ if (typeof exports !== 'undefined' && !exports.nodeType) {
 "use strict";
 
 koara.Node = function() {
-  this.children = [];
+	this.children = [];
 };
 
-koara.Node.prototype.add = function(n, i) {
-	this.children[i] = n;
-};
+koara.Node.prototype = {
+	constructor: koara.Node,
 
-koara.Node.prototype.childrenAccept = function(renderer) {
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].accept(renderer);
+	add: function(n, i) {
+		this.children[i] = n;
+	},
+
+	childrenAccept: function(renderer) {
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].accept(renderer);
+		}
 	}
+
 };
 
 "use strict";
 
-koara.Document = function() {};
+koara.Document = function() {
+	this.children = [];
+};
 koara.Document.prototype = new koara.Node();
-koara.Document.prototype.constructor = koara.Document;
 
 koara.Document.prototype.accept = function(renderer) {
 	renderer.visitDocument(this);
 };
+
+
 
 "use strict";
 
@@ -428,15 +436,15 @@ koara.CharStream = function(reader) {
 	this.maxNextCharInd = 0;
 	this.inBuf = 0;
 	this.tabSize = 4;
-}
+};
 
 koara.CharStream.prototype = {
 	constructor: koara.CharStream,
-	
+
 	beginToken: function() {
 		this.tokenBegin = -1;
 		var c = this.readChar();
-		
+
 		this.tokenBegin = this.bufpos;
 		return c;
 	},
@@ -454,11 +462,11 @@ koara.CharStream.prototype = {
 		}
 
 		var c = this.buffer[this.bufpos];
-		
+
 		this.updateLineColumn(c);
 		return c;
 	},
-	
+
 	fillBuff: function() {
 		if (this.maxNextCharInd === this.available) {
 			if (this.available === this.bufsize) {
@@ -471,8 +479,8 @@ koara.CharStream.prototype = {
 				this.available = this.bufsize;
 			}
 		}
-		var i=0;
-		
+        var i = 0;
+
 		try {
 			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) === -1) {
 				throw new Error("IOException");
@@ -488,14 +496,14 @@ koara.CharStream.prototype = {
 			throw e;
 		}
 	},
-	
+
 	backup: function(amount) {
 		this.inBuf += amount;
 		if ((this.bufpos -= amount) < 0) {
 			this.bufpos += this.bufsize;
 		}
 	},
-	
+
 	updateLineColumn: function(c) {
 		this.column++;
 		if (this.prevCharIsLF) {
@@ -505,67 +513,68 @@ koara.CharStream.prototype = {
 		}
 
 		switch (c) {
-		case '\n':
+		case "\n":
 			this.prevCharIsLF = true;
 			break;
-		case '\t':
+		case "\t":
 			this.column--;
 			this.column += this.tabSize - this.column % this.tabSize;
 			break;
-		default: 
+		default:
 			break;
 		}
 		this.bufline[this.bufpos] = this.line;
 		this.bufcolumn[this.bufpos] = this.column;
 	},
-	
+
 	getImage: function() {
 			if (this.bufpos >= this.tokenBegin) {
-				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join('')
-			} 
-			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join('')
-						+ this.buffer.slice(0, this.bufpos + 1).join('');
-	}, 
-	
+				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join("");
+			}
+			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join("") +
+                this.buffer.slice(0, this.bufpos + 1).join("");
+	},
+
 	getBeginColumn: function() {
 		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
 	},
-	
+
 	getBeginLine: function() {
 		return this.bufpos in this.bufline ? this.bufline[this.bufpos] : 0;
 	},
-	
+
 	getEndColumn: function() {
 		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
 	},
-	
+
 	getEndLine: function() {
 		return this.tokenBegin in this.bufline ? this.bufline[this.tokenBegin] : 0;
 	}
-}
+
+};
 
 "use strict";
 
-koara.LookaheadSuccess = function() {}
+koara.LookaheadSuccess = function() {};
 
 koara.LookaheadSuccess.prototype = {
-	constructor: koara.LookaheadSuccess		
-}
+	constructor: koara.LookaheadSuccess
+};
 
 "use strict";
 
-koara.Parser = function() {	
+koara.Parser = function() {
 	this.lookAheadSuccess = new koara.LookaheadSuccess();
 	this.modules = ["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"];
-}
+};
 
 koara.Parser.prototype = {
 	constructor: koara.Parser,
-	
+
 	parse: function(text) {
 		return this.parseReader(new koara.StringReader(text));
 	},
-	
+
 	parseReader: function(reader) {
 		this.cs = new koara.CharStream(reader);
 		this.tm = new koara.TokenManager(this.cs);
@@ -574,9 +583,9 @@ koara.Parser.prototype = {
 		this.nextTokenKind = -1;
 
 		var document = new koara.Document();
-		
+
 		this.tree.openScope();
-		
+
 		while (this.getNextTokenKind() === this.tm.EOL) {
 			this.consumeToken(this.tm.EOL);
 		}
@@ -599,7 +608,7 @@ koara.Parser.prototype = {
         this.tree.closeScope(document);
         return document;
 	},
-	
+
 	blockElement: function() {
         this.currentBlockLevel++;
         if (this.modules.indexOf("headings") >= 0 && this.headingAhead(1)) {

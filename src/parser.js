@@ -1,17 +1,17 @@
 "use strict";
 
-koara.Parser = function() {	
+koara.Parser = function() {
 	this.lookAheadSuccess = new koara.LookaheadSuccess();
 	this.modules = ["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"];
-}
+};
 
 koara.Parser.prototype = {
 	constructor: koara.Parser,
-	
+
 	parse: function(text) {
 		return this.parseReader(new koara.StringReader(text));
 	},
-	
+
 	parseReader: function(reader) {
 		this.cs = new koara.CharStream(reader);
 		this.tm = new koara.TokenManager(this.cs);
@@ -20,9 +20,9 @@ koara.Parser.prototype = {
 		this.nextTokenKind = -1;
 
 		var document = new koara.Document();
-		
+
 		this.tree.openScope();
-		
+
 		while (this.getNextTokenKind() === this.tm.EOL) {
 			this.consumeToken(this.tm.EOL);
 		}
@@ -45,7 +45,7 @@ koara.Parser.prototype = {
         this.tree.closeScope(document);
         return document;
 	},
-	
+
 	blockElement: function() {
         this.currentBlockLevel++;
         if (this.modules.indexOf("headings") >= 0 && this.headingAhead(1)) {
