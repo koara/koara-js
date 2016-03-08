@@ -1,12 +1,11 @@
 "use strict";
 
-koara.Document = function() {
-	this.children = [];
+function Document() {
+    Node.call(this);
+}
+
+Document.prototype = new Node();
+Document.prototype.constructor = Document;
+Document.prototype.accept = function(renderer) {
+    renderer.visitDocument(this);
 };
-koara.Document.prototype = new koara.Node();
-
-koara.Document.prototype.accept = function(renderer) {
-	renderer.visitDocument(this);
-};
-
-

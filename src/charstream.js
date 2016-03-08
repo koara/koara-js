@@ -1,6 +1,6 @@
 "use strict";
 
-koara.CharStream = function(reader) {
+function CharStream(reader) {
 	this.available = 4096;
 	this.bufsize = 4096;
 	this.tokenBegin = 0;
@@ -15,10 +15,10 @@ koara.CharStream = function(reader) {
 	this.maxNextCharInd = 0;
 	this.inBuf = 0;
 	this.tabSize = 4;
-};
+}
 
-koara.CharStream.prototype = {
-	constructor: koara.CharStream,
+CharStream.prototype = {
+	constructor: CharStream,
 
 	beginToken: function() {
 		this.tokenBegin = -1;

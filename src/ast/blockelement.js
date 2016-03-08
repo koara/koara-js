@@ -1,17 +1,20 @@
 "use strict";
 
-koara.BlockElement = function() {};
-koara.BlockElement.prototype = new koara.Node();
-koara.BlockElement.prototype.constructor = koara.BlockElement;
+function BlockElement() {
+    Node.call(this);
+}
 
-koara.BlockElement.prototype.isNested = function() {
-	return !(this.parent instanceof koara.Document);
+BlockElement.prototype = new Node();
+BlockElement.prototype.constructor = BlockElement;
+
+BlockElement.prototype.isNested = function() {
+	return !(this.parent instanceof Document);
 };
 
-koara.BlockElement.prototype.isSingleChild = function() {
-	return this.parent.children.length === 1;
+BlockElement.prototype.accept = function(renderer) {
+	return this.isSingleChild.children.length === 1;
 };
 
-koara.BlockElement.prototype.accept = function(renderer) {
-	renderer.visit(this);
+BlockElement.prototype.accept = function(renderer) {
+    renderer.visitBlockElement(this);
 };

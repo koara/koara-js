@@ -1,14 +1,14 @@
 "use strict";
 
-koara.TreeState = function() {
+function TreeState() {
 	this.nodes = [];
 	this.marks = [];
 	this.nodesOnStack = 0;
 	this.currentMark = 0;
-};
+}
 
-koara.TreeState.prototype = {
-	constructor: koara.TreeState,
+TreeState.prototype = {
+	constructor: TreeState,
 
 	openScope: function() {
 		this.marks.push(this.currentMark);

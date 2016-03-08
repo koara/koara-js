@@ -1,9 +1,12 @@
 "use strict";
 
-koara.Paragraph = function() {};
-koara.Paragraph.prototype = new koara.BlockElement();
-koara.Paragraph.prototype.constructor = koara.Paragraph;
+function Paragraph() {
+	BlockElement.call(this);
+}
 
-koara.Paragraph.prototype.accept = function(renderer) {
-	renderer.visitParagraph(this);
+Paragraph.prototype = new BlockElement();
+Paragraph.prototype.constructor = Paragraph;
+
+Paragraph.prototype.accept = function(renderer) {
+    renderer.visitParagraph(this);
 };

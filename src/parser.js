@@ -1,25 +1,25 @@
 "use strict";
 
-koara.Parser = function() {
-	this.lookAheadSuccess = new koara.LookaheadSuccess();
+function Parser() {
+	this.lookAheadSuccess = new LookaheadSuccess();
 	this.modules = ["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"];
-};
+}
 
-koara.Parser.prototype = {
-	constructor: koara.Parser,
+Parser.prototype = {
+	constructor: Parser,
 
 	parse: function(text) {
-		return this.parseReader(new koara.StringReader(text));
+		return this.parseReader(new StringReader(text));
 	},
 
 	parseReader: function(reader) {
-		this.cs = new koara.CharStream(reader);
-		this.tm = new koara.TokenManager(this.cs);
-		this.token = new koara.Token();
-		this.tree = new koara.TreeState();
+		this.cs = new CharStream(reader);
+		this.tm = new TokenManager(this.cs);
+		this.token = new Token();
+		this.tree = new TreeState();
 		this.nextTokenKind = -1;
 
-		var document = new koara.Document();
+		var document = new Document();
 
 		this.tree.openScope();
 
@@ -65,7 +65,7 @@ koara.Parser.prototype = {
 	},
 
     heading: function() {
-        var heading = new koara.Heading();
+        var heading = new Heading();
 
         this.tree.openScope();
         var headingLevel = 0;
@@ -97,7 +97,7 @@ koara.Parser.prototype = {
     },
 
     blockQuote: function() {
-        var blockQuote = new koara.BlockQuote();
+        var blockQuote = new BlockQuote();
 
         this.tree.openScope();
         this.currentQuoteLevel++;
@@ -143,7 +143,7 @@ koara.Parser.prototype = {
       },
 
       unorderedList: function() {
-          var list = new koara.ListBlock(false);
+          var list = new ListBlock(false);
 
           this.tree.openScope();
           var listBeginColumn = this.unorderedListItem();
@@ -187,7 +187,7 @@ koara.Parser.prototype = {
       },
 
       orderedList: function() {
-        var list = new koara.ListBlock(true);
+        var list = new ListBlock(true);
 
         this.tree.openScope();
         var listBeginColumn = this.orderedListItem();
@@ -206,7 +206,7 @@ koara.Parser.prototype = {
     },
 
     orderedListItem: function() {
-        var listItem = new koara.ListItem();
+        var listItem = new ListItem();
 
         this.tree.openScope();
         var t = this.consumeToken(this.tm.DIGITS);
@@ -336,7 +336,7 @@ koara.Parser.prototype = {
     },
 
     paragraph: function() {
-        var paragraph = this.modules.indexOf("paragraphs") >= 0 ? new koara.Paragraph() : new koara.BlockElement();
+        var paragraph = this.modules.indexOf("paragraphs") >= 0 ? new Paragraph() : new BlockElement();
 
         this.tree.openScope();
         this.inline();
@@ -355,7 +355,7 @@ koara.Parser.prototype = {
     },
 
     text: function() {
-        var text = new koara.Text();
+        var text = new Text();
         var s = "";
 
         this.tree.openScope();
@@ -423,7 +423,7 @@ koara.Parser.prototype = {
     },
 
     image: function() {
-        var image = new koara.Image();
+        var image = new Image();
         var ref = "";
 
         this.tree.openScope();
@@ -479,7 +479,7 @@ koara.Parser.prototype = {
     },
 
     strong: function() {
-        var strong = new koara.Strong();
+        var strong = new Strong();
 
         this.tree.openScope();
         this.consumeToken(this.tm.ASTERISK);
@@ -497,13 +497,13 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
-                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.UNDERSCORE));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.UNDERSCORE));
                     break;
                 }
             }
@@ -531,13 +531,13 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.ASTERISK:
-                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.ASTERISK));
                     break;
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 }
             }
@@ -547,7 +547,7 @@ koara.Parser.prototype = {
     },
 
     code: function() {
-        var code = new koara.Code();
+        var code = new Code();
 
         this.tree.openScope();
         this.consumeToken(this.tm.BACKTICK);
@@ -557,7 +557,7 @@ koara.Parser.prototype = {
     },
 
     codeText: function() {
-        var text = new koara.Text();
+        var text = new Text();
         var s = "";
 
         this.tree.openScope();
@@ -634,7 +634,7 @@ koara.Parser.prototype = {
     },
 
    looseChar: function() {
-        var text = new koara.Text();
+        var text = new Text();
 
         this.tree.openScope();
         switch (this.getNextTokenKind()) {
@@ -655,7 +655,7 @@ koara.Parser.prototype = {
     },
 
     lineBreak: function() {
-        var linebreak = new koara.LineBreak();
+        var linebreak = new LineBreak();
 
         this.tree.openScope();
         while (this.getNextTokenKind() === this.tm.SPACE || this.getNextTokenKind() === this.tm.TAB) {
@@ -944,13 +944,13 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case LBRACK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.UNDERSCORE));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.UNDERSCORE));
                     break;
                 }
             }
@@ -984,10 +984,10 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case LBRACK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
                     this.tree.addSingleValue(new KoaraText(), this.consumeToken(UNDERSCORE));
@@ -1014,10 +1014,10 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
                     this.tree.addSingleValue(new KoaraText(), this.consumeToken(this.tm.UNDERSCORE));
@@ -1058,13 +1058,13 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.ASTERISK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.ASTERISK));
                     break;
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 }
             }
@@ -1098,13 +1098,13 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.ASTERISK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.ASTERISK));
                     break;
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 }
             }
@@ -1128,13 +1128,13 @@ koara.Parser.prototype = {
             } else {
                 switch (this.getNextTokenKind()) {
                 case this.tm.ASTERISK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.ASTERISK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.ASTERISK));
                     break;
                 case this.tm.BACKTICK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(this.tm.BACKTICK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new Koara.Text(), this.consumeToken(LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(LBRACK));
                     break;
                 }
             }

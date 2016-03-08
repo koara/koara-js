@@ -1,11 +1,11 @@
 "use strict";
 
-koara.Html5Renderer = function() {
+function Html5Renderer() {
 	this.level = 0;
-};
+}
 
-koara.Html5Renderer.prototype = {
-	constructor: koara.Html5Renderer,
+Html5Renderer.prototype = {
+	constructor: Html5Renderer,
 
 	visitDocument: function(node) {
 		this.out = "";

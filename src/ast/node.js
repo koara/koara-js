@@ -1,11 +1,11 @@
 "use strict";
 
-koara.Node = function() {
+function Node() {
 	this.children = [];
-};
+}
 
-koara.Node.prototype = {
-	constructor: koara.Node,
+Node.prototype = {
+	constructor: Node,
 
 	add: function(n, i) {
 		this.children[i] = n;

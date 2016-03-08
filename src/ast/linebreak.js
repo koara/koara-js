@@ -1,9 +1,9 @@
 "use strict";
 
-koara.LineBreak = function() {};
-koara.LineBreak.prototype = new koara.Node();
-koara.LineBreak.prototype.constructor = koara.LineBreak;
+function LineBreak() {}
+LineBreak.prototype = new Node();
+LineBreak.prototype.constructor = LineBreak;
 
-koara.LineBreak.prototype.accept = function(renderer) {
+LineBreak.prototype.accept = function(renderer) {
 	renderer.visitLineBreak(this);
 };

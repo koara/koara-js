@@ -1,14 +1,14 @@
 "use strict";
 
-koara.TokenManager = function(stream) {
+function TokenManager(stream) {
 	this.cs = stream;
 	this.jjrounds = [];
 	this.jjstateSet = [];
 	this.jjnextStates = [2, 3, 5];
-};
+}
 
-koara.TokenManager.prototype = {
-	constructor: koara.TokenManager,
+TokenManager.prototype = {
+	constructor: TokenManager,
 
 	EOF: 0,
 	ASTERISK: 1,
@@ -63,7 +63,7 @@ koara.TokenManager.prototype = {
     },
 
     fillToken: function() {
-        return new koara.Token(this.matchedKind, this.cs.getBeginLine(), this.cs.getBeginColumn(), this.cs.getEndLine(), this.cs.getEndColumn(),
+        return new Token(this.matchedKind, this.cs.getBeginLine(), this.cs.getBeginColumn(), this.cs.getEndLine(), this.cs.getEndColumn(),
                 this.cs.getImage());
     },
 

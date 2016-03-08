@@ -1,12 +1,12 @@
 "use strict";
 
-koara.StringReader = function(text) {
+function StringReader(text) {
 	this.index = 0;
 	this.text = text;
-};
+}
 
-koara.StringReader.prototype = {
-	constructor: koara.StringReader,
+StringReader.prototype = {
+	constructor: StringReader,
 
 	read: function(buffer, offset, length) {
 		if (this.text.toString().substring(this.index).length > 0) {
