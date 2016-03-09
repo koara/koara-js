@@ -1234,7 +1234,6 @@
                     }
                 }
             }
-    
             text.value = s;
             this.tree.closeScope(text);
         },
@@ -2697,7 +2696,7 @@
                     break;
                 }
             }
-            return scanToken(BACKTICK);
+            return this.scanToken(BACKTICK);
         },
     
         scanCodeTextTokensAhead: function() {
@@ -3484,9 +3483,9 @@
                     this.scanPosition = xsp;
                     if (this.scanToken(this.tm.DASH)) {
                         this.scanPosition = xsp;
-                        if (scanToken(DIGITS) || scanToken(DOT)) {
+                        if (this.scanToken(this.tm.DIGITS) || this.scanToken(this.tm.DOT)) {
                             this.scanPosition = xsp;
-                            if (scanFencedCodeBlock()) {
+                            if (this.scanFencedCodeBlock()) {
                                 this.scanPosition = xsp;
                                 return this.scanParagraph();
                             }
