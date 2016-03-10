@@ -1,0 +1,16 @@
+{
+  "name": "koara-js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/koara/koara-js",
+  "authors": [
+    "Andy Van Den Heuvel <andy.vandenheuvel@gmail.com>"
+  ],
+  "license": "Apache 2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

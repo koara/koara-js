@@ -1,6 +1,6 @@
 {
   "name": "koara",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Koara parser written in Javascript",
   "devDependencies": {
     "gulp": "3.9.0",
