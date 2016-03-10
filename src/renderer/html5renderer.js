@@ -12,12 +12,12 @@ Html5Renderer.prototype = {
 		node.childrenAccept(this);
 	},
 
-//	public void visit(Heading node) {
-//		out.append(indent() + "<h" + node.getValue() + ">");
-//		node.childrenAccept(this);
-//		out.append("</h" + node.getValue() + ">\n");
-//		if(!node.isNested()) { out.append("\n"); }
-//	}
+	visitHeading: function(node) {
+		this.out += this.indent() + "<h" + 	node.value + ">";
+		node.childrenAccept(this);
+		this.out += "</h" + node.value + ">\n";
+		if(!node.isNested()) { this.out += "\n"; }
+	},
 //
 //	public void visit(BlockQuote node) {
 //		out.append(indent() + "<blockquote>");

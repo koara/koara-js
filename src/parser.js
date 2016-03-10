@@ -128,7 +128,7 @@ Parser.prototype = {
         var i = 0;
 
         do {
-            consumeToken(this.tm.GT);
+            this.consumeToken(this.tm.GT);
             this.whiteSpace();
         } while (++i < this.currentQuoteLevel);
       },
@@ -166,7 +166,7 @@ Parser.prototype = {
 
           this.tree.openScope();
 
-          var t = consumeToken(this.tm.DASH);
+          var t = this.consumeToken(this.tm.DASH);
 
           this.whiteSpace();
           if (this.listItemHasInlineElements()) {
@@ -398,10 +398,10 @@ Parser.prototype = {
                 s += this.consumeToken(this.tm.LT).image;
                 break;
             case this.tm.RBRACK:
-                s += consumeToken(this.tm.RBRACK).image;
+                s += this.consumeToken(this.tm.RBRACK).image;
                 break;
             case this.tm.RPAREN:
-                s += consumeToken(RPAREN).image;
+                s += this.consumeToken(this.tm.RPAREN).image;
                 break;
             default:
                 if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
@@ -735,7 +735,7 @@ Parser.prototype = {
                 s += this.consumeToken(this.tm.UNDERSCORE).image;
                 break;
             case this.tm.SPACE:
-                s += consumeToken(this.tm.SPACE).image;
+                s += this.consumeToken(this.tm.SPACE).image;
                 break;
             case this.tm.TAB:
                 s += "    ";
@@ -820,7 +820,7 @@ Parser.prototype = {
                         s += this.consumeToken(this.tm.SPACE).image;
                         break;
                     case this.tm.TAB:
-                        consumeToken(this.tm.TAB);
+                        this.consumeToken(this.tm.TAB);
                         s += "    ";
                         break;
                     }

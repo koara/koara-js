@@ -59,6 +59,17 @@
         renderer.visitParagraph(this);
     };
     
+    function Heading() {
+    	BlockElement.call(this);
+    }
+    
+    Heading.prototype = new BlockElement();
+    Heading.prototype.constructor = Heading;
+    
+    Heading.prototype.accept = function(renderer) {
+        renderer.visitHeading(this);
+    };
+    
     function LineBreak() {}
     LineBreak.prototype = new Node();
     LineBreak.prototype.constructor = LineBreak;
@@ -457,15 +468,15 @@
                             }
                             break;
                         case 7:
-                            if ((0x77ff670000000000 & l) !== 0 && kind > 11) {
+                            if ((8646743059272302592 & l) !== 0 && kind > 11) {
                                 kind = 11;
                             }
                             break;
                         }
                     } while (i !== startsAt);
                 } else if (this.curChar.charCodeAt(0) < 128) {
-                    l = (1 << (this.curChar.charCodeAt(0) & 77));
-    
+                    l = (1 << (this.curChar.charCodeAt(0) & 077));
+                    
                     do {
                         switch (this.jjstateSet[--i]) {
                         case 6:
@@ -485,7 +496,7 @@
                             }
                             break;
                         case 7:
-                            if ((0x1b8000000 & l) !== 0 && kind > 11) {
+                            if ((7381975040 & l) !== 0 && kind > 11) {
                                 kind = 11;
                             }
                             break;
@@ -660,12 +671,12 @@
     		node.childrenAccept(this);
     	},
     
-    //	public void visit(Heading node) {
-    //		out.append(indent() + "<h" + node.getValue() + ">");
-    //		node.childrenAccept(this);
-    //		out.append("</h" + node.getValue() + ">\n");
-    //		if(!node.isNested()) { out.append("\n"); }
-    //	}
+    	visitHeading: function(node) {
+    		this.out += this.indent() + "<h" + 	node.value + ">";
+    		node.childrenAccept(this);
+    		this.out += "</h" + node.value + ">\n";
+    		if(!node.isNested()) { this.out += "\n"; }
+    	},
     //
     //	public void visit(BlockQuote node) {
     //		out.append(indent() + "<blockquote>");
@@ -945,7 +956,7 @@
             var i = 0;
     
             do {
-                consumeToken(this.tm.GT);
+                this.consumeToken(this.tm.GT);
                 this.whiteSpace();
             } while (++i < this.currentQuoteLevel);
           },
@@ -983,7 +994,7 @@
     
               this.tree.openScope();
     
-              var t = consumeToken(this.tm.DASH);
+              var t = this.consumeToken(this.tm.DASH);
     
               this.whiteSpace();
               if (this.listItemHasInlineElements()) {
@@ -1215,10 +1226,10 @@
                     s += this.consumeToken(this.tm.LT).image;
                     break;
                 case this.tm.RBRACK:
-                    s += consumeToken(this.tm.RBRACK).image;
+                    s += this.consumeToken(this.tm.RBRACK).image;
                     break;
                 case this.tm.RPAREN:
-                    s += consumeToken(RPAREN).image;
+                    s += this.consumeToken(this.tm.RPAREN).image;
                     break;
                 default:
                     if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
@@ -1552,7 +1563,7 @@
                     s += this.consumeToken(this.tm.UNDERSCORE).image;
                     break;
                 case this.tm.SPACE:
-                    s += consumeToken(this.tm.SPACE).image;
+                    s += this.consumeToken(this.tm.SPACE).image;
                     break;
                 case this.tm.TAB:
                     s += "    ";
@@ -1637,7 +1648,7 @@
                             s += this.consumeToken(this.tm.SPACE).image;
                             break;
                         case this.tm.TAB:
-                            consumeToken(this.tm.TAB);
+                            this.consumeToken(this.tm.TAB);
                             s += "    ";
                             break;
                         }

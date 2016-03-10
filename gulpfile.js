@@ -29,6 +29,7 @@ gulp.task('scripts', function() {
 		'src/ast/document.js',
 		'src/ast/blockelement.js',
 		'src/ast/paragraph.js',
+		'src/ast/heading.js',
 		'src/ast/linebreak.js',
 		'src/ast/text.js',
 		'src/charstream.js',

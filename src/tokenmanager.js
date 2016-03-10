@@ -184,7 +184,7 @@ TokenManager.prototype = {
                             if (kind > 9) {
                                 kind = 9;
                             }
-                        } else if ((0x100000200 & l) !== 0) {
+                        } else if ((4294967808 & l) !== 0) {
                             this.checkNAddStates(0, 2);
                         }
                         if (this.curChar.charCodeAt(0) === 13) {
@@ -192,11 +192,11 @@ TokenManager.prototype = {
                         }
                         break;
                     case 8:
-                        if ((0x2400 & l) !== 0) {
+                        if ((9216 & l) !== 0) {
                             if (kind > 9) {
                                 kind = 9;
                             }
-                        } else if ((0x100000200 & l) !== 0) {
+                        } else if ((4294967808 & l) !== 0) {
                             this.checkNAddStates(0, 2);
                         }
                         if (this.curChar.charCodeAt(0) === 13) {
@@ -204,13 +204,13 @@ TokenManager.prototype = {
                         }
                         break;
                     case 0:
-                        if ((0x880098feffffd9ff & l) !== 0) {
+                        if ((-8646743063567279617 & l) !== 0) {
                             kind = 4;
                             this.checkNAdd(0);
                         }
                         break;
                     case 1:
-                        if ((0x3ff000000000000 & l) !== 0) {
+                        if ((287948901175001088 & l) !== 0) {
                             if (kind > 7) {
                                 kind = 7;
                             }
@@ -218,12 +218,12 @@ TokenManager.prototype = {
                         }
                         break;
                     case 2:
-                        if ((0x100000200 & l) !== 0) {
+                        if ((4294967808 & l) !== 0) {
                             this.checkNAddStates(0, 2);
                         }
                         break;
                     case 3:
-                        if ((0x2400 & l) !== 0 && kind > 9) {
+                        if ((9216 & l) !== 0 && kind > 9) {
                             kind = 9;
                         }
                         break;
@@ -238,7 +238,7 @@ TokenManager.prototype = {
                         }
                         break;
                     case 7:
-                        if ((0x77ff670000000000 & l) !== 0 && kind > 11) {
+                        if ((8646743059272302592 & l) !== 0 && kind > 11) {
                             kind = 11;
                         }
                         break;
@@ -246,7 +246,7 @@ TokenManager.prototype = {
                 } while (i !== startsAt);
             } else if (this.curChar.charCodeAt(0) < 128) {
                 l = (1 << (this.curChar.charCodeAt(0) & 77));
-
+                
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
@@ -266,7 +266,7 @@ TokenManager.prototype = {
                         }
                         break;
                     case 7:
-                        if ((0x1b8000000 & l) !== 0 && kind > 11) {
+                        if ((7381975040 & l) !== 0 && kind > 11) {
                             kind = 11;
                         }
                         break;

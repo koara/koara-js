@@ -1,12 +1,12 @@
 "use strict";
 
-koara.Heading = function() {};
-koara.Heading.prototype = new koara.BlockElement();
+function Heading() {
+	BlockElement.call(this);
+}
 
-koara.Heading.prototype = {
-	constructor: koara.Heading,
+Heading.prototype = new BlockElement();
+Heading.prototype.constructor = Heading;
 
-	accept: function(renderer) {
-		renderer.visit(this);
-	}
+Heading.prototype.accept = function(renderer) {
+    renderer.visitHeading(this);
 };
