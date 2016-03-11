@@ -327,7 +327,6 @@
             try {
                 this.curChar = this.cs.readChar();
             } catch (e) {
-            	console.log('---' + e);
                 return pos + 1;
             }
             return this.moveNfa(state, pos + 1);
@@ -397,25 +396,25 @@
                     this.round = 0x80000001;
                 }
                 if (this.curChar.charCodeAt(0) < 64) {
-                    l = 1 << this.curChar.charCodeAt(0);
+                    l = 1 * Number(Math.pow(2, this.curChar.charCodeAt(0)));
                     do {
                         switch (this.jjstateSet[--i]) {
                         case 6:
-                            if ((0x880098feffffd9ff & l) !== 0) {
+                            if (this.bitwise64(0x880098feffffd9ff, l) !== 0) {
                                 if (kind > 4) {
                                     kind = 4;
                                 }
                                 this.checkNAdd(0);
-                            } else if ((0x3ff000000000000 & l) !== 0) {
+                            } else if (this.bitwise64(0x3ff000000000000, l) !== 0) {
                                 if (kind > 7) {
                                     kind = 7;
                                 }
                                 this.checkNAdd(1);
-                            } else if ((0x2400 & l) !== 0) {
+                            } else if (this.bitwise64(0x2400, l) !== 0) {
                                 if (kind > 9) {
                                     kind = 9;
                                 }
-                            } else if ((4294967808 & l) !== 0) {
+                            } else if (this.bitwise64(4294967808, l) !== 0) {
                                 this.checkNAddStates(0, 2);
                             }
                             if (this.curChar.charCodeAt(0) === 13) {
@@ -423,11 +422,11 @@
                             }
                             break;
                         case 8:
-                            if ((9216 & l) !== 0) {
+                            if (this.bitwise64(0x2400, l) !== 0) {
                                 if (kind > 9) {
                                     kind = 9;
                                 }
-                            } else if ((4294967808 & l) !== 0) {
+                            } else if (this.bitwise64(0x100000200, l) !== 0) {
                                 this.checkNAddStates(0, 2);
                             }
                             if (this.curChar.charCodeAt(0) === 13) {
@@ -435,13 +434,13 @@
                             }
                             break;
                         case 0:
-                            if ((-8646743063567279617 & l) !== 0) {
+                            if (this.bitwise64(0x880098feffffd9ff, l) !== 0) {
                                 kind = 4;
                                 this.checkNAdd(0);
                             }
                             break;
                         case 1:
-                            if ((287948901175001088 & l) !== 0) {
+                            if (this.bitwise64(0x3ff000000000000, l) !== 0) {
                                 if (kind > 7) {
                                     kind = 7;
                                 }
@@ -449,12 +448,12 @@
                             }
                             break;
                         case 2:
-                            if ((4294967808 & l) !== 0) {
+                            if (this.bitwise64(0x100000200, l) !== 0) {
                                 this.checkNAddStates(0, 2);
                             }
                             break;
                         case 3:
-                            if ((9216 & l) !== 0 && kind > 9) {
+                            if (this.bitwise64(0x2400, l) !== 0 && kind > 9) {
                                 kind = 9;
                             }
                             break;
@@ -469,15 +468,15 @@
                             }
                             break;
                         case 7:
-                            if ((8646743059272302592 & l) !== 0 && kind > 11) {
+                            if (this.bitwise64(0x77ff670000000000, l) !== 0 && kind > 11) {
                                 kind = 11;
                             }
                             break;
                         }
                     } while (i !== startsAt);
                 } else if (this.curChar.charCodeAt(0) < 128) {
-                    l = (1 << (this.curChar.charCodeAt(0) & 77));
-                    
+                    l = 1 * Number(Math.pow(2, this.bitwise64(this.curChar.charCodeAt(0), 77)));
+    
                     do {
                         switch (this.jjstateSet[--i]) {
                         case 6:
@@ -491,13 +490,13 @@
                             }
                             break;
                         case 0:
-                            if ((-7381975041 & l) !== 0) {
+                            if (this.bitwise64(0xfffffffe47ffffff, l) !== 0) {
                                 kind = 4;
                                 this.checkNAdd(0);
                             }
                             break;
                         case 7:
-                            if ((7381975040 & l) !== 0 && kind > 11) {
+                            if (this.bitwise64(0x1b8000000, l) !== 0 && kind > 11) {
                                 kind = 11;
                             }
                             break;
@@ -550,32 +549,51 @@
     
         stopStringLiteralDfa: function(pos, active) {
             if (pos === 0) {
-                if ((active & 0x2000) !== 0) {
+                if (this.bitwise64(active, 0x2000) !== 0) {
                     this.matchedKind = 4;
                     return 0;
-                } else if ((active & 0x180000) !== 0) {
+                } else if (this.bitwise64(active, 0x180000) !== 0) {
                     return 8;
-                } else if ((active & 0x4) !== 0) {
+                } else if (this.bitwise64(active, 0x4) !== 0) {
                     return 7;
                 }
-            } else if (pos === 1 && (active & 0x2000) !== 0) {
+            } else if (pos === 1 && this.bitwise64(active, 0x2000) !== 0) {
                 this.matchedKind = 4;
                 this.matchedPos = 1;
                 return 0;
-            } else if (pos === 2 && (active & 0x2000) !== 0) {
+            } else if (pos === 2 && this.bitwise64(active, 0x2000) !== 0) {
                 this.matchedKind = 4;
                 this.matchedPos = 2;
                 return 0;
-            } else if (pos === 3 && (active & 0x2000) !== 0) {
+            } else if (pos === 3 && this.bitwise64(active, 0x2000) !== 0) {
                 this.matchedKind = 4;
                 this.matchedPos = 3;
                 return 0;
-            } else if (pos === 4 && (active & 0x2000) !== 0) {
+            } else if (pos === 4 && this.bitwise64(active, 0x2000) !== 0) {
                 this.matchedKind = 4;
                 this.matchedPos = 4;
                 return 0;
             }
             return -1;
+        },
+    
+        bitwise64: function(a, b) {
+            var divisor = 1 << 30;
+            var mask = ~((~0) << 30);
+            var result = 0;
+            var shift = 0;
+    
+            while ((a !== 0) && (b !== 0)) {
+                var rs = (mask & a) & (mask & b);
+    
+                a = Math.floor(a / divisor);
+                b = Math.floor(b / divisor);
+                for (var i = shift++; i--;) {
+                    rs *= divisor;
+                }
+                result += rs;
+            }
+            return result;
         }
     
     };
@@ -669,6 +687,9 @@
     
     	visitDocument: function(node) {
     		this.out = "";
+    		
+    		console.log('DOCUMENT' + node.children.length);
+    		
     		node.childrenAccept(this);
     	},
     
@@ -676,7 +697,9 @@
     		this.out += this.indent() + "<h" + 	node.value + ">";
     		node.childrenAccept(this);
     		this.out += "</h" + node.value + ">\n";
-    		if(!node.isNested()) { this.out += "\n"; }
+    		if (!node.isNested()) {
+                this.out += "\n";
+            }
     	},
     //
     //	public void visit(BlockQuote node) {

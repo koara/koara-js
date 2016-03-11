@@ -16,7 +16,9 @@ Html5Renderer.prototype = {
 		this.out += this.indent() + "<h" + 	node.value + ">";
 		node.childrenAccept(this);
 		this.out += "</h" + node.value + ">\n";
-		if(!node.isNested()) { this.out += "\n"; }
+		if (!node.isNested()) {
+            this.out += "\n";
+        }
 	},
 //
 //	public void visit(BlockQuote node) {

@@ -2656,7 +2656,6 @@ Parser.prototype = {
 
     scanMoreBlockElements: function() {
         var xsp = this.scanPosition;
-
         this.lookingAhead = true;
         this.semanticLookAhead = this.headingAhead(1);
         this.lookingAhead = false;
