@@ -1,7 +1,6 @@
 "use strict";
 
 function Html5Renderer() {
-	this.level = 0;
 }
 
 Html5Renderer.prototype = {
@@ -9,6 +8,8 @@ Html5Renderer.prototype = {
 
 	visitDocument: function(node) {
 		this.out = "";
+		this.level = 0;
+		this.listSequence = [];
 		node.childrenAccept(this);
 	},
 
@@ -31,38 +32,47 @@ Html5Renderer.prototype = {
 //		if(!node.isNested()) { out.append("\n"); }
 //	}
 //
-//	public void visit(ListBlock node) {
-//		listSequence.push(0);
-//		String tag = node.isOrdered() ? "ol" : "ul";
-//		out.append(indent() + "<" + tag + ">\n");
-//		level++;
-//		node.childrenAccept(this);
-//		level--;
-//		out.append(indent() + "</" + tag + ">\n");
-//		if(!node.isNested()) { out.append("\n"); }
-//		listSequence.pop();
-//	}
-//
-//	public void visit(ListItem node) {
-//		Integer seq = listSequence.peek() + 1;
-//		listSequence.set(listSequence.size() - 1, seq);
-//		out.append(indent() + "<li");
-//		if(node.getNumber() != null && (seq != node.getNumber())) {
-//			out.append(" value=\"" + node.getNumber() + "\"");
-//			listSequence.push(node.getNumber());
-//		}
-//		out.append(">");
-//		if(node.getChildren() != null) {
-//			boolean block = (node.getChildren()[0].getClass() == Paragraph.class || node.getChildren()[0].getClass() == BlockElement.class);
-//
-//			if(node.getChildren().length > 1 || !block) { out.append("\n"); }
-//			level++;
-//			node.childrenAccept(this);
-//			level--;
-//			if(node.getChildren().length > 1 || !block) { out.append(indent()); }
-//		}
-//		out.append("</li>\n");
-//	}
+	visitListBlock: function(node) {
+		this.listSequence.push(0);
+		var tag = node.ordered ? "ol" : "ul";
+
+		this.out += this.indent() + "<" + tag + ">\n";
+		this.level++;
+		node.childrenAccept(this);
+		this.level--;
+		this.out += this.indent() + "</" + tag + ">\n";
+		if (!node.isNested()) {
+            this.out += "\n";
+		}
+		this.listSequence.pop();
+	},
+
+	visitListItem: function(node) {
+		var seq = Number(this.listSequence[this.listSequence.length - 1]) + 1;
+
+		this.listSequence[this.listSequence.length - 1] = seq;
+
+        this.out += this.indent() + "<li";
+		if (node.number && (seq !== node.number)) {
+			this.out += " value=\"" + node.number + "\"";
+			this.listSequence.push(node.number);
+		}
+		this.out += ">";
+		if (node.children && node.children.length > 0) {
+			var block = (node.children[0].constructor.name === "Paragraph" || node.children[0].constructor.name === "BlockElement");
+
+			if (node.children.length > 1 || !block) {
+                this.out += "\n";
+            }
+			this.level++;
+			node.childrenAccept(this);
+			this.level--;
+			if (node.children.length > 1 || !block) {
+				this.out += this.indent();
+			}
+		}
+		this.out += "</li>\n";
+	},
 //
 //	public void visit(CodeBlock node) {
 //		out.append(indent() + "<pre><code");
@@ -75,7 +85,7 @@ Html5Renderer.prototype = {
 //	}
 //
 	visitParagraph: function(node) {
-		if (node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
+		if (node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
 			node.childrenAccept(this);
 		} else {
 			this.out += this.indent() + "<p>";
@@ -104,11 +114,11 @@ Html5Renderer.prototype = {
 //		out.append("\" />");
 //	}
 //
-//	public void visit(Link node) {
-//		out.append("<a href=\"" + escapeUrl(node.getValue().toString()) + "\">");
-//		node.childrenAccept(this);
-//		out.append("</a>");
-//	}
+	visitLink: function(node) {
+		this.out += "<a href=\"" + this.escapeUrl(node.value.toString()) + "\">";
+		node.childrenAccept(this);
+		this.out += "</a>";
+	},
 //
 //	public void visit(Strong node) {
 //		out.append("<strong>");
@@ -129,40 +139,40 @@ Html5Renderer.prototype = {
 //	}
 //
 	visitText: function(node) {
-		this.out += node.value;
+		this.out += this.escape(node.value);
 	},
 
-//	public String escape(String text) {
-//		return text.replaceAll("&", "&amp;")
-//				.replaceAll("<", "&lt;")
-//				.replaceAll(">", "&gt;")
-//				.replaceAll("\"", "&quot;");
-//	}
-//
 	visitLineBreak: function(node) {
 		this.out += "<br>\n" + this.indent();
 		node.childrenAccept(this);
 	},
-//
-//	public String escapeUrl(String text) {
-//		return text.replaceAll(" ", "%20")
-//				.replaceAll("\"", "%22")
-//				.replaceAll("`", "%60")
-//				.replaceAll("<", "%3C")
-//				.replaceAll(">", "%3E")
-//				.replaceAll("\\[", "%5B")
-//				.replaceAll("\\]", "%5D")
-//				.replaceAll("\\\\", "%5C");
-//	}
-//
+
+	escapeUrl: function(text) {
+        return text.replace(/ /gm, "%20").
+            replace(/\"/gm, "%22").
+            replace(/`/gm, "%60").
+            replace(/</gm, "%3C").
+            replace(/>/gm, "%3E").
+            replace(/\[/gm, "%5B").
+            replace(/\]/gm, "%5D").
+            replace(/\\/gm, "%5C");
+	},
+
 	indent: function() {
 		var repeat = this.level * 2;
-        var buf = [];
+        var ind = "";
 
 		for (var i = repeat - 1; i >= 0; i--) {
-            buf.push(" ");
+			ind += " ";
 		}
-		return buf.join("");
+		return ind;
+	},
+
+	escape: function(text) {
+		return text.replace(/&/gm, "&amp;").
+            replace(/</gm, "&lt;").
+            replace(/>/gm, "&gt;").
+            replace(/\"/gm, "&quot;");
 	},
 
 	getOutput: function() {

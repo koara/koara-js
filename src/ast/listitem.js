@@ -1,12 +1,12 @@
 "use strict";
 
-koara.ListItem = function() {};
-koara.ListItem.prototype = new koara.Node();
+function ListItem() {
+	Node.call(this);
+}
 
-koara.ListItem.prototype = {
-	constructor: koara.ListItem,
+ListItem.prototype = new Node();
+ListItem.prototype.constructor = ListItem;
 
-	accept: function(renderer) {
-		renderer.visit(this);
-	}
+ListItem.prototype.accept = function(renderer) {
+	renderer.visitListItem(this);
 };

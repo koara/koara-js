@@ -9,7 +9,6 @@ for(i in modules) {
 	if(modules.hasOwnProperty(i)) {
 		testcases = fs.readdirSync(testSuiteFolder + '/input/' + modules[i]);
 		for(j in testcases) {
-			console.log('//' + testcases[j]);
 			if(path.extname(testcases[j]) === ".kd") {
 				tests.push({module: modules[i], name: testcases[j].substr(0, testcases[j].length-3)})
 			}

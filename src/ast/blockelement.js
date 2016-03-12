@@ -11,8 +11,8 @@ BlockElement.prototype.isNested = function() {
 	return !(this.parent instanceof Document);
 };
 
-BlockElement.prototype.accept = function(renderer) {
-	return this.isSingleChild.children.length === 1;
+BlockElement.prototype.isSingleChild = function() {
+	return this.parent.children.length === 1;
 };
 
 BlockElement.prototype.accept = function(renderer) {

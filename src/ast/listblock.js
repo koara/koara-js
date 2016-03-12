@@ -1,12 +1,13 @@
 "use strict";
 
-koara.ListBlock = function() {};
-koara.ListBlock.prototype = new koara.BlockElement();
+function ListBlock(ordered) {
+	BlockElement.call(this);
+	this.ordered = ordered;
+}
 
-koara.ListBlock.prototype = {
-	constructor: koara.ListBlock,
+ListBlock.prototype = new BlockElement();
+ListBlock.prototype.constructor = ListBlock;
 
-	accept: function(renderer) {
-		renderer.visit(this);
-	}
+ListBlock.prototype.accept = function(renderer) {
+	renderer.visitListBlock(this);
 };

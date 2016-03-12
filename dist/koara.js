@@ -40,8 +40,8 @@
     	return !(this.parent instanceof Document);
     };
     
-    BlockElement.prototype.accept = function(renderer) {
-    	return this.isSingleChild.children.length === 1;
+    BlockElement.prototype.isSingleChild = function() {
+    	return this.parent.children.length === 1;
     };
     
     BlockElement.prototype.accept = function(renderer) {
@@ -70,12 +70,46 @@
         renderer.visitHeading(this);
     };
     
+    function ListBlock(ordered) {
+    	BlockElement.call(this);
+    	this.ordered = ordered;
+    }
+    
+    ListBlock.prototype = new BlockElement();
+    ListBlock.prototype.constructor = ListBlock;
+    
+    ListBlock.prototype.accept = function(renderer) {
+    	renderer.visitListBlock(this);
+    };
+    
+    function ListItem() {
+    	Node.call(this);
+    }
+    
+    ListItem.prototype = new Node();
+    ListItem.prototype.constructor = ListItem;
+    
+    ListItem.prototype.accept = function(renderer) {
+    	renderer.visitListItem(this);
+    };
+    
     function LineBreak() {}
     LineBreak.prototype = new Node();
     LineBreak.prototype.constructor = LineBreak;
     
     LineBreak.prototype.accept = function(renderer) {
     	renderer.visitLineBreak(this);
+    };
+    
+    function Link() {
+    	Node.call(this);
+    }
+    
+    Link.prototype = new Node();
+    Link.prototype.constructor = Link;
+    
+    Link.prototype.accept = function(renderer) {
+    	renderer.visitLink(this);
     };
     
     function Text() {
@@ -397,6 +431,7 @@
                 }
                 if (this.curChar.charCodeAt(0) < 64) {
                     l = 1 * Number(Math.pow(2, this.curChar.charCodeAt(0)));
+    
                     do {
                         switch (this.jjstateSet[--i]) {
                         case 6:
@@ -475,8 +510,7 @@
                         }
                     } while (i !== startsAt);
                 } else if (this.curChar.charCodeAt(0) < 128) {
-                    l = 1 * Number(Math.pow(2, this.bitwise64(this.curChar.charCodeAt(0), 77)));
-    
+                    l = 1 * Number(Math.pow(2, this.bitwise64(this.curChar.charCodeAt(0), 63)));
                     do {
                         switch (this.jjstateSet[--i]) {
                         case 6:
@@ -679,7 +713,6 @@
     };
     
     function Html5Renderer() {
-    	this.level = 0;
     }
     
     Html5Renderer.prototype = {
@@ -687,9 +720,8 @@
     
     	visitDocument: function(node) {
     		this.out = "";
-    		
-    		console.log('DOCUMENT' + node.children.length);
-    		
+    		this.level = 0;
+    		this.listSequence = [];
     		node.childrenAccept(this);
     	},
     
@@ -712,38 +744,47 @@
     //		if(!node.isNested()) { out.append("\n"); }
     //	}
     //
-    //	public void visit(ListBlock node) {
-    //		listSequence.push(0);
-    //		String tag = node.isOrdered() ? "ol" : "ul";
-    //		out.append(indent() + "<" + tag + ">\n");
-    //		level++;
-    //		node.childrenAccept(this);
-    //		level--;
-    //		out.append(indent() + "</" + tag + ">\n");
-    //		if(!node.isNested()) { out.append("\n"); }
-    //		listSequence.pop();
-    //	}
-    //
-    //	public void visit(ListItem node) {
-    //		Integer seq = listSequence.peek() + 1;
-    //		listSequence.set(listSequence.size() - 1, seq);
-    //		out.append(indent() + "<li");
-    //		if(node.getNumber() != null && (seq != node.getNumber())) {
-    //			out.append(" value=\"" + node.getNumber() + "\"");
-    //			listSequence.push(node.getNumber());
-    //		}
-    //		out.append(">");
-    //		if(node.getChildren() != null) {
-    //			boolean block = (node.getChildren()[0].getClass() == Paragraph.class || node.getChildren()[0].getClass() == BlockElement.class);
-    //
-    //			if(node.getChildren().length > 1 || !block) { out.append("\n"); }
-    //			level++;
-    //			node.childrenAccept(this);
-    //			level--;
-    //			if(node.getChildren().length > 1 || !block) { out.append(indent()); }
-    //		}
-    //		out.append("</li>\n");
-    //	}
+    	visitListBlock: function(node) {
+    		this.listSequence.push(0);
+    		var tag = node.ordered ? "ol" : "ul";
+    
+    		this.out += this.indent() + "<" + tag + ">\n";
+    		this.level++;
+    		node.childrenAccept(this);
+    		this.level--;
+    		this.out += this.indent() + "</" + tag + ">\n";
+    		if (!node.isNested()) {
+                this.out += "\n";
+    		}
+    		this.listSequence.pop();
+    	},
+    
+    	visitListItem: function(node) {
+    		var seq = Number(this.listSequence[this.listSequence.length - 1]) + 1;
+    
+    		this.listSequence[this.listSequence.length - 1] = seq;
+    
+            this.out += this.indent() + "<li";
+    		if (node.number && (seq !== node.number)) {
+    			this.out += " value=\"" + node.number + "\"";
+    			this.listSequence.push(node.number);
+    		}
+    		this.out += ">";
+    		if (node.children && node.children.length > 0) {
+    			var block = (node.children[0].constructor.name === "Paragraph" || node.children[0].constructor.name === "BlockElement");
+    
+    			if (node.children.length > 1 || !block) {
+                    this.out += "\n";
+                }
+    			this.level++;
+    			node.childrenAccept(this);
+    			this.level--;
+    			if (node.children.length > 1 || !block) {
+    				this.out += this.indent();
+    			}
+    		}
+    		this.out += "</li>\n";
+    	},
     //
     //	public void visit(CodeBlock node) {
     //		out.append(indent() + "<pre><code");
@@ -756,7 +797,7 @@
     //	}
     //
     	visitParagraph: function(node) {
-    		if (node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
+    		if (node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
     			node.childrenAccept(this);
     		} else {
     			this.out += this.indent() + "<p>";
@@ -785,11 +826,11 @@
     //		out.append("\" />");
     //	}
     //
-    //	public void visit(Link node) {
-    //		out.append("<a href=\"" + escapeUrl(node.getValue().toString()) + "\">");
-    //		node.childrenAccept(this);
-    //		out.append("</a>");
-    //	}
+    	visitLink: function(node) {
+    		this.out += "<a href=\"" + this.escapeUrl(node.value.toString()) + "\">";
+    		node.childrenAccept(this);
+    		this.out += "</a>";
+    	},
     //
     //	public void visit(Strong node) {
     //		out.append("<strong>");
@@ -810,40 +851,40 @@
     //	}
     //
     	visitText: function(node) {
-    		this.out += node.value;
+    		this.out += this.escape(node.value);
     	},
     
-    //	public String escape(String text) {
-    //		return text.replaceAll("&", "&amp;")
-    //				.replaceAll("<", "&lt;")
-    //				.replaceAll(">", "&gt;")
-    //				.replaceAll("\"", "&quot;");
-    //	}
-    //
     	visitLineBreak: function(node) {
     		this.out += "<br>\n" + this.indent();
     		node.childrenAccept(this);
     	},
-    //
-    //	public String escapeUrl(String text) {
-    //		return text.replaceAll(" ", "%20")
-    //				.replaceAll("\"", "%22")
-    //				.replaceAll("`", "%60")
-    //				.replaceAll("<", "%3C")
-    //				.replaceAll(">", "%3E")
-    //				.replaceAll("\\[", "%5B")
-    //				.replaceAll("\\]", "%5D")
-    //				.replaceAll("\\\\", "%5C");
-    //	}
-    //
+    
+    	escapeUrl: function(text) {
+            return text.replace(/ /gm, "%20").
+                replace(/\"/gm, "%22").
+                replace(/`/gm, "%60").
+                replace(/</gm, "%3C").
+                replace(/>/gm, "%3E").
+                replace(/\[/gm, "%5B").
+                replace(/\]/gm, "%5D").
+                replace(/\\/gm, "%5C");
+    	},
+    
     	indent: function() {
     		var repeat = this.level * 2;
-            var buf = [];
+            var ind = "";
     
     		for (var i = repeat - 1; i >= 0; i--) {
-                buf.push(" ");
+    			ind += " ";
     		}
-    		return buf.join("");
+    		return ind;
+    	},
+    
+    	escape: function(text) {
+    		return text.replace(/&/gm, "&amp;").
+                replace(/</gm, "&lt;").
+                replace(/>/gm, "&gt;").
+                replace(/\"/gm, "&quot;");
     	},
     
     	getOutput: function() {
@@ -855,6 +896,8 @@
     function Parser() {
     	this.lookAheadSuccess = new LookaheadSuccess();
     	this.modules = ["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"];
+    	this.currentBlockLevel = 0;
+    	this.currentQuoteLevel = 0;
     }
     
     Parser.prototype = {
@@ -1269,6 +1312,7 @@
                     }
                 }
             }
+    
             text.value = s;
             this.tree.closeScope(text);
         },
@@ -1467,7 +1511,7 @@
                     s += this.consumeToken(this.tm.UNDERSCORE).image;
                     break;
                 default:
-                    if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+                    if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
                         switch (this.getNextTokenKind()) {
                         case this.tm.SPACE:
                             s += this.consumeToken(this.tm.SPACE).image;
@@ -1666,7 +1710,7 @@
                     s += this.consumeToken(this.tm.RPAREN).image;
                     break;
                 default:
-                    if (!this.nextAfterSpace(this.tm.RBRACK)) {
+                    if (!this.nextAfterSpace([this.tm.RBRACK])) {
                         switch (this.getNextTokenKind()) {
                         case this.tm.SPACE:
                             s += this.consumeToken(this.tm.SPACE).image;
@@ -1750,7 +1794,7 @@
                     s += this.consumeToken(this.tm.UNDERSCORE).image;
                     break;
                 default:
-                    if (!this.nextAfterSpace(this.tm.RPAREN)) {
+                    if (!this.nextAfterSpace([this.tm.RPAREN])) {
                         switch (this.getNextTokenKind()) {
                         case this.tm.SPACE:
                             s += this.consumeToken(this.tm.SPACE).image;
@@ -2393,7 +2437,7 @@
             this.lookAhead = 2;
             this.lastPosition = this.scanPosition = this.token;
             try {
-                return !scanResourceElement();
+                return !this.scanResourceElement();
             } catch (ls) {
                 return true;
             }
@@ -3508,6 +3552,7 @@
     
         scanMoreBlockElements: function() {
             var xsp = this.scanPosition;
+    
             this.lookingAhead = true;
             this.semanticLookAhead = this.headingAhead(1);
             this.lookingAhead = false;
@@ -3533,7 +3578,7 @@
         scanToken: function(kind) {
             if (this.scanPosition === this.lastPosition) {
                 this.lookAhead--;
-                if (this.scanPosition.next == null) {
+                if (!this.scanPosition.next) {
                     this.lastPosition = this.scanPosition = this.scanPosition.next = this.tm.getNextToken();
                 } else {
                     this.lastPosition = this.scanPosition = this.scanPosition.next;
@@ -3553,7 +3598,7 @@
         getNextTokenKind: function() {
             if (this.nextTokenKind !== -1) {
                 return this.nextTokenKind;
-            } else if ((this.nextToken = this.token.next) == null) {
+            } else if (!(this.nextToken = this.token.next)) {
                 this.token.next = this.tm.getNextToken();
                 return (this.nextTokenKind = this.token.next.kind);
             }
@@ -3578,7 +3623,7 @@
         getToken: function(index) {
             t = this.lookingAhead ? this.scanPosition : this.token;
             for (var i = 0; i < index; i++) {
-                if (t.next != null) {
+                if (t.next) {
                     t = t.next;
                 } else {
                     t = t.next = this.tm.getNextToken();

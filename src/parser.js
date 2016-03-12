@@ -3,6 +3,8 @@
 function Parser() {
 	this.lookAheadSuccess = new LookaheadSuccess();
 	this.modules = ["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"];
+	this.currentBlockLevel = 0;
+	this.currentQuoteLevel = 0;
 }
 
 Parser.prototype = {
@@ -417,6 +419,7 @@ Parser.prototype = {
                 }
             }
         }
+
         text.value = s;
         this.tree.closeScope(text);
     },
@@ -615,7 +618,7 @@ Parser.prototype = {
                 s += this.consumeToken(this.tm.UNDERSCORE).image;
                 break;
             default:
-                if (!this.nextAfterSpace(this.tm.EOL, this.tm.EOF)) {
+                if (!this.nextAfterSpace([this.tm.EOL, this.tm.EOF])) {
                     switch (this.getNextTokenKind()) {
                     case this.tm.SPACE:
                         s += this.consumeToken(this.tm.SPACE).image;
@@ -814,7 +817,7 @@ Parser.prototype = {
                 s += this.consumeToken(this.tm.RPAREN).image;
                 break;
             default:
-                if (!this.nextAfterSpace(this.tm.RBRACK)) {
+                if (!this.nextAfterSpace([this.tm.RBRACK])) {
                     switch (this.getNextTokenKind()) {
                     case this.tm.SPACE:
                         s += this.consumeToken(this.tm.SPACE).image;
@@ -898,7 +901,7 @@ Parser.prototype = {
                 s += this.consumeToken(this.tm.UNDERSCORE).image;
                 break;
             default:
-                if (!this.nextAfterSpace(this.tm.RPAREN)) {
+                if (!this.nextAfterSpace([this.tm.RPAREN])) {
                     switch (this.getNextTokenKind()) {
                     case this.tm.SPACE:
                         s += this.consumeToken(this.tm.SPACE).image;
@@ -1541,7 +1544,7 @@ Parser.prototype = {
         this.lookAhead = 2;
         this.lastPosition = this.scanPosition = this.token;
         try {
-            return !scanResourceElement();
+            return !this.scanResourceElement();
         } catch (ls) {
             return true;
         }
@@ -2656,6 +2659,7 @@ Parser.prototype = {
 
     scanMoreBlockElements: function() {
         var xsp = this.scanPosition;
+
         this.lookingAhead = true;
         this.semanticLookAhead = this.headingAhead(1);
         this.lookingAhead = false;
@@ -2681,7 +2685,7 @@ Parser.prototype = {
     scanToken: function(kind) {
         if (this.scanPosition === this.lastPosition) {
             this.lookAhead--;
-            if (this.scanPosition.next == null) {
+            if (!this.scanPosition.next) {
                 this.lastPosition = this.scanPosition = this.scanPosition.next = this.tm.getNextToken();
             } else {
                 this.lastPosition = this.scanPosition = this.scanPosition.next;
@@ -2701,7 +2705,7 @@ Parser.prototype = {
     getNextTokenKind: function() {
         if (this.nextTokenKind !== -1) {
             return this.nextTokenKind;
-        } else if ((this.nextToken = this.token.next) == null) {
+        } else if (!(this.nextToken = this.token.next)) {
             this.token.next = this.tm.getNextToken();
             return (this.nextTokenKind = this.token.next.kind);
         }
@@ -2726,7 +2730,7 @@ Parser.prototype = {
     getToken: function(index) {
         t = this.lookingAhead ? this.scanPosition : this.token;
         for (var i = 0; i < index; i++) {
-            if (t.next != null) {
+            if (t.next) {
                 t = t.next;
             } else {
                 t = t.next = this.tm.getNextToken();

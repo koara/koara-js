@@ -167,6 +167,7 @@ TokenManager.prototype = {
             }
             if (this.curChar.charCodeAt(0) < 64) {
                 l = 1 * Number(Math.pow(2, this.curChar.charCodeAt(0)));
+
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
@@ -245,8 +246,7 @@ TokenManager.prototype = {
                     }
                 } while (i !== startsAt);
             } else if (this.curChar.charCodeAt(0) < 128) {
-                l = 1 * Number(Math.pow(2, this.bitwise64(this.curChar.charCodeAt(0), 77)));
-
+                l = 1 * Number(Math.pow(2, this.bitwise64(this.curChar.charCodeAt(0), 63)));
                 do {
                     switch (this.jjstateSet[--i]) {
                     case 6:
