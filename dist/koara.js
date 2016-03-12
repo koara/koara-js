@@ -3707,6 +3707,7 @@
     };
     	
 	
+	exports.CharStream = CharStream;
     exports.Document = Document;
     exports.Parser = Parser;
     exports.StringReader = StringReader;

@@ -1,10 +1,12 @@
 'use strict';
 
+var coveralls = require('gulp-coveralls')
 var fs = require('fs');
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var eslint = require('gulp-eslint');
 var insert = require('gulp-insert');
+var istanbul = require('gulp-istanbul');
 var jasmine = require('gulp-jasmine');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
@@ -69,8 +71,22 @@ gulp.task('serve', ['default'], function() {
 	gulp.src('.').pipe(webserver());
 });
 
-gulp.task('test', ['scripts'], function () {
-	return gulp.src('test/com*.js').pipe(jasmine({verbose: true, includeStackTrace: true}));
+gulp.task('pre-test', function () {
+	  return gulp.src(['lib/**/*.js'])
+	    .pipe(istanbul())
+	    .pipe(istanbul.hookRequire());
+	});
+
+
+gulp.task('test', ['scripts', 'pre-test'], function () {
+	return gulp.src('test/com*.js').
+	    pipe(jasmine({verbose: true, includeStackTrace: true})).
+	    pipe(istanbul.writeReports());
 });
+
+gulp.task('travis', ['build'], function () {
+	gulp.src('test/coverage/**/lcov.info').pipe(coveralls());
+});
+
 
 
