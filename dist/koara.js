@@ -112,6 +112,17 @@
     	renderer.visitLink(this);
     };
     
+    function Image() {
+    	Node.call(this);
+    }
+    
+    Image.prototype = new Node();
+    Image.prototype.constructor = Image;
+    
+    Image.prototype.accept = function(renderer) {
+    	renderer.visitImage(this);
+    };
+    
     function Text() {
         Node.call(this);
     }
@@ -820,12 +831,12 @@
     //		}
     //	}
     //
-    //	public void visit(Image node) {
-    //		out.append("<img src=\"" + escapeUrl(node.getValue().toString()) + "\" alt=\"");
-    //		node.childrenAccept(this);
-    //		out.append("\" />");
-    //	}
-    //
+    	visitImage: function(node) {
+    		this.out += "<img src=\"" + this.escapeUrl(node.value) + "\" alt=\"";
+    		node.childrenAccept(this);
+    		this.out += "\" />";
+    	},
+    
     	visitLink: function(node) {
     		this.out += "<a href=\"" + this.escapeUrl(node.value.toString()) + "\">";
     		node.childrenAccept(this);
@@ -3377,7 +3388,7 @@
         scanImage: function() {
             var xsp = null;
     
-            if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanToken(this.IMAGE_LABEL) || this.scanImageElement()) {
+            if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanToken(this.tm.IMAGE_LABEL) || this.scanImageElement()) {
                 return true;
             }
             while (true) {

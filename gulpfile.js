@@ -34,6 +34,7 @@ gulp.task('scripts', function() {
 		'src/ast/listitem.js',
 		'src/ast/linebreak.js',
 		'src/ast/link.js',
+		'src/ast/image.js',
 		'src/ast/text.js',
 		'src/charstream.js',
 		'src/token.js',

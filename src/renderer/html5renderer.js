@@ -108,12 +108,12 @@ Html5Renderer.prototype = {
 //		}
 //	}
 //
-//	public void visit(Image node) {
-//		out.append("<img src=\"" + escapeUrl(node.getValue().toString()) + "\" alt=\"");
-//		node.childrenAccept(this);
-//		out.append("\" />");
-//	}
-//
+	visitImage: function(node) {
+		this.out += "<img src=\"" + this.escapeUrl(node.value) + "\" alt=\"";
+		node.childrenAccept(this);
+		this.out += "\" />";
+	},
+
 	visitLink: function(node) {
 		this.out += "<a href=\"" + this.escapeUrl(node.value.toString()) + "\">";
 		node.childrenAccept(this);

@@ -2484,7 +2484,7 @@ Parser.prototype = {
     scanImage: function() {
         var xsp = null;
 
-        if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanToken(this.IMAGE_LABEL) || this.scanImageElement()) {
+        if (this.scanToken(this.tm.LBRACK) || this.scanWhitspaceTokens() || this.scanToken(this.tm.IMAGE_LABEL) || this.scanImageElement()) {
             return true;
         }
         while (true) {
