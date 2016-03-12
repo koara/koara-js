@@ -1210,7 +1210,7 @@
             } while (this.getNextTokenKind() === this.tm.BACKTICK);
                 this.whiteSpace();
                 if (this.getNextTokenKind() === this.tm.CHAR_SEQUENCE) {
-                    this.codeBlock.language = this.codeLanguage();
+                    codeBlock.language = this.codeLanguage();
                 }
                 if (this.getNextTokenKind() !== this.tm.EOF && !this.fencesAhead()) {
                     this.consumeToken(this.tm.EOL);
