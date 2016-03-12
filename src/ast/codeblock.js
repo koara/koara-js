@@ -1,12 +1,12 @@
 "use strict";
 
-koara.CodeBlock = function() {};
-koara.CodeBlock.prototype = new koara.BlockElement();
+function CodeBlock() {
+	BlockElement.call(this);
+}
 
-koara.CodeBlock.prototype = {
-	constructor: koara.CodeBlock,
+CodeBlock.prototype = new BlockElement();
+CodeBlock.prototype.constructor = CodeBlock;
 
-	accept: function(renderer) {
-		renderer.visit(this);
-	}
+CodeBlock.prototype.accept = function(renderer) {
+	renderer.visitCodeBlock(this);
 };

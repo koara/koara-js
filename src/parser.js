@@ -241,7 +241,7 @@ Parser.prototype = {
         var beginColumn = this.consumeToken(this.tm.BACKTICK).beginColumn;
 
         do {
-            this.consumeToken(BACKTICK);
+            this.consumeToken(this.tm.BACKTICK);
         } while (this.getNextTokenKind() === this.tm.BACKTICK);
             this.whiteSpace();
             if (this.getNextTokenKind() === this.tm.CHAR_SEQUENCE) {
@@ -330,10 +330,10 @@ Parser.prototype = {
             this.consumeToken(this.tm.EOL);
             this.whiteSpace();
             while (this.getNextTokenKind() === this.tm.BACKTICK) {
-                this.consumeToken(BACKTICK);
+                this.consumeToken(this.tm.BACKTICK);
             }
         }
-        codeBlock.setValue(s.toString());
+        codeBlock.value = s.toString();
         this.tree.closeScope(codeBlock);
     },
 
@@ -1243,10 +1243,10 @@ Parser.prototype = {
 
     fencesAhead: function() {
         if (this.getNextTokenKind() === this.tm.EOL) {
-            var i = skip(2, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
+            var i = this.skip(2, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
 
-            if (this.getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK && getToken(i + 2).kind === this.tm.BACKTICK) {
-                i = skip(i + 3, [this.tm.SPACE, this.tm.TAB]);
+            if (this.getToken(i).kind === this.tm.BACKTICK && this.getToken(i + 1).kind === this.tm.BACKTICK && this.getToken(i + 2).kind === this.tm.BACKTICK) {
+                i = this.skip(i + 3, [this.tm.SPACE, this.tm.TAB]);
                 return this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.EOF;
             }
         }
@@ -2622,7 +2622,7 @@ Parser.prototype = {
     },
 
     scanBlockQuoteEmptyLines: function() {
-        return this.scanBlockQuoteEmptyLine() || this.scanToken(EOL);
+        return this.scanBlockQuoteEmptyLine() || this.scanToken(this.tm.EOL);
     },
 
     scanBlockQuoteEmptyLine: function() {
@@ -2633,7 +2633,7 @@ Parser.prototype = {
         }
         while (true) {
             xsp = this.scanPosition;
-            if (this.scanToken(this.tm.GT) || scanWhitspaceTokens()) {
+            if (this.scanToken(this.tm.GT) || this.scanWhitspaceTokens()) {
                 this.scanPosition = xsp;
                 break;
             }

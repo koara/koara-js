@@ -21,17 +21,21 @@ Html5Renderer.prototype = {
             this.out += "\n";
         }
 	},
-//
-//	public void visit(BlockQuote node) {
-//		out.append(indent() + "<blockquote>");
-//		if(node.getChildren() != null && node.getChildren().length > 0) { out.append("\n"); }
-//		level++;
-//		node.childrenAccept(this);
-//		level--;
-//		out.append(indent() + "</blockquote>\n");
-//		if(!node.isNested()) { out.append("\n"); }
-//	}
-//
+
+	visitBlockQuote: function(node) {
+		this.out += this.indent() + "<blockquote>";
+		if (node.children && node.children.length > 0) {
+            this.out += "\n";
+		}
+        this.level++;
+        node.childrenAccept(this);
+        this.level--;
+        this.out += this.indent() + "</blockquote>\n";
+        if (!node.isNested()) {
+           this.out += "\n";
+        }
+	},
+
 	visitListBlock: function(node) {
 		this.listSequence.push(0);
 		var tag = node.ordered ? "ol" : "ul";
@@ -73,17 +77,19 @@ Html5Renderer.prototype = {
 		}
 		this.out += "</li>\n";
 	},
-//
-//	public void visit(CodeBlock node) {
-//		out.append(indent() + "<pre><code");
-//		if(node.getLanguage() != null) {
-//			out.append(" class=\"language-" + escape(node.getLanguage()) + "\"");
-//		}
-//		out.append(">");
-//		out.append(escape(node.getValue().toString()) + "</code></pre>\n");
-//		if(!node.isNested()) { out.append("\n"); }
-//	}
-//
+
+	visitCodeBlock: function(node) {
+		this.out += this.indent() + "<pre><code";
+		if (node.language) {
+			this.out += " class=\"language-" + this.escape(node.language) + "\"";
+		}
+		this.out += ">";
+		this.out += this.escape(node.value) + "</code></pre>\n";
+		if (!node.isNested()) {
+            this.out += "\n";
+        }
+	},
+
 	visitParagraph: function(node) {
 		if (node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
 			node.childrenAccept(this);
@@ -131,13 +137,13 @@ Html5Renderer.prototype = {
 		node.childrenAccept(this);
 		this.out += "</em>";
 	},
-//
-//	public void visit(Code node) {
-//		out.append("<code>");
-//		node.childrenAccept(this);
-//		out.append("</code>");
-//	}
-//
+
+	visitCode: function(node) {
+		this.out += "<code>";
+		node.childrenAccept(this);
+		this.out += "</code>";
+	},
+
 	visitText: function(node) {
 		this.out += this.escape(node.value);
 	},

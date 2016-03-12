@@ -1,12 +1,12 @@
 "use strict";
 
-koara.BlockQuote = function() {};
-koara.BlockQuote.prototype = new koara.BlockElement();
+function BlockQuote() {
+	BlockElement.call(this);
+}
 
-koara.BlockQuote.prototype = {
-	constructor: koara.BlockQuote,
+BlockQuote.prototype = new BlockElement();
+BlockQuote.prototype.constructor = BlockQuote;
 
-	accept: function(renderer) {
-		renderer.visit(this);
-	}
+BlockQuote.prototype.accept = function(renderer) {
+    renderer.visitBlockQuote(this);
 };
