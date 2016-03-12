@@ -123,6 +123,28 @@
     	renderer.visitImage(this);
     };
     
+    function Strong() {
+    	Node.call(this);
+    }
+    
+    Strong.prototype = new Node();
+    Strong.prototype.constructor = Strong;
+    
+    Strong.prototype.accept = function(renderer) {
+    	renderer.visitStrong(this);
+    };
+    
+    function Em() {
+    	Node.call(this);
+    }
+    
+    Em.prototype = new Node();
+    Em.prototype.constructor = Em;
+    
+    Em.prototype.accept = function(renderer) {
+    	renderer.visitEm(this);
+    };
+    
     function Text() {
         Node.call(this);
     }
@@ -672,7 +694,7 @@
     
     	addSingleValue: function(n, t) {
     		this.openScope();
-            n.setValue(t.image);
+            n.value = t.image;
             this.closeScope(n);
     	},
     
@@ -842,18 +864,18 @@
     		node.childrenAccept(this);
     		this.out += "</a>";
     	},
-    //
-    //	public void visit(Strong node) {
-    //		out.append("<strong>");
-    //		node.childrenAccept(this);
-    //		out.append("</strong>");
-    //	}
-    //
-    //	public void visit(Em node) {
-    //		out.append("<em>");
-    //		node.childrenAccept(this);
-    //		out.append("</em>");
-    //	}
+    
+    	visitStrong: function(node) {
+    		this.out += "<strong>";
+    		node.childrenAccept(this);
+    		this.out += "</strong>";
+    	},
+    
+    	visitEm: function(node) {
+    		this.out += "<em>";
+    		node.childrenAccept(this);
+    		this.out += "</em>";
+    	},
     //
     //	public void visit(Code node) {
     //		out.append("<code>");
@@ -1852,7 +1874,7 @@
                     case this.tm.BACKTICK:
                         this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                         break;
-                    case LBRACK:
+                    case this.tm.LBRACK:
                         this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                         break;
                     case this.tm.UNDERSCORE:
@@ -1892,11 +1914,11 @@
                     case this.tm.BACKTICK:
                         this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                         break;
-                    case LBRACK:
+                    case this.tm.LBRACK:
                         this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                         break;
                     case this.tm.UNDERSCORE:
-                        this.tree.addSingleValue(new KoaraText(), this.consumeToken(UNDERSCORE));
+                        this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.UNDERSCORE));
                         break;
                     }
                 }
@@ -1926,7 +1948,7 @@
                         this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                         break;
                     case this.tm.UNDERSCORE:
-                        this.tree.addSingleValue(new KoaraText(), this.consumeToken(this.tm.UNDERSCORE));
+                        this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.UNDERSCORE));
                         break;
                     }
                 }
@@ -2014,7 +2036,7 @@
                         break;
                     }
                 }
-            } while (this.emWithinStrongMultilineContentHasElementsAhaed());
+            } while (this.emWithinStrongMultilineContentHasElementsAhead());
         },
     
         emWithinStrong: function() {
@@ -2127,11 +2149,11 @@
                         var quoteLevel = this.newQuoteLevel(i);
     
                         if (quoteLevel === this.currentQuoteLevel) {
-                            i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+                            i = this.skip(i, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
                             if (this.getToken(i).kind === token || this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.DASH ||
                                 (this.getToken(i).kind === this.tm.DIGITS && this.getToken(i + 1).kind === this.tm.DOT) ||
-                                (getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK &&
-                                getToken(i + 2).kind === this.tm.BACKTICK) || this.headingAhead(i)) {
+                                (this.getToken(i).kind === this.tm.BACKTICK && this.getToken(i + 1).kind === this.tm.BACKTICK &&
+                                this.getToken(i + 2).kind === this.tm.BACKTICK) || this.headingAhead(i)) {
                                 return false;
                             }
                         } else {
@@ -2150,7 +2172,7 @@
                 var i = skip(2, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
     
                 if (this.getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK && getToken(i + 2).kind === this.tm.BACKTICK) {
-                    i = skip(i + 3, this.tm.SPACE, this.tm.TAB);
+                    i = skip(i + 3, [this.tm.SPACE, this.tm.TAB]);
                     return this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.EOF;
                 }
             }
@@ -2568,7 +2590,7 @@
             this.lookAhead = 1;
             this.lastPosition = this.scanPosition = this.token;
             try {
-                return !scanEmWithinStrongMultilineContent();
+                return !this.scanEmWithinStrongMultilineContent();
             } catch (ls) {
                 return true;
             }
@@ -3143,7 +3165,7 @@
         scanStrongWithinEmMultiline: function() {
             var xsp = null;
     
-            if (this.scanToken(ASTERISK) || this.scanForMoreStrongWithinEmMultilineElements()) {
+            if (this.scanToken(this.tm.ASTERISK) || this.scanForMoreStrongWithinEmMultilineElements()) {
                 return true;
             }
             while (true) {

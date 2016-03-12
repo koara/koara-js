@@ -948,7 +948,7 @@ Parser.prototype = {
                 case this.tm.BACKTICK:
                     this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
-                case LBRACK:
+                case this.tm.LBRACK:
                     this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
@@ -988,11 +988,11 @@ Parser.prototype = {
                 case this.tm.BACKTICK:
                     this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
-                case LBRACK:
+                case this.tm.LBRACK:
                     this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
-                    this.tree.addSingleValue(new KoaraText(), this.consumeToken(UNDERSCORE));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.UNDERSCORE));
                     break;
                 }
             }
@@ -1022,7 +1022,7 @@ Parser.prototype = {
                     this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 case this.tm.UNDERSCORE:
-                    this.tree.addSingleValue(new KoaraText(), this.consumeToken(this.tm.UNDERSCORE));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.UNDERSCORE));
                     break;
                 }
             }
@@ -1110,7 +1110,7 @@ Parser.prototype = {
                     break;
                 }
             }
-        } while (this.emWithinStrongMultilineContentHasElementsAhaed());
+        } while (this.emWithinStrongMultilineContentHasElementsAhead());
     },
 
     emWithinStrong: function() {
@@ -1223,11 +1223,11 @@ Parser.prototype = {
                     var quoteLevel = this.newQuoteLevel(i);
 
                     if (quoteLevel === this.currentQuoteLevel) {
-                        i = this.skip(i, this.tm.SPACE, this.tm.TAB, this.tm.GT);
+                        i = this.skip(i, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
                         if (this.getToken(i).kind === token || this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.DASH ||
                             (this.getToken(i).kind === this.tm.DIGITS && this.getToken(i + 1).kind === this.tm.DOT) ||
-                            (getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK &&
-                            getToken(i + 2).kind === this.tm.BACKTICK) || this.headingAhead(i)) {
+                            (this.getToken(i).kind === this.tm.BACKTICK && this.getToken(i + 1).kind === this.tm.BACKTICK &&
+                            this.getToken(i + 2).kind === this.tm.BACKTICK) || this.headingAhead(i)) {
                             return false;
                         }
                     } else {
@@ -1246,7 +1246,7 @@ Parser.prototype = {
             var i = skip(2, [this.tm.SPACE, this.tm.TAB, this.tm.GT]);
 
             if (this.getToken(i).kind === this.tm.BACKTICK && getToken(i + 1).kind === this.tm.BACKTICK && getToken(i + 2).kind === this.tm.BACKTICK) {
-                i = skip(i + 3, this.tm.SPACE, this.tm.TAB);
+                i = skip(i + 3, [this.tm.SPACE, this.tm.TAB]);
                 return this.getToken(i).kind === this.tm.EOL || this.getToken(i).kind === this.tm.EOF;
             }
         }
@@ -1664,7 +1664,7 @@ Parser.prototype = {
         this.lookAhead = 1;
         this.lastPosition = this.scanPosition = this.token;
         try {
-            return !scanEmWithinStrongMultilineContent();
+            return !this.scanEmWithinStrongMultilineContent();
         } catch (ls) {
             return true;
         }
@@ -2239,7 +2239,7 @@ Parser.prototype = {
     scanStrongWithinEmMultiline: function() {
         var xsp = null;
 
-        if (this.scanToken(ASTERISK) || this.scanForMoreStrongWithinEmMultilineElements()) {
+        if (this.scanToken(this.tm.ASTERISK) || this.scanForMoreStrongWithinEmMultilineElements()) {
             return true;
         }
         while (true) {

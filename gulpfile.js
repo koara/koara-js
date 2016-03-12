@@ -35,6 +35,8 @@ gulp.task('scripts', function() {
 		'src/ast/linebreak.js',
 		'src/ast/link.js',
 		'src/ast/image.js',
+		'src/ast/strong.js',
+		'src/ast/em.js',
 		'src/ast/text.js',
 		'src/charstream.js',
 		'src/token.js',

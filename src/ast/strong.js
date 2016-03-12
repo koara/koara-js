@@ -1,12 +1,12 @@
 "use strict";
 
-koara.Strong = function() {};
-koara.Strong.prototype = new koara.Node();
+function Strong() {
+	Node.call(this);
+}
 
-koara.Strong.prototype = {
-	constructor: koara.Strong,
+Strong.prototype = new Node();
+Strong.prototype.constructor = Strong;
 
-	accept: function(renderer) {
-		renderer.visit(this);
-	}
+Strong.prototype.accept = function(renderer) {
+	renderer.visitStrong(this);
 };

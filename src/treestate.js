@@ -29,7 +29,7 @@ TreeState.prototype = {
 
 	addSingleValue: function(n, t) {
 		this.openScope();
-        n.setValue(t.image);
+        n.value = t.image;
         this.closeScope(n);
 	},
 

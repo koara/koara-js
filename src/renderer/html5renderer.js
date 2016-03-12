@@ -119,18 +119,18 @@ Html5Renderer.prototype = {
 		node.childrenAccept(this);
 		this.out += "</a>";
 	},
-//
-//	public void visit(Strong node) {
-//		out.append("<strong>");
-//		node.childrenAccept(this);
-//		out.append("</strong>");
-//	}
-//
-//	public void visit(Em node) {
-//		out.append("<em>");
-//		node.childrenAccept(this);
-//		out.append("</em>");
-//	}
+
+	visitStrong: function(node) {
+		this.out += "<strong>";
+		node.childrenAccept(this);
+		this.out += "</strong>";
+	},
+
+	visitEm: function(node) {
+		this.out += "<em>";
+		node.childrenAccept(this);
+		this.out += "</em>";
+	},
 //
 //	public void visit(Code node) {
 //		out.append("<code>");
