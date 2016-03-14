@@ -1003,7 +1003,7 @@ Parser.prototype = {
         var strong = new Strong();
 
         this.tree.openScope();
-        thiss.consumeToken(this.tm.ASTERISK);
+        this.consumeToken(this.tm.ASTERISK);
         do {
             if (this.hasTextAhead()) {
                this.text();
@@ -1136,7 +1136,7 @@ Parser.prototype = {
                     this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.BACKTICK));
                     break;
                 case this.tm.LBRACK:
-                    this.tree.addSingleValue(new Text(), this.consumeToken(LBRACK));
+                    this.tree.addSingleValue(new Text(), this.consumeToken(this.tm.LBRACK));
                     break;
                 }
             }
