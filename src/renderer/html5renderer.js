@@ -58,7 +58,7 @@ Html5Renderer.prototype = {
 		this.listSequence[this.listSequence.length - 1] = seq;
 
         this.out += this.indent() + "<li";
-		if (node.number && (seq !== node.number)) {
+		if (node.number && (seq !== Number(node.number))) {
 			this.out += " value=\"" + node.number + "\"";
 			this.listSequence.push(node.number);
 		}

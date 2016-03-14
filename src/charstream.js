@@ -114,20 +114,20 @@ CharStream.prototype = {
                 this.buffer.slice(0, this.bufpos + 1).join("");
 	},
 
-	getBeginColumn: function() {
-		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
-	},
-
-	getBeginLine: function() {
-		return this.bufpos in this.bufline ? this.bufline[this.bufpos] : 0;
-	},
-
 	getEndColumn: function() {
-		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
+		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
 	},
 
 	getEndLine: function() {
-		return this.tokenBegin in this.bufline ? this.bufline[this.tokenBegin] : 0;
+		return this.tokenBegin in this.bufline ? this.bufline[this.bufpos] : 0;
+	},
+
+	getBeginColumn: function() {
+		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
+	},
+
+	getBeginLine: function() {
+		return this.bufpos in this.bufline ? this.bufline[this.tokenBegin] : 0;
 	}
 
 };

@@ -303,20 +303,20 @@
                     this.buffer.slice(0, this.bufpos + 1).join("");
     	},
     
-    	getBeginColumn: function() {
-    		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
-    	},
-    
-    	getBeginLine: function() {
-    		return this.bufpos in this.bufline ? this.bufline[this.bufpos] : 0;
-    	},
-    
     	getEndColumn: function() {
-    		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
+    		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
     	},
     
     	getEndLine: function() {
-    		return this.tokenBegin in this.bufline ? this.bufline[this.tokenBegin] : 0;
+    		return this.tokenBegin in this.bufline ? this.bufline[this.bufpos] : 0;
+    	},
+    
+    	getBeginColumn: function() {
+    		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
+    	},
+    
+    	getBeginLine: function() {
+    		return this.bufpos in this.bufline ? this.bufline[this.tokenBegin] : 0;
     	}
     
     };
@@ -836,7 +836,7 @@
     		this.listSequence[this.listSequence.length - 1] = seq;
     
             this.out += this.indent() + "<li";
-    		if (node.number && (seq !== node.number)) {
+    		if (node.number && (seq !== Number(node.number))) {
     			this.out += " value=\"" + node.number + "\"";
     			this.listSequence.push(node.number);
     		}
