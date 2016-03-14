@@ -1,6 +1,7 @@
 "use strict";
 
 function Html5Renderer() {
+	this.out = "";
 }
 
 Html5Renderer.prototype = {

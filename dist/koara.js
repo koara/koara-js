@@ -779,6 +779,7 @@
     };
     
     function Html5Renderer() {
+    	this.out = "";
     }
     
     Html5Renderer.prototype = {
@@ -2719,7 +2720,7 @@
                                     if (this.scanToken(this.tm.EQ)) {
                                         this.scanPosition = xsp;
                                         if (this.scanToken(this.tm.ESCAPED_CHAR)) {
-                                            this.tm.scanPosition = xsp;
+                                            this.scanPosition = xsp;
                                             if (this.scanToken(this.tm.GT)) {
                                                 this.scanPosition = xsp;
                                                 if (this.scanToken(this.tm.IMAGE_LABEL)) {

@@ -71,22 +71,11 @@ gulp.task('serve', ['default'], function() {
 	gulp.src('.').pipe(webserver());
 });
 
-gulp.task('pre-test', function () {
-	  return gulp.src(['lib/**/*.js'])
-	    .pipe(istanbul())
-	    .pipe(istanbul.hookRequire());
-	});
-
-
-gulp.task('test', ['scripts', 'pre-test'], function () {
+gulp.task('test', ['scripts'], function () {
 	return gulp.src('test/com*.js').
-	    pipe(jasmine({verbose: true, includeStackTrace: true})).
-	    pipe(istanbul.writeReports());
+	    pipe(jasmine({verbose: true, includeStackTrace: true}));
 });
 
-gulp.task('travis', ['build'], function () {
-	gulp.src('test/coverage/**/lcov.info').pipe(coveralls());
-});
 
 
 
