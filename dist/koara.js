@@ -299,7 +299,7 @@
     			if (this.bufpos >= this.tokenBegin) {
     				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join("");
     			}
-    			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join("") +
+    			return this.buffer.slice(this.tokenBegin, this.bufsize).join("") +
                     this.buffer.slice(0, this.bufpos + 1).join("");
     	},
     
@@ -1288,7 +1288,7 @@
                             } else if (!this.fencesAhead()) {
                                 this.consumeToken(this.tm.EOL);
                                 s += "\n";
-                                this.levelWhiteSpace(this.beginColumn);
+                                this.levelWhiteSpace(beginColumn);
                             }
                 }
             }
@@ -1658,7 +1658,7 @@
                 case this.tm.BACKSLASH:
                     s += this.consumeToken(this.tm.BACKSLASH).image;
                     break;
-                case this.tm.ACKTICK:
+                case this.tm.BACKTICK:
                     s += this.consumeToken(this.tm.BACKTICK).image;
                     break;
                 case this.tm.COLON:
@@ -1671,7 +1671,7 @@
                     s += this.consumeToken(this.tm.DIGITS).image;
                     break;
                 case this.tm.DOT:
-                    s += this.consumeToken(this.tm.DOT).imagec;
+                    s += this.consumeToken(this.tm.DOT).image;
                     break;
                 case this.tm.EQ:
                     s += this.consumeToken(this.tm.EQ).image;
@@ -2255,7 +2255,7 @@
     
         textAhead: function() {
             if (this.getNextTokenKind() === this.tm.EOL && this.getToken(2).kind !== this.tm.EOL) {
-            	var i = this.skip(2, [this.tm.SPACE, this.tm.TAB]);
+                var i = this.skip(2, [this.tm.SPACE, this.tm.TAB]);
                 var quoteLevel = this.newQuoteLevel(i);
     
                 if (quoteLevel === this.currentQuoteLevel || !(this.modules.indexOf("blockquotes") >= 0)) {

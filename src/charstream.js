@@ -110,7 +110,7 @@ CharStream.prototype = {
 			if (this.bufpos >= this.tokenBegin) {
 				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join("");
 			}
-			return this.buffer.slice(this.tokenBegin, this.bufsize - this.tokenBegin).join("") +
+			return this.buffer.slice(this.tokenBegin, this.bufsize).join("") +
                 this.buffer.slice(0, this.bufpos + 1).join("");
 	},
 
