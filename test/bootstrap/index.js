@@ -1,0 +1,1 @@
+global.koara = require('../..');

@@ -1,16 +1,21 @@
 {
-  "name": "koara-js",
-  "version": "0.0.0",
-  "homepage": "https://github.com/koara/koara-js",
-  "authors": [
-    "Andy Van Den Heuvel <andy.vandenheuvel@gmail.com>"
-  ],
+  "name": "koara",
+  "description": "Koara parser written in Javascript",
   "license": "Apache 2.0",
+  "keywords": [
+    "markup",
+    "html",
+    "xml"
+  ],
+  "main": "koara.js",
   "ignore": [
-    "**/.*",
+    "lib",
     "node_modules",
-    "bower_components",
     "test",
-    "tests"
-  ]
+    "index.js",
+    "gulpfile.js",
+    ".*"
+  ],
+  "dependencies": {},
+  "devDependencies": {}
 }

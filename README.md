@@ -8,6 +8,10 @@
 # Koara-js
 [Koara](http://www.koara.io) is a modular lightweight markup language. This project is a Koara parser written in Javascript.
 
+## Related Projects
+
+- [koara / koara-js-html](http://www.github.com/koara/koara-js-html): Koara to Html parser written in Javascript
+- [koara / koara-js-xml](http://www.github.com/koara/koara-js-html): Koara to Xml parser written in Javascript
 
 
 
