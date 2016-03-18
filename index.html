@@ -2,12 +2,15 @@
 	<head>
 		<script src="dist/koara.js"></script>
 		<script>
-			console.log(koara);
 			var parser = new koara.Parser();
-			var document = parser.parse('///');
-			//var renderer = new koara.Html5Renderer();
-			//document.write('////' + renderer.getOutput());
-		
+			
+			// Parse string or file and generate AST
+			var doc = parser.parse('TEST');
+			
+			// Render as Html
+			var renderer = new koara.Html5Renderer();
+			doc.accept(renderer);
+			console.log(renderer.getOutput());
 		</script>
 	</head>
 	<body>
