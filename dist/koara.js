@@ -11,13 +11,507 @@ module.exports = require('./lib/koara');
 var used = []
   , exports = module.exports = {};
 
-var parser = require('./koara/parser');
-exports.parser = parser;
-
-
-
-},{"./koara/parser":3}],3:[function(require,module,exports){
+exports.Parser = require('./koara/parser');
+},{"./koara/parser":22}],3:[function(require,module,exports){
 "use strict";
+
+var Node = require('./node');
+
+function Document() {
+    Node.call(this);
+}
+
+Document.prototype = new Node();
+Document.prototype.constructor = Document;
+Document.prototype.accept = function(renderer) {
+    renderer.visitDocument(this);
+};
+
+module.exports = Document;
+
+},{"./node":15}],4:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function BlockElement() {
+    Node.call(this);
+}
+
+BlockElement.prototype = new Node();
+BlockElement.prototype.constructor = BlockElement;
+
+BlockElement.prototype.isNested = function() {
+	return !(this.parent instanceof Document);
+};
+
+BlockElement.prototype.isSingleChild = function() {
+	return this.parent.children.length === 1;
+};
+
+BlockElement.prototype.accept = function(renderer) {
+    renderer.visitBlockElement(this);
+};
+
+module.exports = BlockElement;
+
+},{"./node":15}],5:[function(require,module,exports){
+"use strict";
+
+var BlockElement = require('./blockelement');
+
+function BlockQuote() {
+	BlockElement.call(this);
+}
+
+BlockQuote.prototype = new BlockElement();
+BlockQuote.prototype.constructor = BlockQuote;
+
+BlockQuote.prototype.accept = function(renderer) {
+    renderer.visitBlockQuote(this);
+};
+
+module.exports = BlockQuote;
+
+},{"./blockelement":4}],6:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function Code() {
+	Node.call(this);
+}
+
+Code.prototype = new Node();
+Code.prototype.constructor = Code;
+
+Code.prototype.accept = function(renderer) {
+	renderer.visitCode(this);
+};
+
+module.exports = Code;
+
+},{"./node":15}],7:[function(require,module,exports){
+"use strict";
+
+var BlockElement = require('./blockelement');
+
+function CodeBlock() {
+	BlockElement.call(this);
+}
+
+CodeBlock.prototype = new BlockElement();
+CodeBlock.prototype.constructor = CodeBlock;
+
+CodeBlock.prototype.accept = function(renderer) {
+	renderer.visitCodeBlock(this);
+};
+
+module.exports = CodeBlock;
+
+},{"./blockelement":4}],8:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function Em() {
+	Node.call(this);
+}
+
+Em.prototype = new Node();
+Em.prototype.constructor = Em;
+
+Em.prototype.accept = function(renderer) {
+	renderer.visitEm(this);
+};
+
+module.exports = Em;
+
+},{"./node":15}],9:[function(require,module,exports){
+"use strict";
+
+var BlockElement = require('./blockelement');
+
+function Heading() {
+	BlockElement.call(this);
+}
+
+Heading.prototype = new BlockElement();
+Heading.prototype.constructor = Heading;
+
+Heading.prototype.accept = function(renderer) {
+    renderer.visitHeading(this);
+};
+
+module.exports = Heading;
+
+},{"./blockelement":4}],10:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function Image() {
+	Node.call(this);
+}
+
+Image.prototype = new Node();
+Image.prototype.constructor = Image;
+
+Image.prototype.accept = function(renderer) {
+	renderer.visitImage(this);
+};
+
+module.exports = Image;
+
+},{"./node":15}],11:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function LineBreak() {}
+LineBreak.prototype = new Node();
+LineBreak.prototype.constructor = LineBreak;
+
+LineBreak.prototype.accept = function(renderer) {
+	renderer.visitLineBreak(this);
+};
+
+module.exports = LineBreak;
+
+},{"./node":15}],12:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function Link() {
+	Node.call(this);
+}
+
+Link.prototype = new Node();
+Link.prototype.constructor = Link;
+
+Link.prototype.accept = function(renderer) {
+	renderer.visitLink(this);
+};
+
+module.exports = Link;
+
+},{"./node":15}],13:[function(require,module,exports){
+"use strict";
+
+var BlockElement = require('./blockelement');
+
+function ListBlock(ordered) {
+	BlockElement.call(this);
+	this.ordered = ordered;
+}
+
+ListBlock.prototype = new BlockElement();
+ListBlock.prototype.constructor = ListBlock;
+
+ListBlock.prototype.accept = function(renderer) {
+	renderer.visitListBlock(this);
+};
+
+module.exports = ListBlock;
+
+},{"./blockelement":4}],14:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function ListItem() {
+	Node.call(this);
+}
+
+ListItem.prototype = new Node();
+ListItem.prototype.constructor = ListItem;
+
+ListItem.prototype.accept = function(renderer) {
+	renderer.visitListItem(this);
+};
+
+module.exports = ListItem;
+
+},{"./node":15}],15:[function(require,module,exports){
+"use strict";
+
+function Node() {
+	this.children = [];
+}
+
+Node.prototype = {
+	constructor: Node,
+
+	add: function(n, i) {
+		this.children[i] = n;
+	},
+
+	childrenAccept: function(renderer) {
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].accept(renderer);
+		}
+	}
+
+};
+
+module.exports = Node;
+
+},{}],16:[function(require,module,exports){
+"use strict";
+
+var BlockElement = require('./blockelement');
+
+function Paragraph() {
+	BlockElement.call(this);
+}
+
+Paragraph.prototype = new BlockElement();
+Paragraph.prototype.constructor = Paragraph;
+
+Paragraph.prototype.accept = function(renderer) {
+    renderer.visitParagraph(this);
+};
+
+module.exports = Paragraph;
+
+},{"./blockelement":4}],17:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function Strong() {
+	Node.call(this);
+}
+
+Strong.prototype = new Node();
+Strong.prototype.constructor = Strong;
+
+Strong.prototype.accept = function(renderer) {
+	renderer.visitStrong(this);
+};
+
+module.exports = Strong;
+
+},{"./node":15}],18:[function(require,module,exports){
+"use strict";
+
+var Node = require('./node');
+
+function Text() {
+    Node.call(this);
+}
+
+Text.prototype = new Node();
+Text.prototype.constructor = Text;
+
+Text.prototype.accept = function(renderer) {
+	renderer.visitText(this);
+};
+
+module.exports = Text;
+
+},{"./node":15}],19:[function(require,module,exports){
+"use strict";
+
+function CharStream(reader) {
+	this.available = 4096;
+	this.bufsize = 4096;
+	this.tokenBegin = 0;
+	this.bufcolumn = [];
+	this.bufpos = -1;
+	this.bufline = [];
+	this.column = 0;
+	this.line = 1;
+	this.prevCharIsLF = false;
+	this.reader = reader;
+	this.buffer = [];
+	this.maxNextCharInd = 0;
+	this.inBuf = 0;
+	this.tabSize = 4;
+}
+
+CharStream.prototype = {
+	constructor: CharStream,
+
+	beginToken: function() {
+		this.tokenBegin = -1;
+		var c = this.readChar();
+
+		this.tokenBegin = this.bufpos;
+		return c;
+	},
+
+	readChar: function() {
+		if (this.inBuf > 0) {
+			--this.inBuf;
+			if (++this.bufpos === this.bufsize) {
+				this.bufpos = 0;
+			}
+			return this.buffer[this.bufpos];
+		}
+		if (++this.bufpos >= this.maxNextCharInd) {
+			this.fillBuff();
+		}
+
+		var c = this.buffer[this.bufpos];
+
+		this.updateLineColumn(c);
+		return c;
+	},
+
+	fillBuff: function() {
+		if (this.maxNextCharInd === this.available) {
+			if (this.available === this.bufsize) {
+				this.bufpos = 0;
+				this.maxNextCharInd = 0;
+				if (this.tokenBegin > 2048) {
+					this.available = this.tokenBegin;
+				}
+			} else {
+				this.available = this.bufsize;
+			}
+		}
+        var i = 0;
+
+		try {
+			if ((i = this.reader.read(this.buffer, this.maxNextCharInd, this.available - this.maxNextCharInd)) === -1) {
+				throw new Error("IOException");
+			} else {
+				this.maxNextCharInd += i;
+			}
+		} catch (e) {
+			--this.bufpos;
+			this.backup(0);
+			if (this.tokenBegin === -1) {
+				this.tokenBegin = this.bufpos;
+			}
+			throw e;
+		}
+	},
+
+	backup: function(amount) {
+		this.inBuf += amount;
+		if ((this.bufpos -= amount) < 0) {
+			this.bufpos += this.bufsize;
+		}
+	},
+
+	updateLineColumn: function(c) {
+		this.column++;
+		if (this.prevCharIsLF) {
+			this.prevCharIsLF = false;
+			this.column = 1;
+			this.line += this.column;
+		}
+
+		switch (c) {
+		case "\n":
+			this.prevCharIsLF = true;
+			break;
+		case "\t":
+			this.column--;
+			this.column += this.tabSize - this.column % this.tabSize;
+			break;
+		default:
+			break;
+		}
+		this.bufline[this.bufpos] = this.line;
+		this.bufcolumn[this.bufpos] = this.column;
+	},
+
+	getImage: function() {
+			if (this.bufpos >= this.tokenBegin) {
+				return this.buffer.slice(this.tokenBegin, this.bufpos + 1).join("");
+			}
+			return this.buffer.slice(this.tokenBegin, this.bufsize).join("") +
+                this.buffer.slice(0, this.bufpos + 1).join("");
+	},
+
+	getEndColumn: function() {
+		return this.tokenBegin in this.bufcolumn ? this.bufcolumn[this.bufpos] : 0;
+	},
+
+	getEndLine: function() {
+		return this.tokenBegin in this.bufline ? this.bufline[this.bufpos] : 0;
+	},
+
+	getBeginColumn: function() {
+		return this.bufpos in this.bufcolumn ? this.bufcolumn[this.tokenBegin] : 0;
+	},
+
+	getBeginLine: function() {
+		return this.bufpos in this.bufline ? this.bufline[this.tokenBegin] : 0;
+	}
+
+};
+
+module.exports = CharStream;
+
+},{}],20:[function(require,module,exports){
+"use strict";
+
+function StringReader(text) {
+	this.index = 0;
+	this.text = text;
+}
+
+StringReader.prototype = {
+	constructor: StringReader,
+
+	read: function(buffer, offset, length) {
+		if (this.text.toString().substring(this.index).length > 0) {
+			var charactersRead = 0;
+
+			for (var i = 0; i < length; i++) {
+				var start = this.index + i;
+				var c = this.text.toString().substring(start, start + 1);
+
+				if (c !== "") {
+					buffer[offset + i] = c;
+					charactersRead++;
+				}
+			}
+			this.index += length;
+			return charactersRead;
+		}
+		return -1;
+	}
+};
+
+module.exports = StringReader;
+
+},{}],21:[function(require,module,exports){
+"use strict";
+
+function LookaheadSuccess() {};
+
+module.exports = LookaheadSuccess;
+
+},{}],22:[function(require,module,exports){
+"use strict";
+
+var LookaheadSuccess = require('./lookaheadsuccess');
+var StringReader = require('./io/stringreader')
+var CharStream = require('./charstream')
+var TokenManager = require('./tokenmanager')
+var Token = require('./token');
+var TreeState = require('./treestate');
+
+var Document = require('./ast/Document');
+var BlockQuote = require('./ast/blockquote');
+var Code = require('./ast/code');
+var CodeBlock = require('./ast/codeblock');
+var Em = require('./ast/em');
+var Heading = require('./ast/heading');
+var Image = require('./ast/image');
+var LineBreak = require('./ast/linebreak');
+var Link = require('./ast/link');
+var ListBlock = require('./ast/listblock');
+var ListItem = require('./ast/listitem');
+var Paragraph = require('./ast/paragraph');
+var Strong = require('./ast/strong');
+var Text = require('./ast/text');
 
 function Parser() {
 	this.lookAheadSuccess = new LookaheadSuccess();
@@ -2760,6 +3254,448 @@ Parser.prototype = {
 };
 
 module.exports = Parser;
+
+},{"./ast/Document":3,"./ast/blockquote":5,"./ast/code":6,"./ast/codeblock":7,"./ast/em":8,"./ast/heading":9,"./ast/image":10,"./ast/linebreak":11,"./ast/link":12,"./ast/listblock":13,"./ast/listitem":14,"./ast/paragraph":16,"./ast/strong":17,"./ast/text":18,"./charstream":19,"./io/stringreader":20,"./lookaheadsuccess":21,"./token":23,"./tokenmanager":24,"./treestate":25}],23:[function(require,module,exports){
+"use strict";
+
+function Token(kind, beginLine, beginColumn, endLine, endColumn, image) {
+	this.kind = kind;
+	this.beginLine = beginLine;
+	this.beginColumn = beginColumn;
+    this.endLine = endLine;
+	this.endColumn = endColumn;
+	this.image = image;
+}
+
+module.exports = Token;
+
+},{}],24:[function(require,module,exports){
+"use strict";
+
+function TokenManager(stream) {
+	this.cs = stream;
+	this.jjrounds = [];
+	this.jjstateSet = [];
+	this.jjnextStates = [2, 3, 5];
+}
+
+TokenManager.prototype = {
+	constructor: TokenManager,
+
+	EOF: 0,
+	ASTERISK: 1,
+	BACKSLASH: 2,
+	BACKTICK: 3,
+	CHAR_SEQUENCE: 4,
+	COLON: 5,
+	DASH: 6,
+	DIGITS: 7,
+	DOT: 8,
+	EOL: 9,
+	EQ: 10,
+	ESCAPED_CHAR: 11,
+	GT: 12,
+	IMAGE_LABEL: 13,
+	LBRACK: 14,
+	LPAREN: 15,
+	LT: 16,
+	RBRACK: 17,
+	RPAREN: 18,
+	SPACE: 19,
+	TAB: 20,
+	UNDERSCORE: 21,
+
+    getNextToken: function() {
+        try {
+            var curPos = 0;
+
+            while (true) {
+                try {
+                    this.curChar = this.cs.beginToken();
+                } catch (e) {
+                    this.matchedKind = 0;
+                    this.matchedPos = -1;
+                    return this.fillToken();
+                }
+
+                this.matchedKind = 2147483647;
+                this.matchedPos = 0;
+                curPos = this.moveStringLiteralDfa0();
+
+                if (this.matchedKind !== 2147483647) {
+                    if (this.matchedPos + 1 < curPos) {
+                        this.cs.backup(curPos - this.matchedPos - 1);
+                    }
+                    return this.fillToken();
+                }
+            }
+        } catch (e) {
+            return null;
+        }
+    },
+
+    fillToken: function() {
+        return new Token(this.matchedKind, this.cs.getBeginLine(), this.cs.getBeginColumn(), this.cs.getEndLine(), this.cs.getEndColumn(),
+                this.cs.getImage());
+    },
+
+    moveStringLiteralDfa0: function() {
+        switch (this.curChar.charCodeAt(0)) {
+        case 9: return this.startNfaWithStates(0, this.TAB, 8);
+        case 32: return this.startNfaWithStates(0, this.SPACE, 8);
+        case 40: return this.stopAtPos(0, this.LPAREN);
+        case 41: return this.stopAtPos(0, this.RPAREN);
+        case 42: return this.stopAtPos(0, this.ASTERISK);
+        case 45: return this.stopAtPos(0, this.DASH);
+        case 46: return this.stopAtPos(0, this.DOT);
+        case 58: return this.stopAtPos(0, this.COLON);
+        case 60: return this.stopAtPos(0, this.LT);
+        case 61: return this.stopAtPos(0, this.EQ);
+        case 62: return this.stopAtPos(0, this.GT);
+        case 73: return this.moveStringLiteralDfa1(0x2000);
+        case 91: return this.stopAtPos(0, this.LBRACK);
+        case 92: return this.startNfaWithStates(0, this.BACKSLASH, 7);
+        case 93: return this.stopAtPos(0, this.RBRACK);
+        case 95: return this.stopAtPos(0, this.UNDERSCORE);
+        case 96: return this.stopAtPos(0, this.BACKTICK);
+        case 105: return this.moveStringLiteralDfa1(0x2000);
+        default: return this.moveNfa(6, 0);
+        }
+    },
+
+    startNfaWithStates: function(pos, kind, state) {
+        this.matchedKind = kind;
+        this.matchedPos = pos;
+        try {
+            this.curChar = this.cs.readChar();
+        } catch (e) {
+            return pos + 1;
+        }
+        return this.moveNfa(state, pos + 1);
+    },
+
+    stopAtPos: function(pos, kind) {
+        this.matchedKind = kind;
+        this.matchedPos = pos;
+        return pos + 1;
+    },
+
+    moveStringLiteralDfa1: function(active) {
+        this.curChar = this.cs.readChar();
+        if (this.curChar.charCodeAt(0) === 77 || this.curChar.charCodeAt(0) === 109) {
+            return this.moveStringLiteralDfa2(active, 0x2000);
+        }
+        return this.startNfa(0, active);
+    },
+
+    moveStringLiteralDfa2: function(old, active) {
+        this.curChar = this.cs.readChar();
+        if (this.curChar.charCodeAt(0) === 65 || this.curChar.charCodeAt(0) === 97) {
+            return this.moveStringLiteralDfa3(active, 0x2000);
+        }
+        return this.startNfa(1, active);
+
+    },
+
+    moveStringLiteralDfa3: function(old, active) {
+        this.curChar = this.cs.readChar();
+        if (this.curChar.charCodeAt(0) === 71 || this.curChar.charCodeAt(0) === 103) {
+            return this.moveStringLiteralDfa4(active, 0x2000);
+        }
+        return this.startNfa(2, active);
+    },
+
+    moveStringLiteralDfa4: function(old, active) {
+        this.curChar = this.cs.readChar();
+        if (this.curChar.charCodeAt(0) === 69 || this.curChar.charCodeAt(0) === 101) {
+            return this.moveStringLiteralDfa5(active, 0x2000);
+        }
+        return this.startNfa(3, active);
+    },
+
+    moveStringLiteralDfa5: function(old, active) {
+        this.curChar = this.cs.readChar();
+        if (this.curChar.charCodeAt(0) === 58 && ((active & 0x2000) !== 0)) {
+            return this.stopAtPos(5, 13);
+        }
+        return this.startNfa(4, active);
+    },
+
+    startNfa: function(pos, active) {
+        return this.moveNfa(this.stopStringLiteralDfa(pos, active), pos + 1);
+    },
+
+    moveNfa: function(startState, curPos) {
+        this.jjnewStateCnt = 8;
+        this.jjstateSet[0] = startState;
+        var startsAt = 0;
+        var i = 1;
+        var l = null;
+        var kind = 0x7fffffff;
+
+        while (true) {
+            if (++this.round === 0x7fffffff) {
+                this.round = 0x80000001;
+            }
+            if (this.curChar.charCodeAt(0) < 64) {
+                l = 1 * Number(Math.pow(2, this.curChar.charCodeAt(0)));
+
+                do {
+                    switch (this.jjstateSet[--i]) {
+                    case 6:
+                        if (this.bitwise64(0x880098feffffd9ff, l) !== 0) {
+                            if (kind > 4) {
+                                kind = 4;
+                            }
+                            this.checkNAdd(0);
+                        } else if (this.bitwise64(0x3ff000000000000, l) !== 0) {
+                            if (kind > 7) {
+                                kind = 7;
+                            }
+                            this.checkNAdd(1);
+                        } else if (this.bitwise64(0x2400, l) !== 0) {
+                            if (kind > 9) {
+                                kind = 9;
+                            }
+                        } else if (this.bitwise64(4294967808, l) !== 0) {
+                            this.checkNAddStates(0, 2);
+                        }
+                        if (this.curChar.charCodeAt(0) === 13) {
+                            this.jjstateSet[this.jjnewStateCnt++] = 4;
+                        }
+                        break;
+                    case 8:
+                        if (this.bitwise64(0x2400, l) !== 0) {
+                            if (kind > 9) {
+                                kind = 9;
+                            }
+                        } else if (this.bitwise64(0x100000200, l) !== 0) {
+                            this.checkNAddStates(0, 2);
+                        }
+                        if (this.curChar.charCodeAt(0) === 13) {
+                            this.jjstateSet[this.jjnewStateCnt++] = 4;
+                        }
+                        break;
+                    case 0:
+                        if (this.bitwise64(0x880098feffffd9ff, l) !== 0) {
+                            kind = 4;
+                            this.checkNAdd(0);
+                        }
+                        break;
+                    case 1:
+                        if (this.bitwise64(0x3ff000000000000, l) !== 0) {
+                            if (kind > 7) {
+                                kind = 7;
+                            }
+                            this.checkNAdd(1);
+                        }
+                        break;
+                    case 2:
+                        if (this.bitwise64(0x100000200, l) !== 0) {
+                            this.checkNAddStates(0, 2);
+                        }
+                        break;
+                    case 3:
+                        if (this.bitwise64(0x2400, l) !== 0 && kind > 9) {
+                            kind = 9;
+                        }
+                        break;
+                    case 4:
+                        if (this.curChar.charCodeAt(0) === 10 && kind > 9) {
+                            kind = 9;
+                        }
+                        break;
+                    case 5:
+                        if (this.curChar.charCodeAt(0) === 13) {
+                            this.jjstateSet[this.jjnewStateCnt++] = 4;
+                        }
+                        break;
+                    case 7:
+                        if (this.bitwise64(0x77ff670000000000, l) !== 0 && kind > 11) {
+                            kind = 11;
+                        }
+                        break;
+                    }
+                } while (i !== startsAt);
+            } else if (this.curChar.charCodeAt(0) < 128) {
+                l = 1 * Number(Math.pow(2, this.bitwise64(this.curChar.charCodeAt(0), 63)));
+                do {
+                    switch (this.jjstateSet[--i]) {
+                    case 6:
+                        if (l !== 0) {
+                            if (kind > 4) {
+                                kind = 4;
+                            }
+                            this.checkNAdd(0);
+                        } else if (this.curChar.charCodeAt(0) === 92) {
+                            this.jjstateSet[this.jjnewStateCnt++] = 7;
+                        }
+                        break;
+                    case 0:
+                        if (this.bitwise64(0xfffffffe47ffffff, l) !== 0) {
+                            kind = 4;
+                            this.checkNAdd(0);
+                        }
+                        break;
+                    case 7:
+                        if (this.bitwise64(0x1b8000000, l) !== 0 && kind > 11) {
+                            kind = 11;
+                        }
+                        break;
+                    }
+                } while (i !== startsAt);
+            } else {
+                do {
+                    switch (this.jjstateSet[--i]) {
+                    case 6:
+                    case 0:
+                        if (kind > 4) {
+                            kind = 4;
+                        }
+                        this.checkNAdd(0);
+                        break;
+                    }
+                } while (i !== startsAt);
+            }
+
+            if (kind !== 0x7fffffff) {
+                this.matchedKind = kind;
+                this.matchedPos = curPos;
+                kind = 0x7fffffff;
+            }
+            ++curPos;
+
+            if ((i = this.jjnewStateCnt) === (startsAt = 8 - (this.jjnewStateCnt = startsAt))) {
+                return curPos;
+            }
+            try {
+                this.curChar = this.cs.readChar();
+            } catch (e) {
+                return curPos;
+            }
+          }
+      },
+
+    checkNAddStates: function(start, end) {
+        do {
+            this.checkNAdd(this.jjnextStates[start]);
+        } while (start++ !== end);
+    },
+
+    checkNAdd: function(state) {
+        if (this.jjrounds[state] !== this.round) {
+            this.jjstateSet[this.jjnewStateCnt++] = state;
+            this.jjrounds[state] = this.round;
+        }
+    },
+
+    stopStringLiteralDfa: function(pos, active) {
+        if (pos === 0) {
+            if (this.bitwise64(active, 0x2000) !== 0) {
+                this.matchedKind = 4;
+                return 0;
+            } else if (this.bitwise64(active, 0x180000) !== 0) {
+                return 8;
+            } else if (this.bitwise64(active, 0x4) !== 0) {
+                return 7;
+            }
+        } else if (pos === 1 && this.bitwise64(active, 0x2000) !== 0) {
+            this.matchedKind = 4;
+            this.matchedPos = 1;
+            return 0;
+        } else if (pos === 2 && this.bitwise64(active, 0x2000) !== 0) {
+            this.matchedKind = 4;
+            this.matchedPos = 2;
+            return 0;
+        } else if (pos === 3 && this.bitwise64(active, 0x2000) !== 0) {
+            this.matchedKind = 4;
+            this.matchedPos = 3;
+            return 0;
+        } else if (pos === 4 && this.bitwise64(active, 0x2000) !== 0) {
+            this.matchedKind = 4;
+            this.matchedPos = 4;
+            return 0;
+        }
+        return -1;
+    },
+
+    bitwise64: function(a, b) {
+        var divisor = 1 << 30;
+        var mask = ~((~0) << 30);
+        var result = 0;
+        var shift = 0;
+
+        while ((a !== 0) && (b !== 0)) {
+            var rs = (mask & a) & (mask & b);
+
+            a = Math.floor(a / divisor);
+            b = Math.floor(b / divisor);
+            for (var i = shift++; i--;) {
+                rs *= divisor;
+            }
+            result += rs;
+        }
+        return result;
+    }
+
+};
+
+module.exports = TokenManager;
+
+
+},{}],25:[function(require,module,exports){
+"use strict";
+
+function TreeState() {
+	this.nodes = [];
+	this.marks = [];
+	this.nodesOnStack = 0;
+	this.currentMark = 0;
+}
+
+TreeState.prototype = {
+	constructor: TreeState,
+
+	openScope: function() {
+		this.marks.push(this.currentMark);
+		this.currentMark = this.nodesOnStack;
+	},
+
+	closeScope: function(n) {
+        var a = this.nodeArity();
+
+		this.currentMark = this.marks.pop();
+		while (a-- > 0) {
+          c = this.popNode();
+          c.parent = n;
+          n.add(c, a);
+        }
+		this.pushNode(n);
+	},
+
+	addSingleValue: function(n, t) {
+		this.openScope();
+        n.value = t.image;
+        this.closeScope(n);
+	},
+
+	nodeArity: function() {
+		return this.nodesOnStack - this.currentMark;
+	},
+
+    popNode: function() {
+        --this.nodesOnStack;
+        return this.nodes.pop();
+    },
+
+    pushNode: function(n) {
+        this.nodes.push(n);
+        ++this.nodesOnStack;
+    }
+
+};
+
+module.exports = TreeState;
 
 },{}]},{},[1])(1)
 });
