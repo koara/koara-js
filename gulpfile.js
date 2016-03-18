@@ -10,6 +10,7 @@ gulp.task('ci', ['default']);
 
 
 gulp.task('scripts', function() {
+	// browserify -e index.js -o dist/koara.js -s koara
 });
 
 gulp.task('lint', function() {
@@ -21,4 +22,7 @@ gulp.task('lint', function() {
 
 gulp.task('test', function (done) {
 	new karma.Server({ configFile: __dirname + '/karma.conf.js', singleRun: true }, done).start();
+});
+
+gulp.task('test-travisci', ['test'], function (done) {
 });

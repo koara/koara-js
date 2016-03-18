@@ -1,22 +1,21 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.koara = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = require('./lib/koara');
+module.exports = require("./lib/koara");
 
 },{"./lib/koara":2}],2:[function(require,module,exports){
-/*!
- * chai
- * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
- * MIT Licensed
- */
-
-var used = []
-  , exports = module.exports = {};
-
-exports.Parser = require('./koara/parser');
-exports.Html5Renderer = require('./koara/html5renderer');
-},{"./koara/html5renderer":20,"./koara/parser":23}],3:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var used = [],
+    exports = module.exports = {};
+
+exports.CharStream = require("./koara/charstream");
+exports.Html5Renderer = require("./koara/html5renderer");
+exports.Parser = require("./koara/parser");
+exports.StringReader = require("./koara/io/stringreader");
+
+},{"./koara/charstream":19,"./koara/html5renderer":20,"./koara/io/stringreader":21,"./koara/parser":23}],3:[function(require,module,exports){
+"use strict";
+
+var Node = require("./node");
 
 function Document() {
     Node.call(this);
@@ -33,7 +32,7 @@ module.exports = Document;
 },{"./node":15}],4:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function BlockElement() {
     Node.call(this);
@@ -59,7 +58,7 @@ module.exports = BlockElement;
 },{"./node":15}],5:[function(require,module,exports){
 "use strict";
 
-var BlockElement = require('./blockelement');
+var BlockElement = require("./blockelement");
 
 function BlockQuote() {
 	BlockElement.call(this);
@@ -77,7 +76,7 @@ module.exports = BlockQuote;
 },{"./blockelement":4}],6:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function Code() {
 	Node.call(this);
@@ -95,7 +94,7 @@ module.exports = Code;
 },{"./node":15}],7:[function(require,module,exports){
 "use strict";
 
-var BlockElement = require('./blockelement');
+var BlockElement = require("./blockelement");
 
 function CodeBlock() {
 	BlockElement.call(this);
@@ -113,7 +112,7 @@ module.exports = CodeBlock;
 },{"./blockelement":4}],8:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function Em() {
 	Node.call(this);
@@ -131,7 +130,7 @@ module.exports = Em;
 },{"./node":15}],9:[function(require,module,exports){
 "use strict";
 
-var BlockElement = require('./blockelement');
+var BlockElement = require("./blockelement");
 
 function Heading() {
 	BlockElement.call(this);
@@ -149,7 +148,7 @@ module.exports = Heading;
 },{"./blockelement":4}],10:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function Image() {
 	Node.call(this);
@@ -167,7 +166,7 @@ module.exports = Image;
 },{"./node":15}],11:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function LineBreak() {}
 LineBreak.prototype = new Node();
@@ -182,7 +181,7 @@ module.exports = LineBreak;
 },{"./node":15}],12:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function Link() {
 	Node.call(this);
@@ -200,7 +199,7 @@ module.exports = Link;
 },{"./node":15}],13:[function(require,module,exports){
 "use strict";
 
-var BlockElement = require('./blockelement');
+var BlockElement = require("./blockelement");
 
 function ListBlock(ordered) {
 	BlockElement.call(this);
@@ -219,7 +218,7 @@ module.exports = ListBlock;
 },{"./blockelement":4}],14:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function ListItem() {
 	Node.call(this);
@@ -261,7 +260,7 @@ module.exports = Node;
 },{}],16:[function(require,module,exports){
 "use strict";
 
-var BlockElement = require('./blockelement');
+var BlockElement = require("./blockelement");
 
 function Paragraph() {
 	BlockElement.call(this);
@@ -279,7 +278,7 @@ module.exports = Paragraph;
 },{"./blockelement":4}],17:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function Strong() {
 	Node.call(this);
@@ -297,7 +296,7 @@ module.exports = Strong;
 },{"./node":15}],18:[function(require,module,exports){
 "use strict";
 
-var Node = require('./node');
+var Node = require("./node");
 
 function Text() {
     Node.call(this);
@@ -452,7 +451,7 @@ module.exports = CharStream;
 },{}],20:[function(require,module,exports){
 "use strict";
 
-var ListItem = require('./ast/listitem');
+var ListItem = require("./ast/listitem");
 
 function Html5Renderer() {
 	this.out = "";
@@ -681,34 +680,34 @@ module.exports = StringReader;
 },{}],22:[function(require,module,exports){
 "use strict";
 
-function LookaheadSuccess() {};
+function LookaheadSuccess() {}
 
 module.exports = LookaheadSuccess;
 
 },{}],23:[function(require,module,exports){
 "use strict";
 
-var LookaheadSuccess = require('./lookaheadsuccess');
-var StringReader = require('./io/stringreader')
-var CharStream = require('./charstream')
-var TokenManager = require('./tokenmanager')
-var Token = require('./token');
-var TreeState = require('./treestate');
+var LookaheadSuccess = require("./lookaheadsuccess");
+var StringReader = require("./io/stringreader");
+var CharStream = require("./charstream");
+var TokenManager = require("./tokenmanager");
+var Token = require("./token");
+var TreeState = require("./treestate");
 
-var Document = require('./ast/Document');
-var BlockQuote = require('./ast/blockquote');
-var Code = require('./ast/code');
-var CodeBlock = require('./ast/codeblock');
-var Em = require('./ast/em');
-var Heading = require('./ast/heading');
-var Image = require('./ast/image');
-var LineBreak = require('./ast/linebreak');
-var Link = require('./ast/link');
-var ListBlock = require('./ast/listblock');
-var ListItem = require('./ast/listitem');
-var Paragraph = require('./ast/paragraph');
-var Strong = require('./ast/strong');
-var Text = require('./ast/text');
+var Document = require("./ast/Document");
+var BlockQuote = require("./ast/blockquote");
+var Code = require("./ast/code");
+var CodeBlock = require("./ast/codeblock");
+var Em = require("./ast/em");
+var Heading = require("./ast/heading");
+var Image = require("./ast/image");
+var LineBreak = require("./ast/linebreak");
+var Link = require("./ast/link");
+var ListBlock = require("./ast/listblock");
+var ListItem = require("./ast/listitem");
+var Paragraph = require("./ast/paragraph");
+var Strong = require("./ast/strong");
+var Text = require("./ast/text");
 
 function Parser() {
 	this.lookAheadSuccess = new LookaheadSuccess();
@@ -3423,6 +3422,7 @@ Parser.prototype = {
 
     consumeToken: function(kind) {
         var old = this.token;
+
         if (this.token.next !== null) {
             this.token = this.token.next;
         } else {
@@ -3438,6 +3438,7 @@ Parser.prototype = {
 
     getToken: function(index) {
         var t = this.lookingAhead ? this.scanPosition : this.token;
+
         for (var i = 0; i < index; i++) {
             if (t.next) {
                 t = t.next;
@@ -3469,7 +3470,7 @@ module.exports = Token;
 },{}],25:[function(require,module,exports){
 "use strict";
 
-var Token = require('./token');
+var Token = require("./token");
 
 function TokenManager(stream) {
 	this.cs = stream;
@@ -3512,7 +3513,6 @@ TokenManager.prototype = {
                 try {
                     this.curChar = this.cs.beginToken();
                 } catch (e) {
-                	console.log(e)
                     this.matchedKind = 0;
                     this.matchedPos = -1;
                     return this.fillToken();
@@ -3530,7 +3530,6 @@ TokenManager.prototype = {
                 }
             }
         } catch (e) {
-        	console.log(e)
             return null;
         }
     },
@@ -3570,7 +3569,6 @@ TokenManager.prototype = {
         try {
             this.curChar = this.cs.readChar();
         } catch (e) {
-        	console.log(e)
             return pos + 1;
         }
         return this.moveNfa(state, pos + 1);
@@ -3773,7 +3771,6 @@ TokenManager.prototype = {
             try {
                 this.curChar = this.cs.readChar();
             } catch (e) {
-            	console.log(e)
                 return curPos;
             }
           }
@@ -3870,7 +3867,7 @@ TreeState.prototype = {
 		this.currentMark = this.marks.pop();
 		while (a-- > 0) {
           var c = this.popNode();
-          
+
           c.parent = n;
           n.add(c, a);
         }

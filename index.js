@@ -1,1 +1,1 @@
-module.exports = require('./lib/koara');
+module.exports = require("./lib/koara");

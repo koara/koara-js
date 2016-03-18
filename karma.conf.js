@@ -3,7 +3,7 @@ module.exports = function(config) {
       frameworks: [ 'jasmine' ],
       files: [
         'dist/koara.js',
-        'test/charstream.js'
+        'test/*.js'
       ],
       reporters: [ 'progress' ],
       colors: true,
