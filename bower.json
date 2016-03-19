@@ -2,20 +2,9 @@
   "name": "koara",
   "description": "Koara parser written in Javascript",
   "license": "Apache 2.0",
-  "keywords": [
-    "markup",
-    "html",
-    "xml"
-  ],
+  "keywords": ["koara", "markup", "html", "xml"],
   "main": "koara.js",
-  "ignore": [
-    "lib",
-    "node_modules",
-    "test",
-    "index.js",
-    "gulpfile.js",
-    ".*"
-  ],
+  "ignore": ["lib", "node_modules", "test", "index.js", "gulpfile.js", ".*"],
   "dependencies": {},
   "devDependencies": {}
 }

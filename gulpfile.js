@@ -6,8 +6,6 @@ var eslint = require('gulp-eslint');
 var karma = require('karma');
 
 gulp.task('default', ['lint', 'scripts', 'test']);
-gulp.task('ci', ['default']);
-
 
 gulp.task('scripts', function() {
 	// browserify -e index.js -o dist/koara.js -s koara

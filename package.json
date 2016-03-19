@@ -1,19 +1,19 @@
 {
-  "author": "Andy Van Den Heuvel <andy.vandenheuvel@gmail.com>",
   "name": "koara",
   "description": "Koara parser written in Javascript",
+  "version": "0.6.2",
   "keywords": [
     "koara",
     "markup",
     "html",
     "xml"
   ],
+  "author": "Andy Van Den Heuvel <andy.vandenheuvel@gmail.com>",
   "homepage": "http://www.koara.io",
   "license": "Apache-2.0",
-  "version": "0.6.2",
   "repository": {
     "type": "git",
-    "url": "https://github.com/koara/koara-js"
+    "url": "https://github.com/koara/koara-js-html"
   },
   "main": "./index",
   "scripts": {
@@ -29,10 +29,10 @@
     "gulp-eslint": "^2.0.0",
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
-    "karma-jasmine": "^0.3.7",
+    "karma-fixture": "^0.2.6",
+    "karma-html2js-preprocessor": "^0.1.0",
+    "karma-jasmine": "^0.3.8",
     "karma-phantomjs-launcher": "^1.0.0",
-    "lodash.assign": "^4.0.6",
-    "phantomjs-prebuilt": "^2.1.5",
-    "watchify": "^3.7.0"
+    "phantomjs-prebuilt": "^2.1.5"
   }
 }

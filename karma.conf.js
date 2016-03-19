@@ -2,17 +2,14 @@ module.exports = function(config) {
   config.set({
       frameworks: [ 'jasmine' ],
       files: [
-        'dist/koara.js',
-        'test/*.js'
+          'dist/koara.js',
+          'test/com*.js',
+          'testsuite/**/*'
       ],
-      reporters: [ 'progress' ],
-      colors: true,
-      logLevel: config.LOG_INFO,
-      autoWatch: false,
-      browsers: [ 'PhantomJS' ],
-      browserDisconnectTimeout: 10000,
-      browserDisconnectTolerance: 2,
-      browserNoActivityTimeout: 20000,
-      singleRun: true
-  });
+      preprocessors: {
+          'testsuite/input/*.*'   : ['html2js'],
+          'testsuite/output/html5/*.*'   : ['html2js']
+      },
+      browsers: [ 'PhantomJS' ]
+  });  
 };

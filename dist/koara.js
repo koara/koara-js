@@ -8,11 +8,11 @@ var used = [],
     exports = module.exports = {};
 
 exports.CharStream = require("./koara/charstream");
-exports.Html5Renderer = require("./koara/html5renderer");
 exports.Parser = require("./koara/parser");
 exports.StringReader = require("./koara/io/stringreader");
+exports.Html5Renderer = require("./koara/html5renderer");
 
-},{"./koara/charstream":19,"./koara/html5renderer":20,"./koara/io/stringreader":21,"./koara/parser":23}],3:[function(require,module,exports){
+},{"./koara/charstream":20,"./koara/html5renderer":21,"./koara/io/stringreader":22,"./koara/parser":24}],3:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -29,7 +29,25 @@ Document.prototype.accept = function(renderer) {
 
 module.exports = Document;
 
-},{"./node":15}],4:[function(require,module,exports){
+},{"./node":16}],4:[function(require,module,exports){
+"use strict";
+
+var Node = require("./node");
+
+function ListItem() {
+	Node.call(this);
+}
+
+ListItem.prototype = new Node();
+ListItem.prototype.constructor = ListItem;
+
+ListItem.prototype.accept = function(renderer) {
+	renderer.visitListItem(this);
+};
+
+module.exports = ListItem;
+
+},{"./node":16}],5:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -55,7 +73,7 @@ BlockElement.prototype.accept = function(renderer) {
 
 module.exports = BlockElement;
 
-},{"./node":15}],5:[function(require,module,exports){
+},{"./node":16}],6:[function(require,module,exports){
 "use strict";
 
 var BlockElement = require("./blockelement");
@@ -73,7 +91,7 @@ BlockQuote.prototype.accept = function(renderer) {
 
 module.exports = BlockQuote;
 
-},{"./blockelement":4}],6:[function(require,module,exports){
+},{"./blockelement":5}],7:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -91,7 +109,7 @@ Code.prototype.accept = function(renderer) {
 
 module.exports = Code;
 
-},{"./node":15}],7:[function(require,module,exports){
+},{"./node":16}],8:[function(require,module,exports){
 "use strict";
 
 var BlockElement = require("./blockelement");
@@ -109,7 +127,7 @@ CodeBlock.prototype.accept = function(renderer) {
 
 module.exports = CodeBlock;
 
-},{"./blockelement":4}],8:[function(require,module,exports){
+},{"./blockelement":5}],9:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -127,7 +145,7 @@ Em.prototype.accept = function(renderer) {
 
 module.exports = Em;
 
-},{"./node":15}],9:[function(require,module,exports){
+},{"./node":16}],10:[function(require,module,exports){
 "use strict";
 
 var BlockElement = require("./blockelement");
@@ -145,7 +163,7 @@ Heading.prototype.accept = function(renderer) {
 
 module.exports = Heading;
 
-},{"./blockelement":4}],10:[function(require,module,exports){
+},{"./blockelement":5}],11:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -163,7 +181,7 @@ Image.prototype.accept = function(renderer) {
 
 module.exports = Image;
 
-},{"./node":15}],11:[function(require,module,exports){
+},{"./node":16}],12:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -178,7 +196,7 @@ LineBreak.prototype.accept = function(renderer) {
 
 module.exports = LineBreak;
 
-},{"./node":15}],12:[function(require,module,exports){
+},{"./node":16}],13:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -196,7 +214,7 @@ Link.prototype.accept = function(renderer) {
 
 module.exports = Link;
 
-},{"./node":15}],13:[function(require,module,exports){
+},{"./node":16}],14:[function(require,module,exports){
 "use strict";
 
 var BlockElement = require("./blockelement");
@@ -215,25 +233,9 @@ ListBlock.prototype.accept = function(renderer) {
 
 module.exports = ListBlock;
 
-},{"./blockelement":4}],14:[function(require,module,exports){
-"use strict";
-
-var Node = require("./node");
-
-function ListItem() {
-	Node.call(this);
-}
-
-ListItem.prototype = new Node();
-ListItem.prototype.constructor = ListItem;
-
-ListItem.prototype.accept = function(renderer) {
-	renderer.visitListItem(this);
-};
-
-module.exports = ListItem;
-
-},{"./node":15}],15:[function(require,module,exports){
+},{"./blockelement":5}],15:[function(require,module,exports){
+arguments[4][4][0].apply(exports,arguments)
+},{"./node":16,"dup":4}],16:[function(require,module,exports){
 "use strict";
 
 function Node() {
@@ -257,7 +259,7 @@ Node.prototype = {
 
 module.exports = Node;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 var BlockElement = require("./blockelement");
@@ -275,7 +277,7 @@ Paragraph.prototype.accept = function(renderer) {
 
 module.exports = Paragraph;
 
-},{"./blockelement":4}],17:[function(require,module,exports){
+},{"./blockelement":5}],18:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -293,7 +295,7 @@ Strong.prototype.accept = function(renderer) {
 
 module.exports = Strong;
 
-},{"./node":15}],18:[function(require,module,exports){
+},{"./node":16}],19:[function(require,module,exports){
 "use strict";
 
 var Node = require("./node");
@@ -311,7 +313,7 @@ Text.prototype.accept = function(renderer) {
 
 module.exports = Text;
 
-},{"./node":15}],19:[function(require,module,exports){
+},{"./node":16}],20:[function(require,module,exports){
 "use strict";
 
 function CharStream(reader) {
@@ -448,10 +450,10 @@ CharStream.prototype = {
 
 module.exports = CharStream;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
-var ListItem = require("./ast/listitem");
+var ListItem = require('./ast/ListItem');
 
 function Html5Renderer() {
 	this.out = "";
@@ -644,7 +646,7 @@ Html5Renderer.prototype = {
 module.exports = Html5Renderer;
 
 
-},{"./ast/listitem":14}],21:[function(require,module,exports){
+},{"./ast/ListItem":4}],22:[function(require,module,exports){
 "use strict";
 
 function StringReader(text) {
@@ -677,14 +679,14 @@ StringReader.prototype = {
 
 module.exports = StringReader;
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 function LookaheadSuccess() {}
 
 module.exports = LookaheadSuccess;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 var LookaheadSuccess = require("./lookaheadsuccess");
@@ -3453,7 +3455,7 @@ Parser.prototype = {
 
 module.exports = Parser;
 
-},{"./ast/Document":3,"./ast/blockquote":5,"./ast/code":6,"./ast/codeblock":7,"./ast/em":8,"./ast/heading":9,"./ast/image":10,"./ast/linebreak":11,"./ast/link":12,"./ast/listblock":13,"./ast/listitem":14,"./ast/paragraph":16,"./ast/strong":17,"./ast/text":18,"./charstream":19,"./io/stringreader":21,"./lookaheadsuccess":22,"./token":24,"./tokenmanager":25,"./treestate":26}],24:[function(require,module,exports){
+},{"./ast/Document":3,"./ast/blockquote":6,"./ast/code":7,"./ast/codeblock":8,"./ast/em":9,"./ast/heading":10,"./ast/image":11,"./ast/linebreak":12,"./ast/link":13,"./ast/listblock":14,"./ast/listitem":15,"./ast/paragraph":17,"./ast/strong":18,"./ast/text":19,"./charstream":20,"./io/stringreader":22,"./lookaheadsuccess":23,"./token":25,"./tokenmanager":26,"./treestate":27}],25:[function(require,module,exports){
 "use strict";
 
 function Token(kind, beginLine, beginColumn, endLine, endColumn, image) {
@@ -3467,7 +3469,7 @@ function Token(kind, beginLine, beginColumn, endLine, endColumn, image) {
 
 module.exports = Token;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 var Token = require("./token");
@@ -3843,7 +3845,7 @@ TokenManager.prototype = {
 module.exports = TokenManager;
 
 
-},{"./token":24}],26:[function(require,module,exports){
+},{"./token":25}],27:[function(require,module,exports){
 "use strict";
 
 function TreeState() {
