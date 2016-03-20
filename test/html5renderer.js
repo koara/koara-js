@@ -1,6 +1,6 @@
 "use strict";
 
-var ListItem = require("./ast/ListItem");
+var ListItem = require("../lib/koara/ast/ListItem");
 
 function Html5Renderer() {
 	this.out = "";

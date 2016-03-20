@@ -1,5 +1,8 @@
+var koara = require('../lib/koara');
+
 describe("A suite", function() {
-var buffer;
+
+    var buffer;
 
 	beforeEach(function() {
 		buffer = [];

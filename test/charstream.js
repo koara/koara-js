@@ -1,5 +1,7 @@
 'use strict';
 
+var koara = require('../lib/koara');
+
 describe("CharStream", function() {
 	var cs;
 
