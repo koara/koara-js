@@ -54,7 +54,6 @@ Html5Renderer.prototype = {
 
 	visitListItem: function(node) {
 		var seq = Number(this.listSequence[this.listSequence.length - 1]) + 1;
-
 		this.listSequence[this.listSequence.length - 1] = seq;
 
         this.out += this.indent() + "<li";
@@ -65,7 +64,8 @@ Html5Renderer.prototype = {
 		this.out += ">";
 		if (node.children && node.children.length > 0) {
 			var block = (node.children[0].constructor.name === "Paragraph" || node.children[0].constructor.name === "BlockElement");
-
+			
+			
 			if (node.children.length > 1 || !block) {
                 this.out += "\n";
             }
@@ -104,18 +104,19 @@ Html5Renderer.prototype = {
 			}
 		}
 	},
-//
-//	@Override
-//	public void visit(BlockElement node) {
-//		if(node.isNested() && (node.getParent() instanceof ListItem) && node.isSingleChild()) {
-//			node.childrenAccept(this);
-//		} else {
-//			out.append(indent());
-//			node.childrenAccept(this);
-//			if(!node.isNested()) { out.append("\n"); }
-//		}
-//	}
-//
+	
+	visitBlockElement: function(node) {
+		if (node.isNested() && (node.parent.constructor.name === "ListItem") && node.isSingleChild()) {
+			node.childrenAccept(this);
+		} else {
+			this.out += this.indent();
+			node.childrenAccept(this);
+			if (!node.isNested()) {
+				this.out += "\n";
+			}
+		}
+	},
+
 	visitImage: function(node) {
 		this.out += "<img src=\"" + this.escapeUrl(node.value) + "\" alt=\"";
 		node.childrenAccept(this);

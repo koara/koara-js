@@ -35,7 +35,7 @@ gulp.task('lint', function() {
 });
 
 gulp.task('test', function (done) {
-	return gulp.src('test/*.js').pipe(jasmine());
+	return gulp.src('test/end*.js').pipe(jasmine());
 });
 
 gulp.task('test-travisci', ['test'], function (done) {
