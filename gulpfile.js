@@ -3,6 +3,8 @@
 var gulp = require('gulp');
 var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
+var cover = require('gulp-coverage');
+var coveralls = require('gulp-coveralls');
 var jasmine = require('gulp-jasmine');
 var eslint = require('gulp-eslint');
 var uglify = require('gulp-uglify');
@@ -34,9 +36,15 @@ gulp.task('lint', function() {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('test', function (done) {
-	return gulp.src('test/end*.js').pipe(jasmine());
+gulp.task('test', function () {
+	return gulp.src('test/*.js').pipe(jasmine());
 });
 
-gulp.task('test-travisci', ['test'], function (done) {
+gulp.task('test-travisci', function () {
+	return gulp.src('test/*.js')
+      .pipe(cover.instrument({ pattern: ['lib/**/*.js'] }))
+      .pipe(jasmine()) 
+      .pipe(cover.gather())
+      .pipe(cover.format({ reporter: 'lcov' }))
+      .pipe(coveralls());
 });
