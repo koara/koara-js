@@ -1,7 +1,5 @@
 "use strict";
 
-var ListItem = require("../lib/koara/ast/ListItem");
-
 function Html5Renderer() {
 	this.out = "";
 }
@@ -94,12 +92,13 @@ Html5Renderer.prototype = {
 	},
 
 	visitParagraph: function(node) {
-		if (node.isNested() && (node.parent instanceof ListItem) && node.isSingleChild()) {
+		if (node.isNested() && (node.parent.constructor.name === "ListItem") && node.isSingleChild()) {
 			node.childrenAccept(this);
 		} else {
 			this.out += this.indent() + "<p>";
 			node.childrenAccept(this);
 			this.out += "</p>\n";
+			
 			if (!node.isNested()) {
 				this.out += "\n";
 			}
@@ -191,4 +190,5 @@ Html5Renderer.prototype = {
 };
 
 module.exports = Html5Renderer;
+
 
