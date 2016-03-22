@@ -16,7 +16,7 @@ var sourcemaps = require('gulp-sourcemaps');
 gulp.task('default', ['lint', 'bundle', 'test']);
 
 gulp.task('bundle', function() {
-	var b = browserify({ entries: './index.js', debug: true, transform: [reactify] });
+	var b = browserify({ entries: './index.js', standalone: 'koara', debug: true, transform: [reactify] });
 	return b.bundle()
 	    .pipe(source('index.js'))
 	    .pipe(rename('koara.js'))
@@ -42,9 +42,9 @@ gulp.task('test', function () {
 
 gulp.task('test-travisci', function () {
 	return gulp.src('test/*.js')
-      .pipe(cover.instrument({ pattern: ['lib/koara/**/*.js'] }))
-      .pipe(jasmine()) 
-      .pipe(cover.gather())
-      .pipe(cover.format({ reporter: 'lcov' }))
-      .pipe(coveralls());
+      //.pipe(cover.instrument({ pattern: ['lib/koara/**/*.js'] }))
+      .pipe(jasmine());
+      //.pipe(cover.gather())
+      //.pipe(cover.format({ reporter: 'lcov' }))
+      //.pipe(coveralls());
 });
