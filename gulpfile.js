@@ -12,6 +12,7 @@ var reactify = require('reactify');
 var rename = require('gulp-rename');
 var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
+var webserver = require('gulp-webserver');
 
 gulp.task('default', ['lint', 'bundle', 'test']);
 
@@ -34,6 +35,10 @@ gulp.task('lint', function() {
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
+});
+
+gulp.task('serve', ['bundle'], function() {
+	gulp.src('.').pipe(webserver());
 });
 
 gulp.task('test', function () {
