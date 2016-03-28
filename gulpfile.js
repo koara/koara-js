@@ -46,10 +46,5 @@ gulp.task('test', function () {
 });
 
 gulp.task('test-travisci', function () {
-	return gulp.src('test/*.js')
-      //.pipe(cover.instrument({ pattern: ['lib/koara/**/*.js'] }))
-      .pipe(jasmine());
-      //.pipe(cover.gather())
-      //.pipe(cover.format({ reporter: 'lcov' }))
-      //.pipe(coveralls());
+	return gulp.src('test/*.js').pipe(jasmine());
 });
