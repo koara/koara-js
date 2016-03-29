@@ -51,5 +51,5 @@ gulp.task('test-travisci', function () {
     .pipe(jasmine())
     .pipe(cover.gather())
     .pipe(cover.format({ reporter: 'lcov' }))
-    //.pipe(coveralls());
+    .pipe(coveralls());
 });
