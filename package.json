@@ -1,7 +1,7 @@
 {
   "name": "koara",
   "description": "Koara parser written in Javascript",
-  "version": "0.6.2",
+  "version": "0.9.3",
   "keywords": [
     "koara",
     "markup",
@@ -22,6 +22,11 @@
   "engines": {
     "node": ">= 0.10.0"
   },
+  "files": [
+    "LICENSE",
+    "index.js",
+    "lib"
+  ],
   "dependencies": {},
   "devDependencies": {
     "browserify": "^13.0.0",
