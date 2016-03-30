@@ -24,11 +24,11 @@ describe("Koara Compliancy Tests", function() {
 		it(test.name + ' to HTML', function () {
 			var kd = fs.readFileSync(testSuiteFolder + '/input/' + test.module + '/' + test.name + ".kd");
 			var html = fs.readFileSync(testSuiteFolder + '/output/html5/' + test.module + '/' + test.name + ".htm");
-            //var parser = new koara.Parser();
-            //var document = parser.parse(kd);                    
-            //var renderer = new Html5Renderer();
-            //document.accept(renderer);
-            //expect(renderer.getOutput()).toEqual(html.toString());
+            var parser = new koara.Parser();
+            var document = parser.parse(kd);                    
+            var renderer = new Html5Renderer();
+            document.accept(renderer);
+            expect(renderer.getOutput()).toEqual(html.toString());
         });
 	});
 });
