@@ -30,6 +30,15 @@ gulp.task('bundle', function() {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('coverage', function () {
+  return gulp.src('test/*.js')
+    .pipe(cover.instrument({pattern: ['lib/*']}))
+    .pipe(jasmine())
+    .pipe(cover.gather())
+    .pipe(cover.format({ reporter: 'lcov' }))
+    .pipe(coveralls());
+});
+
 gulp.task('lint', function() {
   return gulp.src(['lib/**/*.js'])
     .pipe(eslint())
@@ -45,11 +54,4 @@ gulp.task('test', function () {
   return gulp.src('test/*.js').pipe(jasmine());
 });
 
-gulp.task('test-travisci', function () {
-  return gulp.src('test/*.js')
-    .pipe(cover.instrument({pattern: ['lib/*']}))
-    .pipe(jasmine())
-    .pipe(cover.gather())
-    .pipe(cover.format({ reporter: 'lcov' }))
-    .pipe(coveralls());
-});
+
