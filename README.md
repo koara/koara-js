@@ -33,7 +33,7 @@ var result1 = parser.parse("Hello World!"); // parse a string
 ## Configuration
 You can configure the Parser:
 
--  **parser.setModules(modules)**  
+-  **parser.modules**  
    Default:	`["paragraphs", "headings", "lists", "links", "images", "formatting", "blockquotes", "code"]`
    
    Specify which parts of the syntax are allowed to be parsed. The rest will render as plain text.
