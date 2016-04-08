@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/travis/koara/koara-js.svg)](https://travis-ci.org/koara/koara-js)
 [![Coverage Status](https://img.shields.io/coveralls/koara/koara-js.svg)](https://coveralls.io/github/koara/koara-js?branch=master)
-[![Latest Version](https://img.shields.io/maven-central/v/io.koara/koara.svg?label=Maven Central)](http://search.maven.org/#search%7Cga%7C1%7Ckoara)
+[![Latest Version](https://img.shields.io/npm/v/koara.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koara/koara-js/blob/master/LICENSE)
 
 # Koara-js
@@ -27,7 +27,7 @@ If you are interested in converting koara to a specific outputFormat, please loo
 ```js
 var koara = require('koara');
 var parser = new koara.Parser();
-var document1 = parser.parse("Hello World!"); // parse a string
+var result1 = parser.parse("Hello World!"); // parse a string
 ```
 
 ## Configuration
