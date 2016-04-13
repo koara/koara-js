@@ -10,7 +10,7 @@
 If you are interested in converting koara to a specific outputFormat, please look the [Related Projects](#related-projects) section.
 
 ## Getting started
-- Download [ZIP file]()
+- Download [ZIP file](https://github.com/koara/koara-js/archive/0.6.2.zip)
 - Npm
 
   ```bash
@@ -24,11 +24,28 @@ If you are interested in converting koara to a specific outputFormat, please loo
   ```
 
 ## Usage
-```js
-var koara = require('koara');
-var parser = new koara.Parser();
-var result1 = parser.parse("Hello World!"); // parse a string
-```
+- Node
+
+  ```js
+  var koara = require('koara');
+  var parser = new koara.Parser();
+  var result1 = parser.parse("Hello World!"); // parse a string
+  ```
+
+- Browser
+
+  ```js
+  <!doctype html>
+  <html>
+    <body>
+      <script type="text/javascript" src="koara.min.js"></script>
+      <script type="text/javascript">
+        var parser = new koara.Parser();
+        var result1 = parser.parse("Hello World!"); // parse a string
+      </script>
+    </body>
+  </html>
+  ```
 
 ## Configuration
 You can configure the Parser:
