@@ -20,15 +20,27 @@ for(i in modules) {
 }
 
 describe("Koara Compliancy Tests", function() {
+//	tests.forEach(function (test) {
+//		it(test.name + ' to HTML', function () {
+//			var kd = fs.readFileSync(testSuiteFolder + '/input/' + test.module + '/' + test.name + ".kd");
+//			var html = fs.readFileSync(testSuiteFolder + '/output/html5/' + test.module + '/' + test.name + ".htm");
+//            var parser = new koara.Parser();
+//            var document = parser.parse(kd);                    
+//            var renderer = new Html5Renderer();
+//            document.accept(renderer);
+//            expect(renderer.getOutput()).toEqual(html.toString());
+//        });
+//	});
+//	
 	tests.forEach(function (test) {
-		it(test.name + ' to HTML', function () {
+		it(test.name + ' to Koara', function () {
 			var kd = fs.readFileSync(testSuiteFolder + '/input/' + test.module + '/' + test.name + ".kd");
-			var html = fs.readFileSync(testSuiteFolder + '/output/html5/' + test.module + '/' + test.name + ".htm");
+			var expected = fs.readFileSync(testSuiteFolder + '/output/koara/' + test.module + '/' + test.name + ".kd");
             var parser = new koara.Parser();
             var document = parser.parse(kd);                    
-            var renderer = new Html5Renderer();
+            var renderer = new koara.KoaraRenderer();
             document.accept(renderer);
-            expect(renderer.getOutput()).toEqual(html.toString());
+            expect(renderer.getOutput()).toEqual(expected.toString());
         });
 	});
 });
