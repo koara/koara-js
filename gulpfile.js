@@ -51,7 +51,7 @@ gulp.task('serve', ['bundle'], function() {
 });
 
 gulp.task('test', function () {
-  return gulp.src('test/com*.js').pipe(jasmine());
+  return gulp.src('test/*.js').pipe(jasmine());
 });
 
 
