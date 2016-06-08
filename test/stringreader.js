@@ -1,6 +1,6 @@
 var koara = require('../lib/koara');
 
-describe("A suite", function() {
+describe("Stringreader", function() {
 
     var buffer;
 
