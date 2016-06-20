@@ -10,7 +10,7 @@
 If you are interested in converting koara to a specific outputFormat, please look the [Related Projects](#related-projects) section.
 
 ## Getting started
-- Download [ZIP file](https://github.com/koara/koara-js/archive/0.11.0.zip)
+- Download [ZIP file](https://github.com/koara/koara-js/archive/0.12.0.zip)
 - Npm
 
   ```bash
