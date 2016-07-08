@@ -13,7 +13,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/koara/koara-js-html"
+    "url": "https://github.com/koara/koara-js"
   },
   "main": "./index",
   "scripts": {
