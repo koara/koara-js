@@ -11,6 +11,7 @@ Html5Renderer.prototype = {
 		this.out = "";
 		this.level = 0;
 		this.listSequence = [];
+		this.hardWrap = false;
 		node.childrenAccept(this);
 	},
 
@@ -152,7 +153,10 @@ Html5Renderer.prototype = {
 	},
 
 	visitLineBreak: function(node) {
-		this.out += "<br>\n" + this.indent();
+		if(this.hardWrap || node.explicit) {
+			this.out += "<br>";
+		}
+		this.out += "\n" + this.indent();
 		node.childrenAccept(this);
 	},
 
