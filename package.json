@@ -1,7 +1,7 @@
 {
   "name": "koara",
   "description": "Koara parser written in Javascript",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "keywords": [
     "koara",
     "markup",
