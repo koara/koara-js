@@ -25,7 +25,7 @@ gulp.task('bundle', function() {
     .pipe(gulp.dest('dist'))
     .pipe(rename('koara.min.js'))
     .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(uglify())
+    .pipe(uglify({mange: { except: ['ListItem'] }}))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('dist'));
 });
@@ -51,7 +51,7 @@ gulp.task('serve', ['bundle'], function() {
 });
 
 gulp.task('test', function () {
-  return gulp.src('test/compli*.js').pipe(jasmine());
+  return gulp.src('test/*.js').pipe(jasmine());
 });
 
 
