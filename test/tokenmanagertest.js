@@ -161,5 +161,18 @@ describe("Tokenmanager", function () {
         expect(tm.UNDERSCORE).toEqual(token.kind);
         expect('_').toEqual(token.image);
     });
+    
+    it("Test Linebreak", function () {
+        var tm = new koara.TokenManager(new koara.CharStream(new koara.StringReader('a\nb')));
+        var token = tm.getNextToken();
+        expect(tm.CHAR_SEQUENCE).toEqual(token.kind);
+        expect('a').toEqual(token.image);
+        token = tm.getNextToken();
+        expect(tm.EOL).toEqual(token.kind);
+        expect('\n').toEqual(token.image);
+        token = tm.getNextToken();
+        expect(tm.CHAR_SEQUENCE).toEqual(token.kind);
+        expect('b').toEqual(token.image);
+    });
 
 });
