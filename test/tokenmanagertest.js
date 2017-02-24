@@ -78,6 +78,14 @@ describe("Tokenmanager", function () {
         expect("\n").toEqual(token.image);
     });
 
+    it("Test Eol With Spaces", function () {
+        var tm = new koara.TokenManager(new koara.CharStream(new koara.StringReader("  \n")));
+        var token = tm.getNextToken();
+        expect(tm.EOL).toEqual(token.kind);
+        expect("  \n").toEqual(token.image);
+    });
+
+    
     it("Test Eq", function () {
         var tm = new koara.TokenManager(new koara.CharStream(new koara.StringReader('=')));
         var token = tm.getNextToken();
