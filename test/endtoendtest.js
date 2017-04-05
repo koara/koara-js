@@ -5,6 +5,7 @@ var Html5Renderer = require('./html5renderer');
 describe("Koara End2End Tests", function() {
 	
 	var parser;
+    var kd = fs.readFileSync("testsuite/input/end2end.kd");
 
 	beforeEach(function() {
 		parser = new koara.Parser();;
@@ -1031,7 +1032,7 @@ describe("Koara End2End Tests", function() {
 	});
 
 	function assertOutput(file, modules) {
-		var kd = fs.readFileSync("testsuite/input/end2end.kd");
+
 		var html = fs.readFileSync("testsuite/output/html5/end2end/" + file + ".htm");
 		
 		parser.modules = modules;
