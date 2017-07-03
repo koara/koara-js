@@ -1,7 +1,7 @@
 {
   "name": "koara",
   "description": "Koara parser written in Javascript",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "keywords": [
     "koara",
     "markup",
@@ -9,7 +9,7 @@
     "xml"
   ],
   "author": "Andy Van Den Heuvel <andy.vandenheuvel@gmail.com>",
-  "homepage": "http://www.koara.io",
+  "homepage": "http://www.codeaddslife.com/koara",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
