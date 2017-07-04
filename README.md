@@ -14,7 +14,7 @@ If you are interested in converting koara to a specific outputFormat, please loo
 - Npm
 
   ```bash
-  npm install koara --save-dev
+  npm install @koara/koara --save-dev
   ```
   
 - Bower
@@ -27,7 +27,7 @@ If you are interested in converting koara to a specific outputFormat, please loo
 - Node
 
   ```js
-  var koara = require('koara');
+  var koara = require('@koara/koara');
   var parser = new koara.Parser();
   var result1 = parser.parse("Hello World!"); // parse a string
   ```
